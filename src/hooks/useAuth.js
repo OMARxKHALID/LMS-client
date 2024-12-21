@@ -64,6 +64,10 @@ export function useAuth() {
     try {
       const response = await fetch(`${BASE_URL}/logout`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth_token}`,
+        },
       });
 
       if (!response.ok) {
@@ -152,6 +156,10 @@ export function useAuth() {
     try {
       const response = await fetch(`${BASE_URL}/users`, {
         method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth_token}`,
+        },
         credentials: "include",
       });
 

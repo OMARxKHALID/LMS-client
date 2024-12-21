@@ -339,7 +339,7 @@ export default function Dashboard() {
                   Upload books to offer for borrowing
                 </p>
                 <Button className="mt-4" asChild>
-                  <Link to="/books/upload">Upload Books</Link>
+                  <Link to="/admin/create-book">Upload New Book</Link>
                 </Button>
               </div>
             ) : (
