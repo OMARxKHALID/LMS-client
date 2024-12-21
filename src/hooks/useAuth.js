@@ -1,8 +1,12 @@
 import { clearUser, setUser, updateUser } from "@/redux/slice/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 export function useAuth() {
   const BASE_URL = "https://lms-server-kkry.onrender.com/api/auth";
+  const { user } = useSelector((state) => state.auth);
+  console.log("🚀 ~ useAuth ~ user:", user);
+  const { token } = user;
+  console.log("🚀 ~ useAuth ~ token:", token);
   const dispatch = useDispatch();
 
   const signIn = async ({ email, password }) => {
@@ -127,6 +131,7 @@ export function useAuth() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         credentials: "include",
         body: JSON.stringify(profileData),
