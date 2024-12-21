@@ -24,7 +24,6 @@ export function useAuth() {
       }
 
       const user = await response.json();
-      console.log("🚀 ~ signIn ~ user:", user);
       dispatch(setUser(user));
       return user;
     } catch (error) {

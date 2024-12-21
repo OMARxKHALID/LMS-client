@@ -326,7 +326,8 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {currentUploadedBooks.length === 0 ? (
+            {borrows.filter((borrow) => borrow.borrowed_by === user._id)
+              .length === 0 ? (
               <div className="text-center py-6">
                 <Library className="h-12 w-12 mx-auto text-muted-foreground" />
                 <h3 className="mt-2 text-lg font-semibold">

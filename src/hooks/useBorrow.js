@@ -57,7 +57,6 @@ export function useBorrow() {
       }
 
       const updatedBorrow = await response.json();
-      console.log("🚀 ~ returnBook ~ updatedBorrow:", updatedBorrow);
       dispatch(updateReturnDate(updatedBorrow.borrow));
       return updatedBorrow;
     } catch (error) {
