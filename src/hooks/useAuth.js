@@ -4,9 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 export function useAuth() {
   const BASE_URL = "https://lms-server-kkry.onrender.com/api/auth";
   const { user } = useSelector((state) => state.auth);
-  console.log("🚀 ~ useAuth ~ user:", user);
-  const { token } = user;
-  console.log("🚀 ~ useAuth ~ token:", token);
+  const auth_token = user?.token;
   const dispatch = useDispatch();
 
   const signIn = async ({ email, password }) => {
@@ -131,7 +129,7 @@ export function useAuth() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${auth_token}`,
         },
         credentials: "include",
         body: JSON.stringify(profileData),
@@ -143,7 +141,6 @@ export function useAuth() {
       }
 
       const updatedUser = await response.json();
-      console.log("🚀 ~ updateProfile ~ updatedUser:", updatedUser);
       dispatch(updateUser(updatedUser));
       return updatedUser;
     } catch (error) {
