@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "@/utils/ProtectedRoute";
 import AuthRoute from "@/utils/AuthRoute";
 import AdminLayout from "@/admin/components/AdminLayout";
-import { publicRoutes, authRoutes, adminRoutes } from "@/Pages/Routes";
+import { publicRoutes, authRoutes, adminRoutes } from "@/pages/Routes";
 import Layout from "./Layout";
 
 function App() {
