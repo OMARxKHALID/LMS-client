@@ -139,7 +139,7 @@ export default function ManageBooks() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {books.length === 0 ? (
+            {getCurrentBooks().length === 0 ? (
               <TableRow>
                 <TableCell colSpan="5" className="text-center">
                   No books available.
