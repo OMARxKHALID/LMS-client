@@ -40,6 +40,7 @@ import {
   PaginationPrevious,
   PaginationNext,
 } from "@/components/ui/pagination";
+
 export default function ManageBooks() {
   const { toast } = useToast();
   const { deleteBook, getBooks } = useBook();
@@ -49,15 +50,24 @@ export default function ManageBooks() {
   const [isPending, startTransition] = useTransition();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
   const totalPages = Math.max(
     1,
-    Math.ceil((books?.length || 0) / itemsPerPage)
+    Math.ceil(
+      books.filter((book) => book.uploaded_by === user._id).length /
+        itemsPerPage
+    )
   );
 
   const getCurrentBooks = () => {
+    if (!books || books.length === 0) return [];
+
+    // Filter books uploaded by the logged-in user
+    const filteredBooks = books.filter((book) => book.uploaded_by === user._id);
+
+    // Paginate the filtered books
     const indexOfLastBook = currentPage * itemsPerPage;
     const indexOfFirstBook = indexOfLastBook - itemsPerPage;
-    const filteredBooks = books.filter((book) => book.uploaded_by === user._id);
     return filteredBooks.slice(indexOfFirstBook, indexOfLastBook);
   };
 
@@ -139,7 +149,8 @@ export default function ManageBooks() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {getCurrentBooks().length === 0 ? (
+            {books.filter((book) => book.uploaded_by === user._id).length ===
+            0 ? (
               <TableRow>
                 <TableCell colSpan="5" className="text-center">
                   No books available.
