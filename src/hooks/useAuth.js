@@ -11,51 +11,41 @@ export function useAuth() {
     try {
       const response = await fetch(`${BASE_URL}/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Error during Sign In");
+        throw new Error(errorData.message || "Sign-in failed");
       }
 
-      const user = await response.json();
-      dispatch(setUser(user));
-      return user;
+      const userData = await response.json();
+      dispatch(setUser(userData));
+      return userData;
     } catch (error) {
-      console.error("Error during Sign In:", error.message);
+      console.error("Sign-in error:", error.message);
       throw error;
     }
   };
 
-  const signUp = async ({ email, password, username, full_name, userType }) => {
+  const signUp = async (userDetails) => {
     try {
       const response = await fetch(`${BASE_URL}/register`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          username,
-          full_name,
-          userType,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userDetails),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Error during sign up");
+        throw new Error(errorData.message || "Sign-up failed");
       }
 
       return response.json();
     } catch (error) {
-      console.error("Error during sign up:", error.message);
+      console.error("Sign-up error:", error.message);
       throw error;
     }
   };
@@ -68,16 +58,17 @@ export function useAuth() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${auth_token}`,
         },
+        credentials: "include",
       });
 
       if (!response.ok) {
-        throw new Error("Error signing out");
+        throw new Error("Sign-out failed");
       }
 
-      dispatch(clearUser(null));
+      dispatch(clearUser());
       return null;
     } catch (error) {
-      console.error("Error during sign out:", error);
+      console.error("Sign-out error:", error.message);
       throw error;
     }
   };
@@ -86,20 +77,18 @@ export function useAuth() {
     try {
       const response = await fetch(`${BASE_URL}/request-password-reset`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Error requesting password reset");
+        throw new Error(errorData.message || "Password reset request failed");
       }
 
       return response.json();
     } catch (error) {
-      console.error("Error during password reset request:", error);
+      console.error("Password reset request error:", error.message);
       throw error;
     }
   };
@@ -108,20 +97,18 @@ export function useAuth() {
     try {
       const response = await fetch(`${BASE_URL}/reset-password/${token}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: newPassword }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Error resetting password");
+        throw new Error(errorData.message || "Password reset failed");
       }
 
       return response.json();
     } catch (error) {
-      console.error("Error during password reset:", error);
+      console.error("Password reset error:", error.message);
       throw error;
     }
   };
@@ -140,14 +127,14 @@ export function useAuth() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Error updating profile");
+        throw new Error(errorData.message || "Profile update failed");
       }
 
       const updatedUser = await response.json();
       dispatch(updateUser(updatedUser));
       return updatedUser;
     } catch (error) {
-      console.error("Error updating profile:", error.message);
+      console.error("Profile update error:", error.message);
       throw error;
     }
   };
@@ -165,12 +152,12 @@ export function useAuth() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Error fetching users");
+        throw new Error(errorData.message || "Fetching users failed");
       }
 
       return response.json();
     } catch (error) {
-      console.error("Error fetching users:", error.message);
+      console.error("Fetch users error:", error.message);
       throw error;
     }
   };
