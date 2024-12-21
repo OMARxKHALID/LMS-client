@@ -7,7 +7,7 @@ import {
 } from "@/redux/slice/categorySlice";
 
 export function useCategory() {
-  const BASE_URL = "http://localhost:5000/api/categories";
+  const BASE_URL = "https://lms-server-kkry.onrender.com/api/categories";
   const dispatch = useDispatch();
 
   const getCategories = async () => {
@@ -58,7 +58,9 @@ export function useCategory() {
       }
 
       const updatedCategory = await response.json();
-      dispatch(updateCategoryAction({ id: categoryId, category: updatedCategory }));
+      dispatch(
+        updateCategoryAction({ id: categoryId, category: updatedCategory })
+      );
       return updatedCategory;
     } catch (error) {
       console.error("Error updating category:", error);

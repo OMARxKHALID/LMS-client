@@ -7,7 +7,7 @@ import {
 } from "@/redux/slice/borrowSlice";
 
 export function useBorrow() {
-  const BASE_URL = "http://localhost:5000/api/borrow";
+  const BASE_URL = "https://lms-server-kkry.onrender.com/api/borrow";
   const dispatch = useDispatch();
 
   const getBorrowRecords = async () => {
@@ -57,7 +57,7 @@ export function useBorrow() {
       }
 
       const updatedBorrow = await response.json();
-      console.log("🚀 ~ returnBook ~ updatedBorrow:", updatedBorrow)
+      console.log("🚀 ~ returnBook ~ updatedBorrow:", updatedBorrow);
       dispatch(updateReturnDate(updatedBorrow.borrow));
       return updatedBorrow;
     } catch (error) {
