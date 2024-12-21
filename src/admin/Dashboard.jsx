@@ -49,6 +49,8 @@ export default function Dashboard() {
   const { toast } = useToast();
   const { borrows, loading } = useSelector((state) => state.borrow);
   const { user } = useSelector((state) => state.auth);
+  const { books } = useSelector((state) => state.books);
+
   const { userType } = user;
 
   const [showOverdueNotice, setShowOverdueNotice] = useState(true);
@@ -326,8 +328,8 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {borrows.filter((borrow) => borrow.borrowed_by === user._id)
-              .length === 0 ? (
+            {books.filter((book) => book.uploaded_by === user._id).length ===
+            0 ? (
               <div className="text-center py-6">
                 <Library className="h-12 w-12 mx-auto text-muted-foreground" />
                 <h3 className="mt-2 text-lg font-semibold">
