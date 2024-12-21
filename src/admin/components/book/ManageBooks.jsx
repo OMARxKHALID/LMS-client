@@ -44,6 +44,8 @@ export default function ManageBooks() {
   const { toast } = useToast();
   const { deleteBook, getBooks } = useBook();
   const { books, isLoading } = useSelector((state) => state.books);
+  const { user } = useSelector((state) => state.auth);
+
   const [isPending, startTransition] = useTransition();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -55,7 +57,8 @@ export default function ManageBooks() {
   const getCurrentBooks = () => {
     const indexOfLastBook = currentPage * itemsPerPage;
     const indexOfFirstBook = indexOfLastBook - itemsPerPage;
-    return books.slice(indexOfFirstBook, indexOfLastBook);
+    const filteredBooks = books.filter((book) => book.uploaded_by === user._id);
+    return filteredBooks.slice(indexOfFirstBook, indexOfLastBook);
   };
 
   const handlePageChange = (pageNumber) => {
