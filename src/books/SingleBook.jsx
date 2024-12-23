@@ -45,6 +45,7 @@ export default function SingleBook() {
   const dispatch = useDispatch();
   const bookId = params.id;
   const { books, isLoading } = useSelector((state) => state.books);
+  console.log("🚀 ~ SingleBook ~ books:", books);
   const { user } = useSelector((state) => state.auth);
   const { borrows } = useSelector((state) => state.borrow);
 
@@ -246,7 +247,7 @@ export default function SingleBook() {
               <Badge>{`${book.available_copies} Available`}</Badge>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-col md:flex-row">
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -275,7 +276,7 @@ export default function SingleBook() {
               </Popover>
 
               <Button
-                className="w-full"
+                className="w-full md:w-auto"
                 onClick={handleBorrow}
                 disabled={
                   book.available_copies === 0 ||
