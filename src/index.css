@@ -100,28 +100,6 @@
   }
 }
 
-@layer components {
-  .book-grid {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
-  }
-
-  .card-hover {
-    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
-  }
-
-  .nav-link {
-    @apply text-sm font-medium transition-colors hover:text-primary;
-  }
-
-  .page-header {
-    @apply text-3xl font-bold tracking-tight mb-8;
-  }
-
-  .section-title {
-    @apply text-xl font-semibold tracking-tight mb-4;
-  }
-}
-
 ::-webkit-scrollbar {
   width: 2px;
 }

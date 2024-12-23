@@ -2,7 +2,7 @@ import { clearUser, setUser, updateUser } from "@/redux/slice/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 export function useAuth() {
-  const BASE_URL = "https://lms-server-kkry.onrender.com/api/auth";
+  const BASE_URL = "http://localhost:5000/api/auth";
   const { user } = useSelector((state) => state.auth);
   const auth_token = user?.token;
   const dispatch = useDispatch();

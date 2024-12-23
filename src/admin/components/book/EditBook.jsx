@@ -66,6 +66,7 @@ const bookSchema = z.object({
   book_data: z.array(z.any()).optional(),
   price: z.coerce.number().optional(),
   borrowed_fine: z.coerce.number().optional(),
+  borrow_price: z.coerce.number().optional(),
 });
 
 export default function EditBook() {
@@ -102,6 +103,7 @@ export default function EditBook() {
       location: "",
       price: 0,
       borrowed_fine: 0,
+      borrow_price: 0,
     },
   });
 
@@ -121,6 +123,7 @@ export default function EditBook() {
         location: book.location,
         price: book.price || 0,
         borrowed_fine: book.borrowed_fine || 0,
+        borrow_price: book.borrow_price || 0,
       });
 
       if (book.pdf_files && book.pdf_files.length > 0) {
@@ -141,6 +144,24 @@ export default function EditBook() {
       }
     }
   }, [book, form]);
+
+  const { watch, setValue } = form;
+
+  const price = watch("price");
+  const borrowPrice = watch("borrow_price");
+
+  const handlePriceChange = (value) => {
+    const priceValue = parseFloat(value) || 0; // Parse the new price value
+    setValue("price", priceValue); // Update the price field
+
+    // Calculate the borrow price based on 10% of the price
+    const calculatedBorrowPrice = parseFloat((priceValue * 0.1).toFixed(2));
+
+    // Only update borrow_price if it's unset or matches the previous calculated value
+    if (!borrowPrice || borrowPrice === parseFloat((price * 0.1).toFixed(2))) {
+      setValue("borrow_price", calculatedBorrowPrice);
+    }
+  };
 
   const onSubmit = async (data) => {
     startTransition(async () => {
@@ -441,6 +462,26 @@ export default function EditBook() {
                       type="number"
                       min="0"
                       placeholder="Enter book price"
+                      {...field}
+                      onChange={(e) => handlePriceChange(e.target.value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="borrow_price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Borrow Price</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="Enter borrow price"
                       {...field}
                     />
                   </FormControl>

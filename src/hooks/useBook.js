@@ -8,7 +8,7 @@ import {
 } from "@/redux/slice/bookSlice";
 
 export function useBook() {
-  const BASE_URL = "https://lms-server-kkry.onrender.com/api/books";
+  const BASE_URL = "http://localhost:5000/api/books";
   const dispatch = useDispatch();
 
   const getBooks = async () => {

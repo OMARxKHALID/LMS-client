@@ -21,6 +21,8 @@ import {
   Loader2,
   BookOpen,
   AlertTriangle,
+  DollarSign,
+  AlertCircle,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
@@ -45,7 +47,6 @@ export default function SingleBook() {
   const dispatch = useDispatch();
   const bookId = params.id;
   const { books, isLoading } = useSelector((state) => state.books);
-  console.log("🚀 ~ SingleBook ~ books:", books);
   const { user } = useSelector((state) => state.auth);
   const { borrows } = useSelector((state) => state.borrow);
 
@@ -59,8 +60,8 @@ export default function SingleBook() {
 
   const hasAlreadyBorrowed = borrows.some(
     (borrow) =>
-      borrow.borrowed_book === bookId &&
-      borrow.borrowed_by === user?._id &&
+      borrow.borrowed_book._id === bookId &&
+      borrow.borrowed_by._id === user?._id &&
       borrow.status === "borrowed"
   );
 
@@ -123,7 +124,11 @@ export default function SingleBook() {
     setIsBorrowing(true);
     try {
       // Call the backend to borrow the book
-      await borrowBook({ borrowed_book, expected_return_date, borrowed_by });
+      const response = await borrowBook({
+        borrowed_book,
+        expected_return_date,
+        borrowed_by,
+      });
 
       // Update available copies on the frontend
       const updatedBook = {
@@ -135,7 +140,9 @@ export default function SingleBook() {
 
       toast({
         title: "Book borrowed successfully",
-        description: `${title} has been successfully borrowed!`,
+        description: `${title} has been successfully borrowed! Total price paid: $${response.total_borrow_price.toFixed(
+          2
+        )}`,
       });
     } catch (error) {
       console.error("Error borrowing book:", error);
@@ -178,7 +185,7 @@ export default function SingleBook() {
         {/* Book Cover */}
         <Card className="lg:col-span-1">
           <CardContent className="p-6">
-            <div className="relative aspect-[2/3] w-full rounded-lg overflow-hidden mb-6">
+            <div className="relative aspect-[2/3] w-full rounded-lg overflow-hidden">
               <img
                 src={book.cover_image_url || "/images/placeholder.jpg"}
                 alt={book.title}
@@ -217,6 +224,13 @@ export default function SingleBook() {
                       format(new Date(book.publication_date), "MMMM d, yyyy")}
                   </span>
                 </div>
+                <div className="flex items-center space-x-2">
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">Price:</span>
+                  <span>
+                    {book.price ? `$${book.price.toFixed(2)}` : "N/A"}
+                  </span>
+                </div>
               </div>
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
@@ -231,8 +245,19 @@ export default function SingleBook() {
                 </div>
                 <div className="flex items-center space-x-2">
                   <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Loan Period:</span>
+                  <span className="text-muted-foreground">Borrow Period:</span>
                   <span>User-defined</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <AlertCircle className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">
+                    Late Return Fine:
+                  </span>
+                  <span>
+                    {book.borrowed_fine
+                      ? `$${book.borrowed_fine.toFixed(2)}/day`
+                      : "N/A"}
+                  </span>
                 </div>
               </div>
             </div>

@@ -7,7 +7,7 @@ import {
 } from "@/redux/slice/borrowSlice";
 
 export function useBorrow() {
-  const BASE_URL = "https://lms-server-kkry.onrender.com/api/borrow";
+  const BASE_URL = "http://localhost:5000/api/borrow";
   const dispatch = useDispatch();
 
   const getBorrowRecords = async () => {
