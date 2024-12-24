@@ -98,7 +98,7 @@ export default function SingleBook() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.response?.data?.message || "Error borrowing book.",
+        description: error?.message || "Error borrowing book.",
       });
     } finally {
       setIsBorrowing(false);
@@ -267,7 +267,7 @@ export default function SingleBook() {
                 ) : (
                   <>
                     <BookOpen className="mr-2 h-4 w-4" />
-                    Borrow Book
+                    {hasAlreadyBorrowed ? "Already Borrowed" : "Borrow Now"}
                   </>
                 )}
               </Button>
