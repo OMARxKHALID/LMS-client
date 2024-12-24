@@ -39,7 +39,7 @@ import { updateBook } from "@/redux/slice/bookSlice";
 
 export default function SingleBook() {
   const [isBorrowing, setIsBorrowing] = useState(false);
-  const [selectedDueDate, setSelectedDueDate] = useState();
+  const [selectedDueDate, setSelectedDueDate] = useState(null);
 
   const params = useParams();
   const { toast } = useToast();
@@ -47,16 +47,14 @@ export default function SingleBook() {
   const dispatch = useDispatch();
   const bookId = params.id;
   const { books, isLoading } = useSelector((state) => state.books);
+  console.log("🚀 ~ SingleBook ~ books:", books);
   const { user } = useSelector((state) => state.auth);
   const { borrows } = useSelector((state) => state.borrow);
+  console.log("🚀 ~ SingleBook ~ borrows:", borrows);
 
   const { borrowBook } = useBorrow();
 
   const book = books.find((book) => book._id === bookId);
-
-  const calculateDueDate = () => {
-    return selectedDueDate ? selectedDueDate.toISOString() : null;
-  };
 
   const hasAlreadyBorrowed = borrows.some(
     (borrow) =>
@@ -64,73 +62,22 @@ export default function SingleBook() {
       borrow.borrowed_by._id === user?._id &&
       borrow.status === "borrowed"
   );
+  console.log("🚀 ~ SingleBook ~ hasAlreadyBorrowed:", hasAlreadyBorrowed);
 
   const handleBorrow = async () => {
-    // Ensure the book exists
-    if (!book) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Book not found.",
-      });
-      return;
-    }
+    if (!book || !user || !selectedDueDate) return;
 
-    // Ensure the user is logged in
-    if (!user || !user?._id) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "User is not logged in. Please log in to borrow a book.",
-      });
-      return;
-    }
-
-    if (hasAlreadyBorrowed) {
-      toast({
-        variant: "destructive",
-        title: "Already Borrowed",
-        description:
-          "You have already borrowed this book. Return it before borrowing again.",
-      });
-      return;
-    }
-
-    // Ensure the book is available
-    if (book.available_copies <= 0) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "This book is not available for borrowing.",
-      });
-      return;
-    }
-
-    // Ensure a due date is selected
-    if (!selectedDueDate) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please select a return date.",
-      });
-      return;
-    }
-
-    const { _id: borrowed_by } = user || {};
-    const { _id: borrowed_book, title } = book;
-
-    const expected_return_date = calculateDueDate();
+    const expectedReturnDate = selectedDueDate.toISOString();
 
     setIsBorrowing(true);
     try {
-      // Call the backend to borrow the book
       const response = await borrowBook({
-        borrowed_book,
-        expected_return_date,
-        borrowed_by,
+        borrowed_book: bookId,
+        expected_return_date: expectedReturnDate,
+        borrowed_by: user._id,
       });
+      console.log("🚀 ~ handleBorrow ~ response:", response);
 
-      // Update available copies on the frontend
       const updatedBook = {
         ...book,
         available_copies: book.available_copies - 1,
@@ -140,7 +87,9 @@ export default function SingleBook() {
 
       toast({
         title: "Book borrowed successfully",
-        description: `${title} has been successfully borrowed! Total price paid: $${response.total_borrow_price.toFixed(
+        description: `${
+          book.title
+        } has been successfully borrowed! Total price: $${response.total_borrow_price.toFixed(
           2
         )}`,
       });
@@ -149,7 +98,7 @@ export default function SingleBook() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Error borrowing book",
+        description: error.response?.data?.message || "Error borrowing book.",
       });
     } finally {
       setIsBorrowing(false);
