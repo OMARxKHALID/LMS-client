@@ -178,7 +178,7 @@ export default function AdminLayout() {
           </SidebarFooter>
         </Sidebar>
 
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-white">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-admin">
           <div className="container mx-auto px-4 py-6 sm:px-6 md:px-8">
             <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-4">
               <div className="w-full sm:w-auto">

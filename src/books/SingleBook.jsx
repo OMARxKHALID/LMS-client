@@ -228,7 +228,7 @@ export default function SingleBook() {
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Price:</span>
                   <span>
-                    {book.price ? `$${book.price.toFixed(2)}` : "N/A"}
+                    {book.price ? `$${book.price.toFixed(2)}/book` : "N/A"}
                   </span>
                 </div>
               </div>
