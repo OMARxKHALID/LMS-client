@@ -17,7 +17,6 @@ export default {
     },
     extend: {
       colors: {
-        admin: "#F1EDE1",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
