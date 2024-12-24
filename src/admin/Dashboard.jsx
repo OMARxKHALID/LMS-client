@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
-import { isPast } from "date-fns";
+import { isPast, format } from "date-fns";
 import {
   RotateCcw,
   BookOpen,
@@ -36,6 +36,12 @@ import {
 import BorrowedBooksTable from "./components/ui/BorrowedBooks";
 import TotalBorrowedBooksTable from "./components/ui/TotalBorrowedBooks";
 import UploadedBooksTable from "./components/ui/UploadedBooks";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+// import { AgGridReact } from "ag-grid-react";
+// import "ag-grid-community/styles/ag-grid.css";
+// import "ag-grid-community/styles/ag-theme-alpine.css";
+// import { ClientSideRowModelModule } from "ag-grid-community";
 
 const calculateProgress = (borrowed, total) => {
   return total > 0 ? (borrowed / total) * 100 : 0;
@@ -94,6 +100,7 @@ export default function Dashboard() {
       setIsReturning(null);
     }
   };
+
   const totalBooks = borrows.length;
   const borrowedBooks = borrows.filter(
     (borrow) => !borrow.return_date && borrow.borrowed_by._id === user._id
@@ -151,6 +158,57 @@ export default function Dashboard() {
 
   const totalBorrowedBooksPages = Math.ceil(borrows.length / ITEMS_PER_PAGE);
 
+  // AG Grid configuration
+  //   const [gridApi, setGridApi] = useState(null);
+  //   const [gridColumnApi, setGridColumnApi] = useState(null);
+
+  //   const onGridReady = (params) => {
+  //     setGridApi(params.api);
+  //     setGridColumnApi(params.columnApi);
+  //     params.api.setRowModelType("clientSide", {
+  //       modules: [ClientSideRowModelModule],
+  //     });
+  //   };
+
+  //   const defaultColDef = useMemo(() => {
+  //     return {
+  //       sortable: true,
+  //       filter: true,
+  //       resizable: true,
+  //     };
+  //   }, []);
+
+  //   const columnDefs = [
+  //     { headerName: "Book Title", field: "book.title", flex: 2 },
+  //     { headerName: "Author", field: "book.author", flex: 1 },
+  //     {
+  //       headerName: "Borrow Date",
+  //       field: "borrow_date",
+  //       flex: 1,
+  //       valueFormatter: (params) => format(new Date(params.value), "dd/MM/yyyy"),
+  //     },
+  //     {
+  //       headerName: "Expected Return",
+  //       field: "expected_return_date",
+  //       flex: 1,
+  //       valueFormatter: (params) => format(new Date(params.value), "dd/MM/yyyy"),
+  //     },
+  //     {
+  //       headerName: "Status",
+  //       field: "return_date",
+  //       flex: 1,
+  //       cellRenderer: (params) => {
+  //         if (params.value) {
+  //           return "Returned";
+  //         } else if (isPast(new Date(params.data.expected_return_date))) {
+  //           return "Overdue";
+  //         } else {
+  //           return "Borrowed";
+  //         }
+  //       },
+  //     },
+  //   ];
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -160,7 +218,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="mx-auto space-y-6">
+    <div className="mx-auto space-y-6 p-4 sm:p-6 lg:p-8">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
         <Button variant="outline" onClick={refresh}>
@@ -193,7 +251,7 @@ export default function Dashboard() {
         <Card className="bg-gradient-to-br from-green-100 to-green-50 dark:from-green-900 dark:to-green-800">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">
-              Borrowed Books
+              Currently Borrowed
             </CardTitle>
             <BookOpen className="h-4 w-4 text-green-600 dark:text-green-400" />
           </CardHeader>
@@ -251,220 +309,268 @@ export default function Dashboard() {
         </Alert>
       )}
 
-      <Card>
+      {/* <Card>
         <CardHeader>
-          <CardTitle>Borrowed Books</CardTitle>
-          <CardDescription>Books that you have borrowed</CardDescription>
+          <CardTitle>Borrowing Analytics</CardTitle>
+          <CardDescription>
+            Detailed view of your borrowing history
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          {currentBorrows.length === 0 ? (
-            <div className="text-center py-6">
-              <BookOpen className="h-12 w-12 mx-auto text-muted-foreground" />
-              <h3 className="mt-2 text-lg font-semibold">No books borrowed</h3>
-              <p className="text-sm text-muted-foreground">
-                Browse and borrow books from the catalog
-              </p>
-              <Button className="mt-4" asChild>
-                <Link to="/books">Browse Books</Link>
-              </Button>
-            </div>
-          ) : (
-            <>
-              <BorrowedBooksTable
-                currentBorrows={currentBorrows}
-                handleReturnBook={handleReturnBook}
-                isReturning={isReturning}
-              />
-              {currentBorrows.length > 4 && (
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious
-                        onClick={() =>
-                          setCurrentBorrowedPage((prev) =>
-                            Math.max(prev - 1, 1)
-                          )
-                        }
-                        disabled={currentBorrowedPage === 1}
-                        className={`cursor-pointer `}
-                      />
-                    </PaginationItem>
-                    {[...Array(totalBorrowedPages)].map((_, i) => (
-                      <PaginationItem key={i}>
-                        <PaginationLink
-                          onClick={() => setCurrentBorrowedPage(i + 1)}
-                          isActive={currentBorrowedPage === i + 1}
-                          className={`cursor-pointer `}
-                        >
-                          {i + 1}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
-                    <PaginationItem>
-                      <PaginationNext
-                        onClick={() =>
-                          setCurrentBorrowedPage((prev) =>
-                            Math.min(prev + 1, totalBorrowedPages)
-                          )
-                        }
-                        disabled={currentBorrowedPage === totalBorrowedPages}
-                        className={`cursor-pointer `}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
+          <div className="ag-theme-alpine w-full h-[400px]">
+            <AgGridReact
+              columnDefs={columnDefs}
+              rowData={borrows.filter(
+                (borrow) => borrow.borrowed_by._id === user._id
               )}
-            </>
-          )}
+              defaultColDef={defaultColDef}
+              onGridReady={onGridReady}
+              pagination={true}
+              paginationPageSize={10}
+            />
+          </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
-      {userType === "seller" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Uploaded Books</CardTitle>
-            <CardDescription>
-              Books that you have uploaded for borrowing
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {books.filter((book) => book.uploaded_by === user._id).length ===
-            0 ? (
-              <div className="text-center py-6">
-                <Library className="h-12 w-12 mx-auto text-muted-foreground" />
-                <h3 className="mt-2 text-lg font-semibold">
-                  No books uploaded
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Upload books to offer for borrowing
-                </p>
-                <Button className="mt-4" asChild>
-                  <Link to="/admin/create-book">Upload New Book</Link>
-                </Button>
-              </div>
-            ) : (
-              <>
-                <UploadedBooksTable
-                  currentUploadedBooks={currentUploadedBooks}
-                />
-                {currentUploadedBooks.length > 4 && (
-                  <Pagination>
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious
-                          onClick={() =>
-                            setCurrentUploadedPage((prev) =>
-                              Math.max(prev - 1, 1)
-                            )
-                          }
-                          disabled={currentUploadedPage === 1}
-                          className={`cursor-pointer `}
-                        />
-                      </PaginationItem>
-                      {[...Array(totalUploadedPages)].map((_, i) => (
-                        <PaginationItem key={i}>
-                          <PaginationLink
-                            onClick={() => setCurrentUploadedPage(i + 1)}
-                            isActive={currentUploadedPage === i + 1}
+      <Tabs defaultValue="current" className="w-full">
+        <TabsList className="flex flex-wrap w-full justify-start overflow-x-auto">
+          <TabsTrigger value="current" className="flex-1 min-w-[120px]">
+            Currently Borrowed
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex-1 min-w-[120px]">
+            Borrowing History
+          </TabsTrigger>
+          {userType === "seller" && (
+            <TabsTrigger value="uploaded" className="flex-1 min-w-[120px]">
+              Uploaded Books
+            </TabsTrigger>
+          )}
+        </TabsList>
+        <TabsContent value="current">
+          <Card>
+            <CardHeader>
+              <CardTitle>Currently Borrowed Books</CardTitle>
+              <CardDescription>
+                Books that you currently have borrowed
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {currentBorrows.length === 0 ? (
+                <div className="text-center py-6">
+                  <BookOpen className="h-12 w-12 mx-auto text-muted-foreground" />
+                  <h3 className="mt-2 text-lg font-semibold">
+                    No books currently borrowed
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Browse and borrow books from the catalog
+                  </p>
+                  <Button className="mt-4" asChild>
+                    <Link to="/books">Browse Books</Link>
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <BorrowedBooksTable
+                    currentBorrows={currentBorrows}
+                    handleReturnBook={handleReturnBook}
+                    isReturning={isReturning}
+                  />
+                  {currentBorrows.length > 4 && (
+                    <Pagination className="mt-4">
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            onClick={() =>
+                              setCurrentBorrowedPage((prev) =>
+                                Math.max(prev - 1, 1)
+                              )
+                            }
+                            disabled={currentBorrowedPage === 1}
                             className={`cursor-pointer `}
-                          >
-                            {i + 1}
-                          </PaginationLink>
+                          />
                         </PaginationItem>
-                      ))}
-                      <PaginationItem>
-                        <PaginationNext
-                          onClick={() =>
-                            setCurrentUploadedPage((prev) =>
-                              Math.min(prev + 1, totalUploadedPages)
-                            )
-                          }
-                          disabled={currentUploadedPage === totalUploadedPages}
-                          className={`cursor-pointer `}
-                        />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
+                        {[...Array(totalBorrowedPages)].map((_, i) => (
+                          <PaginationItem key={i}>
+                            <PaginationLink
+                              onClick={() => setCurrentBorrowedPage(i + 1)}
+                              isActive={currentBorrowedPage === i + 1}
+                              className={`cursor-pointer `}
+                            >
+                              {i + 1}
+                            </PaginationLink>
+                          </PaginationItem>
+                        ))}
+                        <PaginationItem>
+                          <PaginationNext
+                            onClick={() =>
+                              setCurrentBorrowedPage((prev) =>
+                                Math.min(prev + 1, totalBorrowedPages)
+                              )
+                            }
+                            disabled={
+                              currentBorrowedPage === totalBorrowedPages
+                            }
+                            className={`cursor-pointer `}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="history">
+          <Card>
+            <CardHeader>
+              <CardTitle>Borrowing History</CardTitle>
+              <CardDescription>Your complete borrowing history</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {currentTotalBorrowedBooks.length === 0 ? (
+                <div className="text-center py-6">
+                  <Library className="h-12 w-12 mx-auto text-muted-foreground" />
+                  <h3 className="mt-2 text-lg font-semibold">
+                    No borrowing history
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Start borrowing books to build your history
+                  </p>
+                  <Button className="mt-4" asChild>
+                    <Link to="/books">Browse Books</Link>
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <TotalBorrowedBooksTable
+                    currentTotalBorrowedBooks={currentTotalBorrowedBooks}
+                  />
+                  {currentTotalBorrowedBooks.length > 4 && (
+                    <Pagination className="mt-4">
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            onClick={() =>
+                              setCurrentTotalBorrowedPage((prev) =>
+                                Math.max(prev - 1, 1)
+                              )
+                            }
+                            disabled={currentTotalBorrowedPage === 1}
+                            className={`cursor-pointer `}
+                          />
+                        </PaginationItem>
+                        {[...Array(totalBorrowedBooksPages)].map((_, i) => (
+                          <PaginationItem key={i}>
+                            <PaginationLink
+                              onClick={() => setCurrentTotalBorrowedPage(i + 1)}
+                              isActive={currentTotalBorrowedPage === i + 1}
+                              className={`cursor-pointer `}
+                            >
+                              {i + 1}
+                            </PaginationLink>
+                          </PaginationItem>
+                        ))}
+                        <PaginationItem>
+                          <PaginationNext
+                            onClick={() =>
+                              setCurrentTotalBorrowedPage((prev) =>
+                                Math.min(prev + 1, totalBorrowedBooksPages)
+                              )
+                            }
+                            disabled={
+                              currentTotalBorrowedPage ===
+                              totalBorrowedBooksPages
+                            }
+                            className={`cursor-pointer `}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        {userType === "seller" && (
+          <TabsContent value="uploaded">
+            <Card>
+              <CardHeader>
+                <CardTitle>Uploaded Books</CardTitle>
+                <CardDescription>
+                  Books that you have uploaded for borrowing
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {books.filter((book) => book.uploaded_by === user._id)
+                  .length === 0 ? (
+                  <div className="text-center py-6">
+                    <Library className="h-12 w-12 mx-auto text-muted-foreground" />
+                    <h3 className="mt-2 text-lg font-semibold">
+                      No books uploaded
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Upload books to offer for borrowing
+                    </p>
+                    <Button className="mt-4" asChild>
+                      <Link to="/admin/create-book">Upload New Book</Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <UploadedBooksTable
+                      currentUploadedBooks={currentUploadedBooks}
+                    />
+                    {currentUploadedBooks.length > 4 && (
+                      <Pagination className="mt-4">
+                        <PaginationContent>
+                          <PaginationItem>
+                            <PaginationPrevious
+                              onClick={() =>
+                                setCurrentUploadedPage((prev) =>
+                                  Math.max(prev - 1, 1)
+                                )
+                              }
+                              disabled={currentUploadedPage === 1}
+                              className={`cursor-pointer `}
+                            />
+                          </PaginationItem>
+                          {[...Array(totalUploadedPages)].map((_, i) => (
+                            <PaginationItem key={i}>
+                              <PaginationLink
+                                onClick={() => setCurrentUploadedPage(i + 1)}
+                                isActive={currentUploadedPage === i + 1}
+                                className={`cursor-pointer `}
+                              >
+                                {i + 1}
+                              </PaginationLink>
+                            </PaginationItem>
+                          ))}
+                          <PaginationItem>
+                            <PaginationNext
+                              onClick={() =>
+                                setCurrentUploadedPage((prev) =>
+                                  Math.min(prev + 1, totalUploadedPages)
+                                )
+                              }
+                              disabled={
+                                currentUploadedPage === totalUploadedPages
+                              }
+                              className={`cursor-pointer `}
+                            />
+                          </PaginationItem>
+                        </PaginationContent>
+                      </Pagination>
+                    )}
+                  </>
                 )}
-              </>
-            )}
-          </CardContent>
-        </Card>
-      )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
+      </Tabs>
 
-      {(userType === "seller" || userType === "buyer") && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Total Borrowed Books</CardTitle>
-            <CardDescription>
-              Books that you have previously borrowed
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {currentTotalBorrowedBooks.length === 0 ? (
-              <div className="text-center py-6">
-                <Library className="h-12 w-12 mx-auto text-muted-foreground" />
-                <h3 className="mt-2 text-lg font-semibold">
-                  No books borrowed
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Browse and borrow books from the catalog
-                </p>
-                <Button className="mt-4" asChild>
-                  <Link to="/books">Browse Books</Link>
-                </Button>
-              </div>
-            ) : (
-              <>
-                <TotalBorrowedBooksTable
-                  currentTotalBorrowedBooks={currentTotalBorrowedBooks}
-                />
-                {currentTotalBorrowedBooks.length > 4 ? (
-                  <Pagination>
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious
-                          onClick={() =>
-                            setCurrentTotalBorrowedPage((prev) =>
-                              Math.max(prev - 1, 1)
-                            )
-                          }
-                          disabled={currentTotalBorrowedPage === 1}
-                          className={`cursor-pointer `}
-                        />
-                      </PaginationItem>
-                      {[...Array(totalBorrowedBooksPages)].map((_, i) => (
-                        <PaginationItem key={i}>
-                          <PaginationLink
-                            onClick={() => setCurrentTotalBorrowedPage(i + 1)}
-                            isActive={currentTotalBorrowedPage === i + 1}
-                            className={`cursor-pointer `}
-                          >
-                            {i + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      ))}
-                      <PaginationItem>
-                        <PaginationNext
-                          onClick={() =>
-                            setCurrentTotalBorrowedPage((prev) =>
-                              Math.min(prev + 1, totalBorrowedBooksPages)
-                            )
-                          }
-                          disabled={
-                            currentTotalBorrowedPage === totalBorrowedBooksPages
-                          }
-                          className={`cursor-pointer `}
-                        />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
-                ) : null}
-              </>
-            )}
-          </CardContent>
-        </Card>
-      )}
       <Toaster />
     </div>
   );

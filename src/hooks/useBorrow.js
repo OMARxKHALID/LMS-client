@@ -33,16 +33,21 @@ export function useBorrow() {
         body: JSON.stringify(borrowData),
       });
 
-      if (!response.ok) {
-        throw new Error("Error borrowing book");
-      }
+      const result = await response.json();
 
-      const newBorrow = await response.json();
-      dispatch(addBorrow(newBorrow.borrow));
-      return newBorrow;
+      if (!response.ok) {
+        if (result.message) {
+          throw new Error(result.message);
+        } else {
+          throw new Error(
+            "An unexpected error occurred while borrowing the book."
+          );
+        }
+      }
+      dispatch(addBorrow(result.borrow));
+      return result;
     } catch (error) {
-      console.error("Error borrowing book:", error);
-      throw error;
+      throw new Error(error.message || "An unexpected error occurred.");
     }
   };
 
@@ -57,11 +62,12 @@ export function useBorrow() {
       }
 
       const updatedBorrow = await response.json();
+      // Ensure this is not called multiple times unnecessarily
+      if (updatedBorrow.status !== "returned") return;
       dispatch(updateReturnDate(updatedBorrow.borrow));
       return updatedBorrow;
     } catch (error) {
-      console.error("Error returning book:", error);
-      throw error;
+      throw new Error(error.message || "An unexpected error occurred.");
     }
   };
 

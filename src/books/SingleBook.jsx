@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Card,
@@ -39,7 +39,7 @@ import { updateBook } from "@/redux/slice/bookSlice";
 
 export default function SingleBook() {
   const [isBorrowing, setIsBorrowing] = useState(false);
-  const [selectedDueDate, setSelectedDueDate] = useState(null);
+  const [selectedDueDate, setSelectedDueDate] = useState();
 
   const params = useParams();
   const { toast } = useToast();
@@ -47,14 +47,20 @@ export default function SingleBook() {
   const dispatch = useDispatch();
   const bookId = params.id;
   const { books, isLoading } = useSelector((state) => state.books);
-  console.log("🚀 ~ SingleBook ~ books:", books);
   const { user } = useSelector((state) => state.auth);
   const { borrows } = useSelector((state) => state.borrow);
-  console.log("🚀 ~ SingleBook ~ borrows:", borrows);
 
-  const { borrowBook } = useBorrow();
+  const { borrowBook, getBorrowRecords } = useBorrow();
 
   const book = books.find((book) => book._id === bookId);
+
+  const calculateDueDate = () => {
+    return selectedDueDate ? selectedDueDate.toISOString() : null;
+  };
+
+  useEffect(() => {
+    getBorrowRecords();
+  }, []);
 
   const hasAlreadyBorrowed = borrows.some(
     (borrow) =>
@@ -62,22 +68,66 @@ export default function SingleBook() {
       borrow.borrowed_by._id === user?._id &&
       borrow.status === "borrowed"
   );
-  console.log("🚀 ~ SingleBook ~ hasAlreadyBorrowed:", hasAlreadyBorrowed);
 
   const handleBorrow = async () => {
-    if (!book || !user || !selectedDueDate) return;
+    if (!book) {
+      toast({
+        variant: "destructive",
+        title: "Book Not Found",
+        description: "The book you're trying to borrow does not exist.",
+      });
+      return;
+    }
 
-    const expectedReturnDate = selectedDueDate.toISOString();
+    if (!user || !user?._id) {
+      toast({
+        variant: "destructive",
+        title: "Authentication Error",
+        description: "You must be logged in to borrow a book.",
+      });
+      return;
+    }
+
+    if (book.available_copies <= 0) {
+      toast({
+        variant: "destructive",
+        title: "Unavailable",
+        description: "This book is not available for borrowing at the moment.",
+      });
+      return;
+    }
+    if (hasAlreadyBorrowed) {
+      toast({
+        variant: "destructive",
+        title: "Already Borrowed",
+        description: "You have already borrowed this book. Return it first.",
+      });
+      return;
+    }
+
+    if (!selectedDueDate) {
+      toast({
+        variant: "destructive",
+        title: "Return Date Required",
+        description: "Please select a valid return date.",
+      });
+      return;
+    }
+
+    const { _id: borrowed_by } = user || {};
+    const { _id: borrowed_book, title } = book;
+
+    const expected_return_date = calculateDueDate();
 
     setIsBorrowing(true);
     try {
       const response = await borrowBook({
-        borrowed_book: bookId,
-        expected_return_date: expectedReturnDate,
-        borrowed_by: user._id,
+        borrowed_book,
+        expected_return_date,
+        borrowed_by,
       });
-      console.log("🚀 ~ handleBorrow ~ response:", response);
 
+      // Success case
       const updatedBook = {
         ...book,
         available_copies: book.available_copies - 1,
@@ -86,19 +136,17 @@ export default function SingleBook() {
       dispatch(updateBook(updatedBook));
 
       toast({
-        title: "Book borrowed successfully",
-        description: `${
-          book.title
-        } has been successfully borrowed! Total price: $${response.total_borrow_price.toFixed(
+        title: "Borrow Successful",
+        description: `${title} has been borrowed successfully. Total cost: $${response.total_borrow_price.toFixed(
           2
-        )}`,
+        )}.`,
       });
     } catch (error) {
-      console.error("Error borrowing book:", error);
+      const errorMessage = error?.message || "An unexpected error occurred.";
       toast({
         variant: "destructive",
         title: "Error",
-        description: error?.message || "Error borrowing book.",
+        description: errorMessage,
       });
     } finally {
       setIsBorrowing(false);
@@ -253,10 +301,7 @@ export default function SingleBook() {
                 className="w-full md:w-auto"
                 onClick={handleBorrow}
                 disabled={
-                  book.available_copies === 0 ||
-                  isBorrowing ||
-                  !selectedDueDate ||
-                  hasAlreadyBorrowed
+                  book.available_copies === 0 || isBorrowing || !selectedDueDate
                 }
               >
                 {isBorrowing ? (
@@ -267,7 +312,7 @@ export default function SingleBook() {
                 ) : (
                   <>
                     <BookOpen className="mr-2 h-4 w-4" />
-                    {hasAlreadyBorrowed ? "Already Borrowed" : "Borrow Now"}
+                    Borrow Book
                   </>
                 )}
               </Button>
@@ -287,19 +332,8 @@ export default function SingleBook() {
                 <BookOpen className="h-4 w-4" />
                 <AlertTitle>Available for Borrowing</AlertTitle>
                 <AlertDescription>
-                  This book is available. Select a return date and click
-                  &quot;Borrow Book&quot; to borrow it.
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {book.available_copies === 0 && (
-              <Alert variant="destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>Currently Unavailable</AlertTitle>
-                <AlertDescription>
-                  This book is currently borrowed. You can place a reservation
-                  to be notified when it becomes available.
+                  This book is available for borrowing! Choose a return date and
+                  borrow now.
                 </AlertDescription>
               </Alert>
             )}
