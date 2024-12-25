@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
-import { isPast, format } from "date-fns";
+import { isPast } from "date-fns";
 import {
   RotateCcw,
   BookOpen,
@@ -38,16 +38,9 @@ import TotalBorrowedBooksTable from "./components/ui/TotalBorrowedBooks";
 import UploadedBooksTable from "./components/ui/UploadedBooks";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// import { AgGridReact } from "ag-grid-react";
-// import "ag-grid-community/styles/ag-grid.css";
-// import "ag-grid-community/styles/ag-theme-alpine.css";
-// import { ClientSideRowModelModule } from "ag-grid-community";
-
 const calculateProgress = (borrowed, total) => {
   return total > 0 ? (borrowed / total) * 100 : 0;
 };
-
-const ITEMS_PER_PAGE = 5;
 
 export default function Dashboard() {
   const [isReturning, setIsReturning] = useState(null);
@@ -128,86 +121,28 @@ export default function Dashboard() {
     .filter(
       (borrow) => borrow.borrowed_by._id === user._id && !borrow.return_date
     )
-    .slice(
-      (currentBorrowedPage - 1) * ITEMS_PER_PAGE,
-      currentBorrowedPage * ITEMS_PER_PAGE
-    );
+    .slice((currentBorrowedPage - 1) * 5, currentBorrowedPage * 5);
 
   const totalBorrowedPages = Math.ceil(
     borrows.filter(
       (borrow) => borrow.borrowed_by._id === user._id && !borrow.return_date
-    ).length / ITEMS_PER_PAGE
+    ).length / 5
   );
 
   const totalUploadedPages = Math.ceil(
-    borrows.filter((borrow) => borrow.borrowed_by._id === user._id).length /
-      ITEMS_PER_PAGE
+    borrows.filter((borrow) => borrow.borrowed_by._id === user._id).length / 5
   );
 
   const currentTotalBorrowedBooks = borrows
     .filter((borrow) => borrow.borrowed_by._id === user._id)
-    .slice(
-      (currentTotalBorrowedPage - 1) * ITEMS_PER_PAGE,
-      currentTotalBorrowedPage * ITEMS_PER_PAGE
-    );
+    .slice((currentTotalBorrowedPage - 1) * 5, currentTotalBorrowedPage * 5);
 
   const currentUploadedBooks = borrows.slice(
-    (currentUploadedPage - 1) * ITEMS_PER_PAGE,
-    currentUploadedPage * ITEMS_PER_PAGE
+    (currentUploadedPage - 1) * 5,
+    currentUploadedPage * 5
   );
 
-  const totalBorrowedBooksPages = Math.ceil(borrows.length / ITEMS_PER_PAGE);
-
-  // AG Grid configuration
-  //   const [gridApi, setGridApi] = useState(null);
-  //   const [gridColumnApi, setGridColumnApi] = useState(null);
-
-  //   const onGridReady = (params) => {
-  //     setGridApi(params.api);
-  //     setGridColumnApi(params.columnApi);
-  //     params.api.setRowModelType("clientSide", {
-  //       modules: [ClientSideRowModelModule],
-  //     });
-  //   };
-
-  //   const defaultColDef = useMemo(() => {
-  //     return {
-  //       sortable: true,
-  //       filter: true,
-  //       resizable: true,
-  //     };
-  //   }, []);
-
-  //   const columnDefs = [
-  //     { headerName: "Book Title", field: "book.title", flex: 2 },
-  //     { headerName: "Author", field: "book.author", flex: 1 },
-  //     {
-  //       headerName: "Borrow Date",
-  //       field: "borrow_date",
-  //       flex: 1,
-  //       valueFormatter: (params) => format(new Date(params.value), "dd/MM/yyyy"),
-  //     },
-  //     {
-  //       headerName: "Expected Return",
-  //       field: "expected_return_date",
-  //       flex: 1,
-  //       valueFormatter: (params) => format(new Date(params.value), "dd/MM/yyyy"),
-  //     },
-  //     {
-  //       headerName: "Status",
-  //       field: "return_date",
-  //       flex: 1,
-  //       cellRenderer: (params) => {
-  //         if (params.value) {
-  //           return "Returned";
-  //         } else if (isPast(new Date(params.data.expected_return_date))) {
-  //           return "Overdue";
-  //         } else {
-  //           return "Borrowed";
-  //         }
-  //       },
-  //     },
-  //   ];
+  const totalBorrowedBooksPages = Math.ceil(borrows.length / 5);
 
   if (loading) {
     return (
@@ -309,41 +244,12 @@ export default function Dashboard() {
         </Alert>
       )}
 
-      {/* <Card>
-        <CardHeader>
-          <CardTitle>Borrowing Analytics</CardTitle>
-          <CardDescription>
-            Detailed view of your borrowing history
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="ag-theme-alpine w-full h-[400px]">
-            <AgGridReact
-              columnDefs={columnDefs}
-              rowData={borrows.filter(
-                (borrow) => borrow.borrowed_by._id === user._id
-              )}
-              defaultColDef={defaultColDef}
-              onGridReady={onGridReady}
-              pagination={true}
-              paginationPageSize={10}
-            />
-          </div>
-        </CardContent>
-      </Card> */}
-
       <Tabs defaultValue="current" className="w-full">
-        <TabsList className="flex flex-wrap w-full justify-start overflow-x-auto">
-          <TabsTrigger value="current" className="flex-1 min-w-[120px]">
-            Currently Borrowed
-          </TabsTrigger>
-          <TabsTrigger value="history" className="flex-1 min-w-[120px]">
-            Borrowing History
-          </TabsTrigger>
+        <TabsList className="w-full justify-start overflow-x-auto">
+          <TabsTrigger value="current">Currently Borrowed</TabsTrigger>
+          <TabsTrigger value="history">Borrowing History</TabsTrigger>
           {userType === "seller" && (
-            <TabsTrigger value="uploaded" className="flex-1 min-w-[120px]">
-              Uploaded Books
-            </TabsTrigger>
+            <TabsTrigger value="uploaded">Uploaded Books</TabsTrigger>
           )}
         </TabsList>
         <TabsContent value="current">
@@ -382,35 +288,40 @@ export default function Dashboard() {
                           <PaginationPrevious
                             onClick={() =>
                               setCurrentBorrowedPage((prev) =>
-                                Math.max(prev - 1, 1)
+                                prev === 1 ? totalBorrowedPages : prev - 1
                               )
                             }
-                            disabled={currentBorrowedPage === 1}
-                            className={`cursor-pointer `}
+                            className="cursor-pointer"
                           />
                         </PaginationItem>
-                        {[...Array(totalBorrowedPages)].map((_, i) => (
-                          <PaginationItem key={i}>
-                            <PaginationLink
-                              onClick={() => setCurrentBorrowedPage(i + 1)}
-                              isActive={currentBorrowedPage === i + 1}
-                              className={`cursor-pointer `}
-                            >
-                              {i + 1}
+                        {[...Array(Math.min(3, totalBorrowedPages))].map(
+                          (_, i) => (
+                            <PaginationItem key={i}>
+                              <PaginationLink
+                                onClick={() => setCurrentBorrowedPage(i + 1)}
+                                isActive={currentBorrowedPage === i + 1}
+                                className="cursor-pointer"
+                              >
+                                {i + 1}
+                              </PaginationLink>
+                            </PaginationItem>
+                          )
+                        )}
+                        {totalBorrowedPages > 3 && (
+                          <PaginationItem>
+                            <PaginationLink className="cursor-default">
+                              ...
                             </PaginationLink>
                           </PaginationItem>
-                        ))}
+                        )}
                         <PaginationItem>
                           <PaginationNext
                             onClick={() =>
                               setCurrentBorrowedPage((prev) =>
-                                Math.min(prev + 1, totalBorrowedPages)
+                                prev === totalBorrowedPages ? 1 : prev + 1
                               )
                             }
-                            disabled={
-                              currentBorrowedPage === totalBorrowedPages
-                            }
-                            className={`cursor-pointer `}
+                            className="cursor-pointer"
                           />
                         </PaginationItem>
                       </PaginationContent>
@@ -428,68 +339,57 @@ export default function Dashboard() {
               <CardDescription>Your complete borrowing history</CardDescription>
             </CardHeader>
             <CardContent>
-              {currentTotalBorrowedBooks.length === 0 ? (
-                <div className="text-center py-6">
-                  <Library className="h-12 w-12 mx-auto text-muted-foreground" />
-                  <h3 className="mt-2 text-lg font-semibold">
-                    No borrowing history
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Start borrowing books to build your history
-                  </p>
-                  <Button className="mt-4" asChild>
-                    <Link to="/books">Browse Books</Link>
-                  </Button>
-                </div>
-              ) : (
-                <>
-                  <TotalBorrowedBooksTable
-                    currentTotalBorrowedBooks={currentTotalBorrowedBooks}
-                  />
-                  {currentTotalBorrowedBooks.length > 4 && (
-                    <Pagination className="mt-4">
-                      <PaginationContent>
-                        <PaginationItem>
-                          <PaginationPrevious
-                            onClick={() =>
-                              setCurrentTotalBorrowedPage((prev) =>
-                                Math.max(prev - 1, 1)
-                              )
-                            }
-                            disabled={currentTotalBorrowedPage === 1}
-                            className={`cursor-pointer `}
-                          />
-                        </PaginationItem>
-                        {[...Array(totalBorrowedBooksPages)].map((_, i) => (
+              <>
+                <TotalBorrowedBooksTable
+                  currentTotalBorrowedBooks={currentTotalBorrowedBooks}
+                />
+                {currentTotalBorrowedBooks.length > 4 && (
+                  <Pagination className="mt-4">
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          onClick={() =>
+                            setCurrentTotalBorrowedPage((prev) =>
+                              prev === 1 ? totalBorrowedBooksPages : prev - 1
+                            )
+                          }
+                          className="cursor-pointer"
+                        />
+                      </PaginationItem>
+                      {[...Array(Math.min(3, totalBorrowedBooksPages))].map(
+                        (_, i) => (
                           <PaginationItem key={i}>
                             <PaginationLink
                               onClick={() => setCurrentTotalBorrowedPage(i + 1)}
                               isActive={currentTotalBorrowedPage === i + 1}
-                              className={`cursor-pointer `}
+                              className="cursor-pointer"
                             >
                               {i + 1}
                             </PaginationLink>
                           </PaginationItem>
-                        ))}
+                        )
+                      )}
+                      {totalBorrowedBooksPages > 3 && (
                         <PaginationItem>
-                          <PaginationNext
-                            onClick={() =>
-                              setCurrentTotalBorrowedPage((prev) =>
-                                Math.min(prev + 1, totalBorrowedBooksPages)
-                              )
-                            }
-                            disabled={
-                              currentTotalBorrowedPage ===
-                              totalBorrowedBooksPages
-                            }
-                            className={`cursor-pointer `}
-                          />
+                          <PaginationLink className="cursor-default">
+                            ...
+                          </PaginationLink>
                         </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
-                  )}
-                </>
-              )}
+                      )}
+                      <PaginationItem>
+                        <PaginationNext
+                          onClick={() =>
+                            setCurrentTotalBorrowedPage((prev) =>
+                              prev === totalBorrowedBooksPages ? 1 : prev + 1
+                            )
+                          }
+                          className="cursor-pointer"
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                )}
+              </>
             </CardContent>
           </Card>
         </TabsContent>
@@ -529,35 +429,40 @@ export default function Dashboard() {
                             <PaginationPrevious
                               onClick={() =>
                                 setCurrentUploadedPage((prev) =>
-                                  Math.max(prev - 1, 1)
+                                  prev === 1 ? totalUploadedPages : prev - 1
                                 )
                               }
-                              disabled={currentUploadedPage === 1}
-                              className={`cursor-pointer `}
+                              className="cursor-pointer"
                             />
                           </PaginationItem>
-                          {[...Array(totalUploadedPages)].map((_, i) => (
-                            <PaginationItem key={i}>
-                              <PaginationLink
-                                onClick={() => setCurrentUploadedPage(i + 1)}
-                                isActive={currentUploadedPage === i + 1}
-                                className={`cursor-pointer `}
-                              >
-                                {i + 1}
+                          {[...Array(Math.min(3, totalUploadedPages))].map(
+                            (_, i) => (
+                              <PaginationItem key={i}>
+                                <PaginationLink
+                                  onClick={() => setCurrentUploadedPage(i + 1)}
+                                  isActive={currentUploadedPage === i + 1}
+                                  className="cursor-pointer"
+                                >
+                                  {i + 1}
+                                </PaginationLink>
+                              </PaginationItem>
+                            )
+                          )}
+                          {totalUploadedPages > 3 && (
+                            <PaginationItem>
+                              <PaginationLink className="cursor-default">
+                                ...
                               </PaginationLink>
                             </PaginationItem>
-                          ))}
+                          )}
                           <PaginationItem>
                             <PaginationNext
                               onClick={() =>
                                 setCurrentUploadedPage((prev) =>
-                                  Math.min(prev + 1, totalUploadedPages)
+                                  prev === totalUploadedPages ? 1 : prev + 1
                                 )
                               }
-                              disabled={
-                                currentUploadedPage === totalUploadedPages
-                              }
-                              className={`cursor-pointer `}
+                              className="cursor-pointer"
                             />
                           </PaginationItem>
                         </PaginationContent>
