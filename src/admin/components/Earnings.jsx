@@ -6,12 +6,11 @@ import { useEarning } from "@/hooks/useEarning";
 
 const Earnings = () => {
   const { getEarningsRecords } = useEarning();
-  const { user } = useSelector((state) => state.auth);
   const { earnings, loading } = useSelector((state) => state.earning);
 
   useEffect(() => {
-    getEarningsRecords(user._id);
-  }, [user._id]);
+    getEarningsRecords();
+  }, []);
 
   if (loading) {
     return (

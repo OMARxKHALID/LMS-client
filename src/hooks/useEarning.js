@@ -5,9 +5,9 @@ export function useEarning() {
   const BASE_URL = `${import.meta.env.VITE_SERVER_URL}/api/earnings`;
   const dispatch = useDispatch();
 
-  const getEarningsRecords = async (userId) => {
+  const getEarningsRecords = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/${userId}`);
+      const response = await fetch(`${BASE_URL}`);
       const data = await response.json();
       dispatch(setEarnings(data.totalEarnings));
     } catch (error) {
