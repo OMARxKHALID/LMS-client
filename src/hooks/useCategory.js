@@ -7,7 +7,7 @@ import {
 } from "@/redux/slice/categorySlice";
 
 export function useCategory() {
-  const BASE_URL = "https://lms-server-kkry.onrender.com/api/categories";
+  const BASE_URL = `${import.meta.env.VITE_SERVER_URL}/api/categories`;
   const dispatch = useDispatch();
 
   const getCategories = async () => {

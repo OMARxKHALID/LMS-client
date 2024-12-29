@@ -170,59 +170,49 @@ export default function ManageCategories() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>All Categories</CardTitle>
-            <CardDescription>
-              View and manage existing categories
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="border-2 border-gray-200 rounded-lg overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Category Name</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+        <div className="border-2 border-gray-200 rounded-lg overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Category Name</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {categories.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan="2" className="text-center">
+                    No categories available.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                categories.map((category) => (
+                  <TableRow key={category._id}>
+                    <TableCell className="font-medium">
+                      {category.name}
+                    </TableCell>
+                    <TableCell className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleEdit(category)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => handleDelete(category._id)}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {categories.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan="2" className="text-center">
-                        No categories available.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    categories.map((category) => (
-                      <TableRow key={category._id}>
-                        <TableCell className="font-medium">
-                          {category.name}
-                        </TableCell>
-                        <TableCell className="flex justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => handleEdit(category)}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="icon"
-                            onClick={() => handleDelete(category._id)}
-                          >
-                            <Trash className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

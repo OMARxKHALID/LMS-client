@@ -11,6 +11,7 @@ import SingleBook from "@/books/SingleBook";
 import EditBook from "@/admin/components/book/EditBook";
 import ManageCategories from "@/admin/components/category/ManageCategories";
 import Profile from "@/admin/components/Profile";
+import Earnings from "@/admin/components/Earnings";
 
 export const publicRoutes = [
   { path: "/", element: <Home />, showFooter: true },
@@ -33,6 +34,11 @@ export const adminRoutes = [
   {
     path: "manage-categories",
     element: <ManageCategories />,
+    roles: ["seller"],
+  },
+  {
+    path: "earnings",
+    element: <Earnings />,
     roles: ["seller"],
   },
   { path: "profile", element: <Profile />, roles: ["buyer", "seller"] },

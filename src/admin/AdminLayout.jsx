@@ -30,6 +30,7 @@ import {
   FolderTree,
   User2,
   ChevronUp,
+  DollarSign,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useAuth } from "@/hooks/useAuth";
@@ -73,19 +74,17 @@ export default function AdminLayout() {
             </div>
           </SidebarHeader>
 
-          <SidebarContent className="overflow-y-auto">
+          <SidebarContent className="py-2">
             <SidebarGroup>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    aria-label="Dashboard"
-                    isActive={isActiveRoute("/admin")}
-                    tooltip="Dashboard"
-                  >
-                    <Link to="/admin">
-                      <LayoutDashboard className="h-4 w-4 text-primary" />
-                      <span className="ml-2">Dashboard</span>
+                  <SidebarMenuButton asChild isActive={isActiveRoute("/admin")}>
+                    <Link
+                      to="/admin"
+                      className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      <LayoutDashboard className="h-5 w-5 mr-3" />
+                      <span>Dashboard</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -98,83 +97,94 @@ export default function AdminLayout() {
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       asChild
-                      aria-label="Manage Books"
                       isActive={isActiveRoute("/admin/manage-books")}
-                      tooltip="Manage Books"
                     >
-                      <Link to="/admin/manage-books">
-                        <BookOpen className="h-4 w-4 text-primary" />
-                        <span className="ml-2">Manage Books</span>
+                      <Link
+                        to="/admin/manage-books"
+                        className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      >
+                        <BookOpen className="h-5 w-5 mr-3" />
+                        <span>Manage Books</span>
                       </Link>
                     </SidebarMenuButton>
-                    <SidebarMenu>
-                      <SidebarMenuItem>
-                        <SidebarMenuButton
-                          asChild
-                          aria-label="Add New Book"
-                          isActive={isActiveRoute("/admin/create-book")}
-                          tooltip="Add New Book"
-                        >
-                          <Link to="/admin/create-book">
-                            <BookCopy className="h-4 w-4 text-primary" />
-                            <span className="ml-2">Add New Book</span>
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    </SidebarMenu>
                   </SidebarMenuItem>
-
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       asChild
-                      aria-label="Categories"
-                      isActive={isActiveRoute("/admin/manage-categories")}
-                      tooltip="Categories"
+                      isActive={isActiveRoute("/admin/create-book")}
                     >
-                      <Link to="/admin/manage-categories">
-                        <FolderTree className="h-4 w-4 text-primary" />
-                        <span className="ml-2">Categories</span>
+                      <Link
+                        to="/admin/create-book"
+                        className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 pl-10"
+                      >
+                        <BookCopy className="h-5 w-5 mr-3" />
+                        <span>Add New Book</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActiveRoute("/admin/manage-categories")}
+                    >
+                      <Link
+                        to="/admin/manage-categories"
+                        className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      >
+                        <FolderTree className="h-5 w-5 mr-3" />
+                        <span>Categories</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroup>
             )}
+
+            <SidebarGroup>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActiveRoute("/admin/earnings")}
+                  >
+                    <Link
+                      to="/admin/earnings"
+                      className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      <DollarSign className="h-5 w-5 mr-3" />
+                      <span>Earnings</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroup>
           </SidebarContent>
 
-          <SidebarFooter>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton>
-                      <User2 className="h-4 w-4 text-primary" />
-                      <span className="ml-2">{user?.username || "User"}</span>
-                      <ChevronUp className="ml-auto h-4 w-4" />
-                    </SidebarMenuButton>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    side="top"
-                    className="w-[--radix-popper-anchor-width]"
-                  >
-                    <DropdownMenuItem>
-                      <Link to="/" className="w-full">
-                        Home
-                      </Link>
-                    </DropdownMenuItem>
-
-                    <DropdownMenuItem>
-                      <Link to="/admin/profile" className="w-full">
-                        Profile
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={handleSignOut}>
-                      Sign out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </SidebarMenuItem>
-            </SidebarMenu>
+          <SidebarFooter className="border-t p-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center w-full text-left">
+                  <User2 className="h-4 w-4 mr-3" />
+                  <span>{user?.username || "User"}</span>
+                  <ChevronUp className="ml-auto h-4 w-4" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="top" align="start" className="w-56">
+                <DropdownMenuItem asChild>
+                  <Link to="/" className="w-full">
+                    Home
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/admin/profile" className="w-full">
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={handleSignOut}>
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarFooter>
         </Sidebar>
 

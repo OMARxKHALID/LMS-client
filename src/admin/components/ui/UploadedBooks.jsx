@@ -6,6 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { format } from "date-fns";
 import { CheckCircle2, Clock } from "lucide-react";
 
 const UploadedBooksTable = ({ currentUploadedBooks }) => {
@@ -15,19 +16,61 @@ const UploadedBooksTable = ({ currentUploadedBooks }) => {
         <TableHeader>
           <TableRow>
             <TableHead>Book</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead>Borrow Price</TableHead>
             <TableHead>Borrowed By</TableHead>
+            <TableHead>Borrowed Date</TableHead>
+            <TableHead>Expected Return Date</TableHead>
+            <TableHead>Return Date</TableHead>
+            <TableHead>Fine</TableHead>
             <TableHead>Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {currentUploadedBooks.map((borrow) => {
-            const { _id, borrowed_book, borrowed_by, return_date } = borrow;
+            const {
+              _id,
+              borrowed_book,
+              borrowed_by,
+              borrowed_date,
+              expected_return_date,
+              return_date,
+              total_price,
+              total_borrow_price,
+              total_borrowed_fine,
+            } = borrow;
+
             return (
               <TableRow key={_id}>
+                <TableCell>{borrowed_book?.title || "Loading..."}</TableCell>
                 <TableCell>
-                  {borrowed_book ? borrowed_book?.title : "Loading..."}
+                  ${total_price ? total_price.toFixed(2) : "N/A"}
                 </TableCell>
-                <TableCell>{borrowed_by.username}</TableCell>
+                <TableCell>
+                  ${total_borrow_price ? total_borrow_price.toFixed(2) : "N/A"}
+                </TableCell>
+                <TableCell>{borrowed_by?.username || "Unknown"}</TableCell>
+                <TableCell>
+                  {borrowed_date
+                    ? format(new Date(borrowed_date), "MMM dd, yyyy")
+                    : "N/A"}
+                </TableCell>
+                <TableCell>
+                  {expected_return_date
+                    ? format(new Date(expected_return_date), "MMM dd, yyyy")
+                    : "N/A"}
+                </TableCell>
+                <TableCell>
+                  {return_date
+                    ? format(new Date(return_date), "MMM dd, yyyy")
+                    : "N/A"}
+                </TableCell>
+                <TableCell>
+                  $
+                  {total_borrowed_fine
+                    ? total_borrowed_fine.toFixed(2)
+                    : "0.00"}
+                </TableCell>
                 <TableCell>
                   {return_date ? (
                     <div className="flex items-center">

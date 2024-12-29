@@ -1,5 +1,3 @@
-// client/src/admin/BorrowedBooksTable.jsx
-import React from "react";
 import {
   Table,
   TableBody,
@@ -23,15 +21,25 @@ const BorrowedBooksTable = ({
         <TableHeader>
           <TableRow>
             <TableHead>Book</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead>Borrow Price</TableHead>
             <TableHead>Due Date</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Fine</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {currentBorrows.map((borrow) => {
-            const { _id, borrowed_book, expected_return_date, borrowed_by } =
-              borrow;
+            const {
+              _id,
+              borrowed_book,
+              expected_return_date,
+              borrowed_by,
+              total_borrow_price,
+              total_borrowed_fine,
+              total_price,
+            } = borrow;
             const isOverdue = isPast(new Date(expected_return_date));
 
             return (
@@ -39,6 +47,8 @@ const BorrowedBooksTable = ({
                 <TableCell>
                   {borrowed_book ? borrowed_book?.title : "Loading..."}
                 </TableCell>
+                <TableCell>${total_price}</TableCell>
+                <TableCell>${total_borrow_price}</TableCell>
                 <TableCell>
                   {expected_return_date
                     ? format(new Date(expected_return_date), "MMM dd, yyyy")
@@ -56,6 +66,9 @@ const BorrowedBooksTable = ({
                       <span className="text-muted-foreground">Due soon</span>
                     </div>
                   )}
+                </TableCell>
+                <TableCell>
+                  ${total_borrowed_fine ? total_borrowed_fine : "0.00"}
                 </TableCell>
                 <TableCell>
                   <Button
