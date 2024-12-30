@@ -16,6 +16,5 @@ const earningSlice = createSlice({
   },
 });
 
-export const { setEarnings, setLoading} =
-earningSlice.actions;
+export const { setEarnings, setLoading } = earningSlice.actions;
 export default earningSlice.reducer;
