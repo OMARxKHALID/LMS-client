@@ -15,10 +15,10 @@ export default function Home() {
             <div className="flex flex-col justify-center space-y-4">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                  Discover, Rent, and Borrow Your Favorite Books Effortlessly!
+                  Discover and Borrow Your Favorite Books Effortlessly!
                 </h1>
                 <p className="max-w-[600px] text-gray-500 md:text-xl">
-                  Streamline your book rental experience with our easy-to-use
+                  Streamline your book borrow experience with our easy-to-use
                   platform.
                 </p>
               </div>
@@ -69,10 +69,9 @@ export default function Home() {
             <Card className="transform transition-all duration-200 hover:scale-105">
               <CardContent className="flex flex-col items-center space-y-2 p-6">
                 <Search className="h-12 w-12 text-primary" />
-                <h3 className="text-xl font-bold">Search & Reserve Books</h3>
+                <h3 className="text-xl font-bold">Search Books</h3>
                 <p className="text-center text-gray-500">
-                  Easily search through thousands of books and reserve your
-                  favorites.
+                  Easily search through thousands of books your favorites.
                 </p>
               </CardContent>
             </Card>
@@ -133,7 +132,7 @@ export default function Home() {
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
                 2
               </div>
-              <h3 className="text-xl font-bold">Reserve or Rent</h3>
+              <h3 className="text-xl font-bold">Borrow</h3>
               <p className="text-gray-500">
                 Select your preferred option and duration.
               </p>
