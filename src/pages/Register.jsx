@@ -10,21 +10,19 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import {
-  Loader2,
-  User,
-  Mail,
-  Lock,
-  ShoppingCart,
-  Store,
-  ChevronDown,
-  ShoppingBag,
-} from "lucide-react"; // Import ChevronDown icon for dropdown
+import { Loader2, User, Mail, Lock, Store, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Define the validation schema using Zod
 const schema = z
@@ -54,6 +52,7 @@ export default function Register() {
     handleSubmit,
     formState: { errors, isSubmitting },
     watch,
+    setValue,
   } = useForm({
     resolver: zodResolver(schema),
   });
@@ -187,38 +186,38 @@ export default function Register() {
             <div className="space-y-2">
               <Label htmlFor="userType">User Type</Label>
               <div className="relative">
-                <select
-                  id="userType"
-                  className="pl-9 pr-4 py-2 border rounded-md w-full text-sm appearance-none"
-                  {...register("userType", {
-                    required: "User type is required",
-                  })}
+                <Select
+                  onValueChange={(value) => {
+                    setValue("userType", value, { shouldValidate: true });
+                  }}
+                  defaultValue={watch("userType")}
                 >
-                  <option value="">Select User Type</option>
-                  <option value="buyer" className="flex items-center">
-                    Buyer
-                  </option>
-                  <option value="seller" className="flex items-center">
-                    Seller
-                  </option>
-                </select>
-                <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-                <div className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none">
-                  {watch("userType") === "buyer" ? (
-                    <ShoppingBag className="h-4 w-4" />
-                  ) : watch("userType") === "seller" ? (
-                    <Store className="h-4 w-4" />
-                  ) : (
-                    <User className="h-4 w-4" />
-                  )}
-                </div>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select User Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="buyer">
+                      <div className="flex items-center gap-2">
+                        <ShoppingBag className="h-4 w-4" />
+                        <span>Buyer</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="seller">
+                      <div className="flex items-center gap-2">
+                        <Store className="h-4 w-4" />
+                        <span>Seller</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.userType && (
+                  <p className="text-sm text-red-500">
+                    {errors.userType.message}
+                  </p>
+                )}
               </div>
-              {errors.userType && (
-                <p className="text-sm text-red-500">
-                  {errors.userType.message}
-                </p>
-              )}
             </div>
+
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>

@@ -34,6 +34,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ModeToggle } from "@/components/ui/mode-toggle";
 
 export default function AdminLayout() {
   const location = useLocation();
@@ -64,7 +65,6 @@ export default function AdminLayout() {
           <SidebarHeader>
             <div className="flex items-center justify-between px-4">
               <h2 className="text-lg font-semibold">Admin Panel</h2>
-              <span className="text-sm text-gray-500">{user.userType}</span>
             </div>
           </SidebarHeader>
 
@@ -156,34 +156,37 @@ export default function AdminLayout() {
           </SidebarContent>
 
           <SidebarFooter className="border-t p-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center w-full text-left">
-                  <User2 className="h-4 w-4 mr-3" />
-                  <span>{user?.username || "User"}</span>
-                  <ChevronUp className="ml-auto h-4 w-4" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="top" align="start" className="w-56">
-                <DropdownMenuItem asChild>
-                  <Link to="/" className="w-full">
-                    Home
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/admin/profile" className="w-full">
-                    Profile
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={handleSignOut}>
-                  Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center justify-between space-x-1">
+              <ModeToggle />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center w-full text-left">
+                    <User2 className="h-4 w-4 mr-2" />
+                    <span>{user?.username || "User"}</span>
+                    <ChevronUp className="ml-auto h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="top" align="start" className="w-56">
+                  <DropdownMenuItem asChild>
+                    <Link to="/" className="w-full">
+                      Home
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin/profile" className="w-full">
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={handleSignOut}>
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </SidebarFooter>
         </Sidebar>
 
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-white">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto">
           <div className="container mx-auto px-4 py-6 sm:px-6 md:px-8">
             <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-4">
               <div className="w-full sm:w-auto">

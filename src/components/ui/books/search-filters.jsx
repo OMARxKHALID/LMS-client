@@ -21,7 +21,7 @@ export default function SearchFilters({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border mb-6">
+    <div className=" p-4 rounded-lg shadow-sm border mb-6">
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1">
           <Label htmlFor="search" className="mb-2">

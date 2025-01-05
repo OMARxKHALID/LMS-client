@@ -9,8 +9,6 @@ import {
   Cell,
 } from "recharts";
 
-const orderColors = ["hsl(var(--primary))", "hsl(var(--secondary))"];
-
 export const BarChart = ({ data, timeFrame }) => {
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -45,10 +43,7 @@ export const BarChart = ({ data, timeFrame }) => {
         />
         <Bar dataKey="earnings" radius={[4, 4, 0, 0]}>
           {data.map((entry, index) => (
-            <Cell
-              key={`cell-${index}`}
-              fill={orderColors[index % orderColors.length]}
-            />
+            <Cell key={`cell-${index}`} />
           ))}
         </Bar>
       </RechartsBarChart>

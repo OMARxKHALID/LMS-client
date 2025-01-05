@@ -6,12 +6,15 @@ import { Toaster } from "@/components/ui/toaster";
 import { BrowserRouter } from "react-router";
 import App from "./App";
 import "./index.css";
+import { ThemeProvider } from "./components/ui/theme-provider";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-        <App />
+        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+          <App />
+        </ThemeProvider>
         <Toaster />
       </BrowserRouter>
     </Provider>

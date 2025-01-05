@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { BookOpenCheck, UserCircle, Book, Menu, X } from "lucide-react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
+import { ModeToggle } from "@/components/ui/mode-toggle";
 
 export default function Header() {
   const { user } = useSelector((state) => state.auth);
@@ -13,7 +14,7 @@ export default function Header() {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/50 backdrop-blur supports-[backdrop-filter]:bg-white/50">
+    <header className="sticky top-0 z-50 w-full border-b backdrop-blur">
       <div className="container h-14 flex items-center justify-between">
         <div className="flex items-center space-x-6">
           <Link to="/" className="flex items-center space-x-2 cursor-pointer">
@@ -34,6 +35,7 @@ export default function Header() {
           </nav>
         </div>
         <div className="hidden md:flex items-center space-x-4">
+          <ModeToggle />
           {user ? (
             <div className="flex items-center space-x-4">
               <Link to="/admin">
@@ -73,7 +75,7 @@ export default function Header() {
       </div>
       {isMenuOpen && (
         <div className="md:hidden">
-          <nav className="flex flex-col space-y-4 p-4 bg-white border-t">
+          <nav className="flex flex-col space-y-4 p-4 border-t">
             <Link
               to="/books"
               className="text-primary hover:text-primary/80 cursor-pointer flex items-center space-x-2"
@@ -89,6 +91,8 @@ export default function Header() {
             >
               About Us
             </Link>
+            <ModeToggle />
+
             {user ? (
               <>
                 <Link to="/admin" onClick={toggleMenu}>

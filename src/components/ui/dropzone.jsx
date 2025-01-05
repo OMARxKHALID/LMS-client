@@ -1,6 +1,6 @@
-import { Upload, PDF, Trash } from "@/lib/icons";
+import { Upload, PDF, Trash } from "@/helpers/icons";
 import { useDropzoneHook } from "@/hooks/useDropzone";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utils";
 
 const Dropzone = ({
   containerClassName,

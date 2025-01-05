@@ -34,7 +34,7 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utils";
 import { updateBook } from "@/redux/slice/bookSlice";
 
 export default function SingleBook() {

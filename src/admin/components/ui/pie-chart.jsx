@@ -7,8 +7,6 @@ import {
   Legend,
 } from "recharts";
 
-const COLORS = ["hsl(var(--primary))", "hsl(var(--secondary))"];
-
 export const PieChart = ({ data }) => {
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -23,7 +21,7 @@ export const PieChart = ({ data }) => {
           dataKey="value"
         >
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            <Cell key={`cell-${index}`} />
           ))}
         </Pie>
         <Tooltip />
