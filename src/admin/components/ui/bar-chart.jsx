@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import {
   Bar,
   BarChart as RechartsBarChart,
@@ -10,7 +11,7 @@ import {
 
 const orderColors = ["hsl(var(--primary))", "hsl(var(--secondary))"];
 
-export const BarChart = ({ data }) => {
+export const BarChart = ({ data, timeFrame }) => {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <RechartsBarChart data={data}>
@@ -20,6 +21,12 @@ export const BarChart = ({ data }) => {
           fontSize={12}
           tickLine={false}
           axisLine={false}
+          tickFormatter={
+            (value) =>
+              timeFrame === "year"
+                ? value.slice(0, 3) // for "year" timeframe
+                : format(new Date(value), "EEE") // Format as day name for other timeframes
+          }
         />
         <YAxis
           stroke="#888888"

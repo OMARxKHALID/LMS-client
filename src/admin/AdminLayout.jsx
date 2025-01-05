@@ -16,13 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Link,
-  useLocation,
-  Outlet,
-  useNavigate,
-  Navigate,
-} from "react-router-dom";
+import { Link, useLocation, Outlet, useNavigate, Navigate } from "react-router";
 import {
   BookOpen,
   LayoutDashboard,

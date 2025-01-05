@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 import { useBook } from "@/hooks/useBook";
 import { useToast } from "@/hooks/use-toast";
 import { useSelector } from "react-redux";

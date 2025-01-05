@@ -23,7 +23,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { useBorrow } from "@/hooks/useBorrow";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import BorrowedBooksTable from "./components/ui/BorrowedBooks";
 import TotalBorrowedBooksTable from "./components/ui/TotalBorrowedBooks";

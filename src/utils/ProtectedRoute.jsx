@@ -1,4 +1,4 @@
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router";
 import { useSelector } from "react-redux";
 
 export default function ProtectedRoute({ children, allowedRoles }) {

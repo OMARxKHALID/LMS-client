@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router";
 import ProtectedRoute from "@/utils/ProtectedRoute";
 import AuthRoute from "@/utils/AuthRoute";
 import AdminLayout from "@/admin/AdminLayout";
