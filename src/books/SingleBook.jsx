@@ -10,7 +10,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import {
   Calendar,
   BookCopy,
@@ -19,8 +18,6 @@ import {
   CalendarDays,
   MapPin,
   Loader2,
-  BookOpen,
-  AlertTriangle,
   DollarSign,
   AlertCircle,
 } from "lucide-react";
@@ -36,10 +33,12 @@ import {
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/helpers/utils";
 import { updateBook } from "@/redux/slice/bookSlice";
+import { useBook } from "@/hooks/useBook";
 
 export default function SingleBook() {
   const [isBorrowing, setIsBorrowing] = useState(false);
   const [selectedDueDate, setSelectedDueDate] = useState();
+  const [isPurchasing, setIsPurchasing] = useState(false);
 
   const params = useParams();
   const { toast } = useToast();
@@ -51,6 +50,7 @@ export default function SingleBook() {
   const { borrows } = useSelector((state) => state.borrow);
 
   const { borrowBook, getBorrowRecords } = useBorrow();
+  const { purchaseBook } = useBook();
 
   const book = books.find((book) => book._id === bookId);
 
@@ -150,6 +150,61 @@ export default function SingleBook() {
       });
     } finally {
       setIsBorrowing(false);
+    }
+  };
+
+  const handlePurchase = async () => {
+    if (!book) {
+      toast({
+        variant: "destructive",
+        title: "Book Not Found",
+        description: "The book you're trying to purchase does not exist.",
+      });
+      return;
+    }
+
+    if (!user || !user?._id) {
+      toast({
+        variant: "destructive",
+        title: "Authentication Error",
+        description: "You must be logged in to purchase a book.",
+      });
+      return;
+    }
+
+    const { _id: purchased_by } = user || {};
+    const { _id: purchased_book } = book;
+
+    setIsPurchasing(true);
+    try {
+      const response = await purchaseBook({
+        purchased_book,
+        purchased_by,
+        quantity: 1,
+      });
+      console.log("🚀 ~ handlePurchase ~ response:", response);
+
+      const updatedBook = {
+        ...book,
+        available_copies: book.available_copies - 1,
+        total_copies: book.total_copies - 1,
+      };
+
+      dispatch(updateBook(updatedBook));
+
+      toast({
+        title: "Purchase Successful",
+        description: `${book.title} has been purchased successfully.`,
+      });
+    } catch (error) {
+      const errorMessage = error?.message || "An unexpected error occurred.";
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: errorMessage,
+      });
+    } finally {
+      setIsPurchasing(false);
     }
   };
 
@@ -297,46 +352,29 @@ export default function SingleBook() {
                 </PopoverContent>
               </Popover>
 
-              <Button
-                className="w-full md:w-auto"
-                onClick={handleBorrow}
-                disabled={
-                  book.available_copies === 0 || isBorrowing || !selectedDueDate
-                }
-              >
-                {isBorrowing ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Borrowing...
-                  </>
-                ) : (
-                  <>
-                    <BookOpen className="mr-2 h-4 w-4" />
-                    Borrow Book
-                  </>
-                )}
-              </Button>
+              <div className="flex gap-2 flex-col md:flex-row">
+                <Button onClick={handleBorrow} disabled={isBorrowing}>
+                  {isBorrowing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Borrowing...
+                    </>
+                  ) : (
+                    "Borrow"
+                  )}
+                </Button>
+                <Button onClick={handlePurchase} disabled={isPurchasing}>
+                  {isPurchasing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Purchasing...
+                    </>
+                  ) : (
+                    "Buy"
+                  )}
+                </Button>
+              </div>
             </div>
-            {hasAlreadyBorrowed && (
-              <Alert variant="destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>Already Borrowed</AlertTitle>
-                <AlertDescription>
-                  You have already borrowed this book. Please return it before
-                  borrowing again.
-                </AlertDescription>
-              </Alert>
-            )}
-            {!hasAlreadyBorrowed && book.available_copies > 0 && (
-              <Alert>
-                <BookOpen className="h-4 w-4" />
-                <AlertTitle>Available for Borrowing</AlertTitle>
-                <AlertDescription>
-                  This book is available for borrowing! Choose a return date and
-                  borrow now.
-                </AlertDescription>
-              </Alert>
-            )}
           </CardContent>
         </Card>
       </div>

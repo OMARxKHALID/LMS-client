@@ -5,6 +5,7 @@ import {
   removeBook,
   setLoading,
   updateBook,
+  purchasedBook,
 } from "@/redux/slice/bookSlice";
 
 export function useBook() {
@@ -72,7 +73,6 @@ export function useBook() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(bookData),
-        credentials: "include",
       });
 
       if (!response.ok) {
@@ -88,5 +88,28 @@ export function useBook() {
     }
   };
 
-  return { getBooks, createBook, deleteBook, editBook };
+  const purchaseBook = async (purchasedBookData) => {
+    try {
+      const response = await fetch(`${BASE_URL}/purchase`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(purchasedBookData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error purchasing a book");
+      }
+
+      const updatedBook = await response.json();
+      dispatch(purchasedBook(updatedBook));
+      return updatedBook;
+    } catch (error) {
+      console.error("Error purchasing a book:", error);
+      throw error;
+    }
+  };
+
+  return { getBooks, createBook, deleteBook, editBook, purchaseBook };
 }

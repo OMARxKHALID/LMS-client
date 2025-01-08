@@ -31,37 +31,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const profileFormSchema = z
-  .object({
-    username: z
-      .string()
-      .min(3, "Username must be at least 3 characters")
-      .max(50, "Username must not exceed 50 characters"),
-    email: z.string().email("Invalid email address"),
-    currentPassword: z.string().optional(),
-    newPassword: z.string().optional(),
-    confirmPassword: z.string().optional(),
-    userType: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      const hasAnyPassword =
-        data.currentPassword || data.newPassword || data.confirmPassword;
-      const hasAllPasswords =
-        data.currentPassword && data.newPassword && data.confirmPassword;
-      return !hasAnyPassword || hasAllPasswords;
-    },
-    {
-      message: "All password fields are required when changing password",
-    }
-  )
-  .refine(
-    (data) => !data.newPassword || data.newPassword === data.confirmPassword,
-    {
-      message: "Passwords do not match",
-      path: ["confirmPassword"],
-    }
-  );
+// Extend the schema to include address and walletBalance
+const profileFormSchema = z.object({
+  username: z.string().min(3).max(50),
+  email: z.string().email(),
+  userType: z.string().optional(),
+  address: z.object({
+    street: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    country: z.string().optional(),
+    postalCode: z.string().optional(),
+  }),
+  walletBalance: z.number().optional(),
+});
 
 export default function Profile() {
   const { user } = useSelector((state) => state.auth);
@@ -75,6 +58,8 @@ export default function Profile() {
       username: user?.username || "",
       email: user?.email || "",
       userType: user?.userType || "",
+      address: user?.address || {},
+      walletBalance: user?.walletBalance || 0,
     },
   });
 
@@ -88,9 +73,7 @@ export default function Profile() {
         description: "Your profile has been updated successfully.",
       });
       setIsEditing(false);
-      form.reset({
-        ...data,
-      });
+      form.reset({ ...data });
     } catch (error) {
       toast({
         title: "Error",
@@ -122,6 +105,7 @@ export default function Profile() {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Always Visible Fields */}
               <FormField
                 control={form.control}
                 name="username"
@@ -129,9 +113,8 @@ export default function Profile() {
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input {...field} disabled={!isEditing} />
+                      <Input {...field} disabled />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -143,38 +126,118 @@ export default function Profile() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input {...field} type="email" disabled={!isEditing} />
+                      <Input {...field} type="email" disabled />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="userType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>User Type</FormLabel>
-                    <FormControl>
-                      <Select
-                        value={field.value}
-                        onValueChange={(value) => field.onChange(value)}
-                        disabled={!isEditing}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select user type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="buyer">Buyer</SelectItem>
-                          <SelectItem value="seller">Seller</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
 
+              {/* Conditionally Rendered Fields */}
+              {isEditing && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="userType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>User Type</FormLabel>
+                        <FormControl>
+                          <Select
+                            value={field.value}
+                            onValueChange={(value) => field.onChange(value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select user type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="buyer">Buyer</SelectItem>
+                              <SelectItem value="seller">Seller</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Address Fields */}
+                  <FormField
+                    control={form.control}
+                    name="address.street"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Street</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="address.city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>City</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="address.state"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>State</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="address.country"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Country</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="address.postalCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Postal Code</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Wallet Balance */}
+                  <FormField
+                    control={form.control}
+                    name="walletBalance"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Wallet Balance</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="number" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
+
+              {/* Buttons */}
               <div className="flex justify-end space-x-4">
                 {isEditing ? (
                   <>

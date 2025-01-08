@@ -24,12 +24,37 @@ const bookSlice = createSlice({
         state.books[index] = action.payload;
       }
     },
+    purchasedBook: (state, action) => {
+      const index = state.books.findIndex(
+        (book) => book._id === action.payload._id
+      );
+      if (index !== -1) {
+        // Update total_copies and available_copies based on the purchase quantity
+        const purchasedQuantity = action.payload.quantity;
+
+        state.books[index].total_copies -= purchasedQuantity;
+        state.books[index].available_copies -= purchasedQuantity;
+
+        // Update other properties if necessary (price, etc.)
+        state.books[index] = {
+          ...state.books[index],
+          ...action.payload,
+        };
+      }
+    },
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
   },
 });
 
-export const { setBooks, addBook, removeBook, setLoading, updateBook } =
-  bookSlice.actions;
+export const {
+  setBooks,
+  addBook,
+  removeBook,
+  setLoading,
+  updateBook,
+  purchasedBook,
+} = bookSlice.actions;
+
 export default bookSlice.reducer;
