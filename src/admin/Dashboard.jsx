@@ -257,7 +257,7 @@ export default function Dashboard() {
           <TabsList className="w-full justify-start overflow-x-auto">
             <TabsTrigger value="current">Currently Borrowed</TabsTrigger>
             <TabsTrigger value="history">Borrowing History</TabsTrigger>
-            {userType === "seller" && (
+            {userType === "admin" && (
               <TabsTrigger value="uploaded">Uploaded Books</TabsTrigger>
             )}
           </TabsList>
@@ -308,7 +308,7 @@ export default function Dashboard() {
               )}
             </>
           </TabsContent>
-          {userType === "seller" && (
+          {userType === "user" && (
             <TabsContent value="uploaded">
               {currentUploadedBooks.length === 0 ? (
                 <Card>

@@ -196,16 +196,16 @@ export default function Register() {
                     <SelectValue placeholder="Select User Type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="buyer">
+                    <SelectItem value="admin">
                       <div className="flex items-center gap-2">
                         <ShoppingBag className="h-4 w-4" />
-                        <span>Buyer</span>
+                        <span>admin</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="seller">
+                    <SelectItem value="user">
                       <div className="flex items-center gap-2">
                         <Store className="h-4 w-4" />
-                        <span>Seller</span>
+                        <span>user</span>
                       </div>
                     </SelectItem>
                   </SelectContent>

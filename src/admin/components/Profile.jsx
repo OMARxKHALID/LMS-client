@@ -150,8 +150,8 @@ export default function Profile() {
                               <SelectValue placeholder="Select user type" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="buyer">Buyer</SelectItem>
-                              <SelectItem value="seller">Seller</SelectItem>
+                              <SelectItem value="admin">admin</SelectItem>
+                              <SelectItem value="user">user</SelectItem>
                             </SelectContent>
                           </Select>
                         </FormControl>

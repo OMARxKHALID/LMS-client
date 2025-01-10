@@ -12,6 +12,7 @@ import EditBook from "@/admin/components/book/EditBook";
 import ManageCategories from "@/admin/components/category/ManageCategories";
 import Profile from "@/admin/components/Profile";
 import Earnings from "@/admin/components/Earnings";
+import Transactions from "@/admin/components/Transactions";
 
 export const publicRoutes = [
   { path: "/", element: <Home />, showFooter: true },
@@ -27,19 +28,24 @@ export const authRoutes = [
 ];
 
 export const adminRoutes = [
-  { path: "", element: <Dashboard />, roles: ["buyer", "seller"] },
-  { path: "manage-books", element: <ManageBooks />, roles: ["seller"] },
-  { path: "create-book", element: <CreateBook />, roles: ["seller"] },
-  { path: "edit-book/:id", element: <EditBook />, roles: ["seller"] },
+  { path: "", element: <Dashboard />, roles: ["admin", "user"] },
+  { path: "manage-books", element: <ManageBooks />, roles: ["admin"] },
+  { path: "create-book", element: <CreateBook />, roles: ["admin"] },
+  { path: "edit-book/:id", element: <EditBook />, roles: ["admin"] },
   {
     path: "manage-categories",
     element: <ManageCategories />,
-    roles: ["seller"],
+    roles: ["admin"],
   },
   {
     path: "earnings",
     element: <Earnings />,
-    roles: ["seller"],
+    roles: ["admin"],
   },
-  { path: "profile", element: <Profile />, roles: ["buyer", "seller"] },
+  {
+    path: "transactions",
+    element: <Transactions />,
+    roles: ["admin"],
+  },
+  { path: "profile", element: <Profile />, roles: ["admin", "user"] },
 ];

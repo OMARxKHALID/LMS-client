@@ -25,6 +25,7 @@ import {
   User2,
   ChevronUp,
   DollarSign,
+  History,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useAuth } from "@/hooks/useAuth";
@@ -85,7 +86,7 @@ export default function AdminLayout() {
               </SidebarMenu>
             </SidebarGroup>
 
-            {user.userType === "seller" && (
+            {user.userType === "admin" && (
               <>
                 <SidebarGroup>
                   <SidebarMenu>
@@ -146,6 +147,24 @@ export default function AdminLayout() {
                         >
                           <DollarSign className="h-5 w-5 mr-3" />
                           <span>Earnings</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </SidebarMenu>
+                </SidebarGroup>
+                <SidebarGroup>
+                  <SidebarMenu>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={isActiveRoute("/admin/transcations")}
+                      >
+                        <Link
+                          to="/admin/transactions"
+                          className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        >
+                          <History className="h-5 w-5 mr-3" />
+                          <span>Transactions</span>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
