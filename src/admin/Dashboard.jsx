@@ -236,7 +236,7 @@ export default function Dashboard() {
         </div>
 
         {showOverdueNotice && overdueBooks > 0 && (
-          <Alert variant="destructive" className="relative">
+          <Alert variant="destructive" className="relative mb-3">
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Overdue Books Notice</AlertTitle>
             <AlertDescription>
@@ -308,7 +308,7 @@ export default function Dashboard() {
               )}
             </>
           </TabsContent>
-          {userType === "user" && (
+          {userType === "admin" && (
             <TabsContent value="uploaded">
               {currentUploadedBooks.length === 0 ? (
                 <Card>

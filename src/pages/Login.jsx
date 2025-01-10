@@ -85,7 +85,7 @@ export default function Login() {
         email: data.email,
         password: data.password,
       });
-      if (response.message === "Login successful") {
+      if (response.message === "LOGGED-IN") {
         trigSuccessInput.fire();
         toast({
           title: "Success",

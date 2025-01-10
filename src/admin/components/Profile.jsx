@@ -105,7 +105,6 @@ export default function Profile() {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* Always Visible Fields */}
               <FormField
                 control={form.control}
                 name="username"
@@ -131,35 +130,33 @@ export default function Profile() {
                   </FormItem>
                 )}
               />
-
-              {/* Conditionally Rendered Fields */}
               {isEditing && (
                 <>
-                  <FormField
-                    control={form.control}
-                    name="userType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>User Type</FormLabel>
-                        <FormControl>
-                          <Select
-                            value={field.value}
-                            onValueChange={(value) => field.onChange(value)}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select user type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="admin">admin</SelectItem>
-                              <SelectItem value="user">user</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Address Fields */}
+                  {user?.username === "admin" && (
+                    <FormField
+                      control={form.control}
+                      name="userType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>User Type</FormLabel>
+                          <FormControl>
+                            <Select
+                              value={field.value}
+                              onValueChange={(value) => field.onChange(value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select user type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="admin">admin</SelectItem>
+                                <SelectItem value="user">user</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  )}
                   <FormField
                     control={form.control}
                     name="address.street"
@@ -220,8 +217,6 @@ export default function Profile() {
                       </FormItem>
                     )}
                   />
-
-                  {/* Wallet Balance */}
                   <FormField
                     control={form.control}
                     name="walletBalance"
@@ -236,8 +231,6 @@ export default function Profile() {
                   />
                 </>
               )}
-
-              {/* Buttons */}
               <div className="flex justify-end space-x-4">
                 {isEditing ? (
                   <>

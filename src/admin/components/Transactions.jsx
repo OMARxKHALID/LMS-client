@@ -22,28 +22,35 @@ function Transactions() {
   const [currentPage, setCurrentPage] = useState(1);
   const { getTransactions } = useTransaction();
   const { transactions, loading } = useSelector((state) => state.transactions);
+  const { user } = useSelector((state) => state.auth);
+  const { _id: userId, userType } = user || [];
 
   useEffect(() => {
     getTransactions();
   }, []);
 
-  const totalTransactions = transactions.length;
-  const successfulTransactions = transactions.filter(
+  const filteredTransactions =
+    userType === "admin"
+      ? transactions
+      : transactions.filter((t) => t.user._id === userId);
+
+  const totalTransactions = filteredTransactions.length;
+  const successfulTransactions = filteredTransactions.filter(
     (t) => t.status === "success"
   ).length;
-  const pendingTransactions = transactions.filter(
+  const pendingTransactions = filteredTransactions.filter(
     (t) => t.status === "pending"
   ).length;
-  const failedTransactions = transactions.filter(
+  const failedTransactions = filteredTransactions.filter(
     (t) => t.status === "failed"
   ).length;
 
-  const paginatedTransactions = transactions.slice(
+  const paginatedTransactions = filteredTransactions.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
 
-  const totalPages = Math.ceil(transactions.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE);
 
   return (
     <SidebarInset>
@@ -171,8 +178,8 @@ function Transactions() {
 
           <div className="flex items-center justify-between mt-4">
             <p className="text-sm text-muted-foreground">
-              Showing {Math.min(ITEMS_PER_PAGE, transactions.length)} of{" "}
-              {transactions.length} transactions
+              Showing {Math.min(ITEMS_PER_PAGE, filteredTransactions.length)} of{" "}
+              {filteredTransactions.length} transactions
             </p>
             <div className="flex items-center space-x-2">
               <Button

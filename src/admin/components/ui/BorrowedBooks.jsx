@@ -37,7 +37,7 @@ const BorrowedBooksTable = ({
               expected_return_date,
               borrowed_by,
               total_borrow_price,
-              total_borrowed_fine,
+              late_fine,
               total_price,
             } = borrow;
             const isOverdue = isPast(new Date(expected_return_date));
@@ -68,7 +68,7 @@ const BorrowedBooksTable = ({
                   )}
                 </TableCell>
                 <TableCell>
-                  ${total_borrowed_fine ? total_borrowed_fine : "0.00"}
+                  ${late_fine ? late_fine.toFixed(2) : "0.00"}
                 </TableCell>
                 <TableCell>
                   <Button

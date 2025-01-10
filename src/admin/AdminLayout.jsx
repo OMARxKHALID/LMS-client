@@ -85,7 +85,24 @@ export default function AdminLayout() {
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroup>
-
+            <SidebarGroup>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActiveRoute("/admin/borrowed-books")}
+                  >
+                    <Link
+                      to="/admin/borrowed-books"
+                      className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      <History className="h-5 w-5 mr-3" />
+                      <span>Borrowed Books</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroup>
             {user.userType === "admin" && (
               <>
                 <SidebarGroup>
@@ -152,26 +169,26 @@ export default function AdminLayout() {
                     </SidebarMenuItem>
                   </SidebarMenu>
                 </SidebarGroup>
-                <SidebarGroup>
-                  <SidebarMenu>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isActiveRoute("/admin/transcations")}
-                      >
-                        <Link
-                          to="/admin/transactions"
-                          className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
-                        >
-                          <History className="h-5 w-5 mr-3" />
-                          <span>Transactions</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </SidebarMenu>
-                </SidebarGroup>
               </>
             )}
+            <SidebarGroup>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActiveRoute("/admin/transcations")}
+                  >
+                    <Link
+                      to="/admin/transactions"
+                      className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      <History className="h-5 w-5 mr-3" />
+                      <span>Transactions</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroup>
           </SidebarContent>
 
           <SidebarFooter className="border-t p-2">

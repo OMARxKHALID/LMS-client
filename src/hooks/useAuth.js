@@ -115,7 +115,7 @@ export function useAuth() {
 
   const updateProfile = async (userId, profileData) => {
     try {
-      const response = await fetch(`${BASE_URL}/users/${userId}`, {
+      const response = await fetch(`${BASE_URL}/user/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -162,6 +162,32 @@ export function useAuth() {
     }
   };
 
+  const getUserBorrowedBooks = async (userId) => {
+    try {
+      const response = await fetch(
+        `${BASE_URL}/user/${userId}/borrowed-books`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${auth_token}`,
+          },
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Fetching borrowed books failed");
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error("Fetch borrowed books error:", error.message);
+      throw error;
+    }
+  };
+
   return {
     signIn,
     signUp,
@@ -170,5 +196,6 @@ export function useAuth() {
     resetPassword,
     updateProfile,
     getAllUsers,
+    getUserBorrowedBooks,
   };
 }

@@ -37,7 +37,7 @@ const TotalBorrowedBooksTable = ({ currentTotalBorrowedBooks = [] }) => {
               return_date,
               total_price,
               total_borrow_price,
-              total_borrowed_fine,
+              late_fine,
             } = borrow;
 
             return (
@@ -66,10 +66,7 @@ const TotalBorrowedBooksTable = ({ currentTotalBorrowedBooks = [] }) => {
                     : "N/A"}
                 </TableCell>
                 <TableCell>
-                  $
-                  {total_borrowed_fine
-                    ? total_borrowed_fine.toFixed(2)
-                    : "0.00"}
+                  ${late_fine ? late_fine.toFixed(2) : "0.00"}
                 </TableCell>
                 <TableCell>
                   {return_date ? (

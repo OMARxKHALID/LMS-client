@@ -13,6 +13,7 @@ import ManageCategories from "@/admin/components/category/ManageCategories";
 import Profile from "@/admin/components/Profile";
 import Earnings from "@/admin/components/Earnings";
 import Transactions from "@/admin/components/Transactions";
+import BorrowedBooks from "@/admin/components/BorrowedBooks";
 
 export const publicRoutes = [
   { path: "/", element: <Home />, showFooter: true },
@@ -45,7 +46,12 @@ export const adminRoutes = [
   {
     path: "transactions",
     element: <Transactions />,
-    roles: ["admin"],
+    roles: ["admin", "user"],
+  },
+  {
+    path: "borrowed-books",
+    element: <BorrowedBooks />,
+    roles: ["admin", "user"],
   },
   { path: "profile", element: <Profile />, roles: ["admin", "user"] },
 ];
