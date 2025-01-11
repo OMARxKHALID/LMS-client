@@ -103,7 +103,25 @@ export default function AdminLayout() {
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroup>
-            {user.userType === "admin" && (
+            <SidebarGroup>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActiveRoute("/admin/purchased-books")}
+                  >
+                    <Link
+                      to="/admin/purchased-books"
+                      className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      <History className="h-5 w-5 mr-3" />
+                      <span>Purchased Books</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroup>
+            {user.role === "admin" && (
               <>
                 <SidebarGroup>
                   <SidebarMenu>

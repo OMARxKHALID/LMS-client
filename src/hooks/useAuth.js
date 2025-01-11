@@ -165,7 +165,7 @@ export function useAuth() {
   const getUserBorrowedBooks = async (userId) => {
     try {
       const response = await fetch(
-        `${BASE_URL}/user/${userId}/borrowed-books`,
+        `${BASE_URL}/user/borrowed-books/${userId}`,
         {
           method: "GET",
           headers: {

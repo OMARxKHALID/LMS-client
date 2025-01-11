@@ -23,14 +23,15 @@ function Transactions() {
   const { getTransactions } = useTransaction();
   const { transactions, loading } = useSelector((state) => state.transactions);
   const { user } = useSelector((state) => state.auth);
-  const { _id: userId, userType } = user || [];
+
+  const { _id: userId, role } = user || [];
 
   useEffect(() => {
     getTransactions();
   }, []);
 
   const filteredTransactions =
-    userType === "admin"
+    role === "admin"
       ? transactions
       : transactions.filter((t) => t.user._id === userId);
 

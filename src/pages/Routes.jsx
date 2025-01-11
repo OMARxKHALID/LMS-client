@@ -14,6 +14,7 @@ import Profile from "@/admin/components/Profile";
 import Earnings from "@/admin/components/Earnings";
 import Transactions from "@/admin/components/Transactions";
 import BorrowedBooks from "@/admin/components/BorrowedBooks";
+import PurchasedBooks from "@/admin/components/PurchasedBooks";
 
 export const publicRoutes = [
   { path: "/", element: <Home />, showFooter: true },
@@ -51,6 +52,11 @@ export const adminRoutes = [
   {
     path: "borrowed-books",
     element: <BorrowedBooks />,
+    roles: ["admin", "user"],
+  },
+  {
+    path: "purchased-books",
+    element: <PurchasedBooks />,
     roles: ["admin", "user"],
   },
   { path: "profile", element: <Profile />, roles: ["admin", "user"] },

@@ -18,10 +18,7 @@ const loadPreloadedState = () => {
 
 const saveStateToLocalStorage = (state) => {
   try {
-    const stateToPersist = {
-      auth: state.auth,
-    };
-    localStorage.setItem("reduxState", JSON.stringify(stateToPersist));
+    localStorage.setItem("reduxState", JSON.stringify(state));
   } catch (error) {
     console.error("Error saving state to localStorage:", error);
   }
@@ -45,7 +42,7 @@ export const store = configureStore({
     }),
 });
 
-// Save state to localStorage on updates
+// Save entire state to localStorage on updates
 store.subscribe(() => {
   const state = store.getState();
   saveStateToLocalStorage(state);

@@ -35,7 +35,7 @@ const schema = z
       .min(8, "Password must be at least 8 characters")
       .regex(/[A-Z]/, "Password must contain at least one uppercase letter"),
     confirmPassword: z.string().min(1, "Confirm Password is required"),
-    userType: z.string().min(1, "User type is required"),
+    role: z.string().min(1, "User type is required"),
   })
   .refine((values) => values.password === values.confirmPassword, {
     message: "Passwords must match!",
@@ -65,7 +65,7 @@ export default function Register() {
         password: data.password,
         username: data.username,
         full_name: data.full_name,
-        userType: data.userType,
+        role: data.role,
       });
       toast({
         title: "Success",
@@ -184,13 +184,13 @@ export default function Register() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="userType">User Type</Label>
+              <Label htmlFor="role">User Type</Label>
               <div className="relative">
                 <Select
                   onValueChange={(value) => {
-                    setValue("userType", value, { shouldValidate: true });
+                    setValue("role", value, { shouldValidate: true });
                   }}
-                  defaultValue={watch("userType")}
+                  defaultValue={watch("role")}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select User Type" />
@@ -210,10 +210,8 @@ export default function Register() {
                     </SelectItem>
                   </SelectContent>
                 </Select>
-                {errors.userType && (
-                  <p className="text-sm text-red-500">
-                    {errors.userType.message}
-                  </p>
+                {errors.role && (
+                  <p className="text-sm text-red-500">{errors.role.message}</p>
                 )}
               </div>
             </div>

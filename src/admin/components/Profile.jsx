@@ -35,7 +35,7 @@ import {
 const profileFormSchema = z.object({
   username: z.string().min(3).max(50),
   email: z.string().email(),
-  userType: z.string().optional(),
+  role: z.string().optional(),
   address: z.object({
     street: z.string().optional(),
     city: z.string().optional(),
@@ -57,7 +57,7 @@ export default function Profile() {
     defaultValues: {
       username: user?.username || "",
       email: user?.email || "",
-      userType: user?.userType || "",
+      role: user?.role || "",
       address: user?.address || {},
       walletBalance: user?.walletBalance || 0,
     },
@@ -135,7 +135,7 @@ export default function Profile() {
                   {user?.username === "admin" && (
                     <FormField
                       control={form.control}
-                      name="userType"
+                      name="role"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>User Type</FormLabel>

@@ -25,7 +25,7 @@ import { useBorrow } from "@/hooks/useBorrow";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import BorrowedBooksTable from "./components/ui/BorrowedBooks";
+import BorrowedBooksTable from "./components/ui/BorrowedBooksTable";
 import TotalBorrowedBooksTable from "./components/ui/TotalBorrowedBooks";
 import UploadedBooksTable from "./components/ui/UploadedBooks";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -43,7 +43,7 @@ export default function Dashboard() {
   const { borrows, loading } = useSelector((state) => state.borrow);
   const { user } = useSelector((state) => state.auth);
 
-  const { userType } = user;
+  const { role } = user;
 
   const [showOverdueNotice, setShowOverdueNotice] = useState(true);
 
@@ -257,7 +257,7 @@ export default function Dashboard() {
           <TabsList className="w-full justify-start overflow-x-auto">
             <TabsTrigger value="current">Currently Borrowed</TabsTrigger>
             <TabsTrigger value="history">Borrowing History</TabsTrigger>
-            {userType === "admin" && (
+            {role === "admin" && (
               <TabsTrigger value="uploaded">Uploaded Books</TabsTrigger>
             )}
           </TabsList>
@@ -308,7 +308,7 @@ export default function Dashboard() {
               )}
             </>
           </TabsContent>
-          {userType === "admin" && (
+          {role === "admin" && (
             <TabsContent value="uploaded">
               {currentUploadedBooks.length === 0 ? (
                 <Card>

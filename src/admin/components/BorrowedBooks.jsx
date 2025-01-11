@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FileText, Eye, Search, RefreshCcw } from "lucide-react";
 import {
   Card,
@@ -18,49 +18,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-const books = [
-  {
-    id: "1",
-    title: "The Great Gatsby",
-    author: "F. Scott Fitzgerald",
-    borrowDate: "2024-12-28",
-    dueDate: "2025-01-28",
-    pdfUrl: "/books/great-gatsby.pdf",
-    status: "borrowed",
-  },
-  {
-    id: "2",
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    borrowDate: "2024-12-15",
-    dueDate: "2025-01-15",
-    returnDate: "2024-12-30",
-    pdfUrl: "/books/mockingbird.pdf",
-    status: "returned",
-  },
-  {
-    id: "3",
-    title: "1984",
-    author: "George Orwell",
-    borrowDate: "2024-12-01",
-    dueDate: "2024-12-31",
-    pdfUrl: "/books/1984.pdf",
-    status: "overdue",
-  },
-];
+import { useSelector } from "react-redux";
+import { useBook } from "@/hooks/useBook";
 
 export default function BorrowedBooks() {
+  const { borrows } = useSelector((state) => state.borrow);
+  const { user } = useSelector((state) => state.auth);
+  const { books } = useSelector((state) => state.books);
+  const { getBooks } = useBook();
+
+  useEffect(() => {
+    getBooks();
+  }, []);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("dueDate");
   const [currentPage, setCurrentPage] = useState(1);
+  const [activeTab, setActiveTab] = useState("current");
   const itemsPerPage = 6;
+
+  const borrowedBooks = borrows.filter((b) => b.borrowed_by._id === user._id);
+  const bookss = books.filter((b) => b.uploaded_by === user._id);
 
   const filterBooks = (books, query) => {
     return books.filter(
       (book) =>
-        book.title.toLowerCase().includes(query.toLowerCase()) ||
-        book.author.toLowerCase().includes(query.toLowerCase())
+        book.borrowed_book.title.toLowerCase().includes(query.toLowerCase()) ||
+        book.borrowed_book.author.toLowerCase().includes(query.toLowerCase())
     );
   };
 
@@ -68,11 +52,14 @@ export default function BorrowedBooks() {
     return [...books].sort((a, b) => {
       switch (sortBy) {
         case "dueDate":
-          return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+          return (
+            new Date(a.expected_return_date).getTime() -
+            new Date(b.expected_return_date).getTime()
+          );
         case "title":
-          return a.title.localeCompare(b.title);
+          return a.borrowed_book.title.localeCompare(b.borrowed_book.title);
         case "author":
-          return a.author.localeCompare(b.author);
+          return a.borrowed_book.author.localeCompare(b.borrowed_book.author);
         default:
           return 0;
       }
@@ -80,7 +67,7 @@ export default function BorrowedBooks() {
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case "borrowed":
         return "bg-blue-500/10 text-blue-500";
       case "returned":
@@ -92,36 +79,52 @@ export default function BorrowedBooks() {
     }
   };
 
-  const filteredBooks = filterBooks(books, searchQuery);
+  const filteredBooks = filterBooks(borrowedBooks, searchQuery);
   const sortedBooks = sortBooks(filteredBooks, sortBy);
-  const totalPages = Math.ceil(sortedBooks.length / itemsPerPage);
-  const currentBooks = sortedBooks.slice(
+  const filteredByTab =
+    activeTab === "current"
+      ? sortedBooks.filter((book) => !book.return_date)
+      : sortedBooks.filter((book) => book.return_date);
+  const totalPages = Math.ceil(filteredByTab.length / itemsPerPage);
+  const currentBooks = filteredByTab.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
   return (
     <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Borrowed Books</h1>
           <p className="text-muted-foreground">
             View and access your borrowed book PDFs
           </p>
         </div>
-        <Button variant="outline" size="sm">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setSearchQuery("");
+            setSortBy("dueDate");
+            setCurrentPage(1);
+          }}
+        >
           <RefreshCcw className="h-4 w-4 mr-2" />
-          Refresh
+          <button onClick={getBooks}>Refresh</button>
         </Button>
       </div>
 
-      <Tabs defaultValue="current" className="space-y-4">
+      <Tabs
+        defaultValue="current"
+        className="space-y-4"
+        onValueChange={setActiveTab}
+      >
         <TabsList>
           <TabsTrigger value="current">Currently Borrowed</TabsTrigger>
           <TabsTrigger value="history">Borrowing History</TabsTrigger>
         </TabsList>
 
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
           <div className="relative flex-1">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -144,154 +147,126 @@ export default function BorrowedBooks() {
         </div>
 
         <TabsContent value="current" className="space-y-4">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {currentBooks.map((book) => (
-              <Card key={book.id} className="overflow-hidden">
-                <CardHeader className="space-y-1">
-                  <div className="flex justify-between items-start">
-                    <CardTitle className="line-clamp-1">{book.title}</CardTitle>
-                    <Badge
-                      className={getStatusColor(book.status)}
-                      variant="secondary"
-                    >
-                      {book.status.charAt(0).toUpperCase() +
-                        book.status.slice(1)}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{book.author}</p>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Borrowed:</span>
-                      <span>
-                        {new Date(book.borrowDate).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Due Date:</span>
-                      <span>{new Date(book.dueDate).toLocaleDateString()}</span>
-                    </div>
-                    {book.returnDate && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Returned:</span>
-                        <span>
-                          {new Date(book.returnDate).toLocaleDateString()}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button
-                    className="w-full"
-                    onClick={() => window.open(book.pdfUrl, "_blank")}
-                  >
-                    <Eye className="w-4 h-4 mr-2" />
-                    View PDF
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-
-          {currentBooks.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-[400px] border rounded-lg bg-muted/10">
-              <FileText className="h-10 w-10 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium">No books found</h3>
-              <p className="text-sm text-muted-foreground">
-                Try adjusting your search or filters
-              </p>
-            </div>
-          )}
-
-          {totalPages > 1 && (
-            <div className="flex justify-center gap-2 mt-6">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </Button>
-              {[...Array(totalPages)].map((_, i) => (
-                <Button
-                  key={i}
-                  variant={currentPage === i + 1 ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setCurrentPage(i + 1)}
-                >
-                  {i + 1}
-                </Button>
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  setCurrentPage((p) => Math.min(totalPages, p + 1))
-                }
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </Button>
-            </div>
-          )}
+          <BooksGrid
+            books={currentBooks}
+            getStatusColor={getStatusColor}
+            bookss={bookss}
+          />
+          {currentBooks.length === 0 && <NoBooksFound />}
         </TabsContent>
 
-        <TabsContent value="history">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {currentBooks
-              .filter((book) => book.status === "returned")
-              .map((book) => (
-                <Card key={book.id} className="overflow-hidden">
-                  <CardHeader className="space-y-1">
-                    <div className="flex justify-between items-start">
-                      <CardTitle className="line-clamp-1">
-                        {book.title}
-                      </CardTitle>
-                      <Badge
-                        className={getStatusColor(book.status)}
-                        variant="secondary"
-                      >
-                        {book.status.charAt(0).toUpperCase() +
-                          book.status.slice(1)}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {book.author}
-                    </p>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-col space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Borrowed:</span>
-                        <span>
-                          {new Date(book.borrowDate).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Returned:</span>
-                        <span>
-                          {new Date(book.returnDate).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button
-                      className="w-full"
-                      onClick={() => window.open(book.pdfUrl, "_blank")}
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      View PDF
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-          </div>
+        <TabsContent value="history" className="space-y-4">
+          <BooksGrid
+            books={currentBooks}
+            getStatusColor={getStatusColor}
+            bookss={bookss}
+          />
+          {currentBooks.length === 0 && <NoBooksFound />}
         </TabsContent>
       </Tabs>
+
+      {totalPages > 1 && (
+        <Pagination
+          totalPages={totalPages}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
+      )}
     </div>
   );
 }
+
+const BooksGrid = ({ books, getStatusColor, bookss }) => (
+  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+    {books.map((book) => (
+      <Card key={book._id} className="overflow-hidden">
+        <CardHeader className="space-y-1">
+          <div className="flex justify-between items-start">
+            <CardTitle className="line-clamp-1">
+              {book.borrowed_book.title}
+            </CardTitle>
+            <Badge className={getStatusColor(book.status)} variant="secondary">
+              {book.status.charAt(0).toUpperCase() + book.status.slice(1)}
+            </Badge>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {book.borrowed_book.author}
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Borrowed:</span>
+              <span>{new Date(book.borrowed_date).toLocaleDateString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Due Date:</span>
+              <span>
+                {new Date(book.expected_return_date).toLocaleDateString()}
+              </span>
+            </div>
+          </div>
+        </CardContent>
+        <CardFooter>
+          {bookss.map((singleBook, index) => (
+            <div className="w-full" key={index}>
+              {singleBook.pdf_files && singleBook.pdf_files.length > 0 ? (
+                <Button
+                  size="sm"
+                  className="w-full"
+                  onClick={() => window.open(singleBook.pdf_files[0], "_blank")}
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  View PDF
+                </Button>
+              ) : (
+                <p>No PDF available</p>
+              )}
+            </div>
+          ))}
+        </CardFooter>
+      </Card>
+    ))}
+  </div>
+);
+
+const NoBooksFound = () => (
+  <div className="flex flex-col items-center justify-center h-[400px] border rounded-lg bg-muted/10">
+    <FileText className="h-10 w-10 text-muted-foreground mb-4" />
+    <h3 className="text-lg font-medium">No books found</h3>
+    <p className="text-sm text-muted-foreground">
+      Try adjusting your search or filters
+    </p>
+  </div>
+);
+
+const Pagination = ({ totalPages, currentPage, setCurrentPage }) => (
+  <div className="flex justify-center gap-2 mt-6">
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+      disabled={currentPage === 1}
+    >
+      Previous
+    </Button>
+    {[...Array(totalPages)].map((_, i) => (
+      <Button
+        key={i}
+        variant={currentPage === i + 1 ? "default" : "outline"}
+        size="sm"
+        onClick={() => setCurrentPage(i + 1)}
+      >
+        {i + 1}
+      </Button>
+    ))}
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+      disabled={currentPage === totalPages}
+    >
+      Next
+    </Button>
+  </div>
+);
