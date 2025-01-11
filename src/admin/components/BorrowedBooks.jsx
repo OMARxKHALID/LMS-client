@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FileText, Eye, Search, RefreshCcw } from "lucide-react";
 import {
   Card,
@@ -24,12 +24,7 @@ import { useBook } from "@/hooks/useBook";
 export default function BorrowedBooks() {
   const { borrows } = useSelector((state) => state.borrow);
   const { user } = useSelector((state) => state.auth);
-  const { books } = useSelector((state) => state.books);
   const { getBooks } = useBook();
-
-  useEffect(() => {
-    getBooks();
-  }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("dueDate");
@@ -38,7 +33,6 @@ export default function BorrowedBooks() {
   const itemsPerPage = 6;
 
   const borrowedBooks = borrows.filter((b) => b.borrowed_by._id === user._id);
-  const bookss = books.filter((b) => b.uploaded_by === user._id);
 
   const filterBooks = (books, query) => {
     return books.filter(
@@ -147,20 +141,12 @@ export default function BorrowedBooks() {
         </div>
 
         <TabsContent value="current" className="space-y-4">
-          <BooksGrid
-            books={currentBooks}
-            getStatusColor={getStatusColor}
-            bookss={bookss}
-          />
+          <BooksGrid books={currentBooks} getStatusColor={getStatusColor} />
           {currentBooks.length === 0 && <NoBooksFound />}
         </TabsContent>
 
         <TabsContent value="history" className="space-y-4">
-          <BooksGrid
-            books={currentBooks}
-            getStatusColor={getStatusColor}
-            bookss={bookss}
-          />
+          <BooksGrid books={currentBooks} getStatusColor={getStatusColor} />
           {currentBooks.length === 0 && <NoBooksFound />}
         </TabsContent>
       </Tabs>
@@ -175,26 +161,25 @@ export default function BorrowedBooks() {
     </div>
   );
 }
-
-const BooksGrid = ({ books, getStatusColor, bookss }) => (
-  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+const BooksGrid = ({ books, getStatusColor }) => (
+  <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
     {books.map((book) => (
-      <Card key={book._id} className="overflow-hidden">
+      <Card key={book._id} className="overflow-hidden flex flex-col">
         <CardHeader className="space-y-1">
           <div className="flex justify-between items-start">
-            <CardTitle className="line-clamp-1">
+            <CardTitle className="line-clamp-1 text-base sm:text-lg">
               {book.borrowed_book.title}
             </CardTitle>
             <Badge className={getStatusColor(book.status)} variant="secondary">
               {book.status.charAt(0).toUpperCase() + book.status.slice(1)}
             </Badge>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             {book.borrowed_book.author}
           </p>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-col space-y-2 text-sm">
+        <CardContent className="flex-grow">
+          <div className="flex flex-col space-y-2 text-xs sm:text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Borrowed:</span>
               <span>{new Date(book.borrowed_date).toLocaleDateString()}</span>
@@ -208,22 +193,25 @@ const BooksGrid = ({ books, getStatusColor, bookss }) => (
           </div>
         </CardContent>
         <CardFooter>
-          {bookss.map((singleBook, index) => (
-            <div className="w-full" key={index}>
-              {singleBook.pdf_files && singleBook.pdf_files.length > 0 ? (
-                <Button
-                  size="sm"
-                  className="w-full"
-                  onClick={() => window.open(singleBook.pdf_files[0], "_blank")}
-                >
-                  <Eye className="w-4 h-4 mr-2" />
-                  View PDF
-                </Button>
-              ) : (
-                <p>No PDF available</p>
-              )}
-            </div>
-          ))}
+          <div className="w-full">
+            {book.borrowed_book.pdf_files &&
+            book.borrowed_book.pdf_files.length > 0 ? (
+              <Button
+                size="sm"
+                className="w-full"
+                onClick={() =>
+                  window.open(book.borrowed_book.pdf_files[0], "_blank")
+                }
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                View PDF
+              </Button>
+            ) : (
+              <p className="text-center text-sm text-muted-foreground">
+                No PDF available
+              </p>
+            )}
+          </div>
         </CardFooter>
       </Card>
     ))}

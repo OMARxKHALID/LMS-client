@@ -131,56 +131,60 @@ export default function PurchasedBooks() {
 }
 
 const BooksGrid = ({ books }) => (
-  <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+  <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
     {books.map((book) => (
-      <Card key={book._id} className="overflow-hidden">
+      <Card key={book._id} className="overflow-hidden flex flex-col">
         <CardHeader className="space-y-1">
           <div className="flex justify-between items-start">
-            <CardTitle className="line-clamp-1 text-sm md:text-base">
+            <CardTitle className="line-clamp-1 text-base sm:text-lg">
               {book.title}
             </CardTitle>
             <Badge className="bg-blue-500/10 text-blue-500" variant="secondary">
               Purchased
             </Badge>
           </div>
-          <p className="text-sm text-muted-foreground">{book.author}</p>
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            {book.author}
+          </p>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-col space-y-2 text-sm">
+        <CardContent className="flex-grow">
+          <div className="flex flex-col space-y-2 text-xs sm:text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Purchased On:</span>
               <span>{new Date(book.purchased_date).toLocaleDateString()}</span>
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 sm:space-x-2">
-          {book.pdf_files && book.pdf_files.length > 0 ? (
-            <>
-              <Button
-                size="sm"
-                className="w-full sm:w-auto"
-                onClick={() => window.open(book.pdf_files[0], "_blank")}
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                View PDF
-              </Button>
-              <Button
-                size="sm"
-                className="w-full sm:w-auto"
-                onClick={() => {
-                  const link = document.createElement("a");
-                  link.href = book.pdf_files[0];
-                  link.download = book.title + ".pdf";
-                  link.click();
-                }}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download PDF
-              </Button>
-            </>
-          ) : (
-            <p className="text-sm text-muted-foreground">No PDF available</p>
-          )}
+        <CardFooter>
+          <div className="w-full flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 sm:space-x-2">
+            {book.pdf_files && book.pdf_files.length > 0 ? (
+              <>
+                <Button
+                  size="sm"
+                  className="w-full sm:w-auto"
+                  onClick={() => window.open(book.pdf_files[0], "_blank")}
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  View PDF
+                </Button>
+                <Button
+                  size="sm"
+                  className="w-full sm:w-auto"
+                  onClick={() => {
+                    const link = document.createElement("a");
+                    link.href = book.pdf_files[0];
+                    link.download = book.title + ".pdf";
+                    link.click();
+                  }}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download PDF
+                </Button>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">No PDF available</p>
+            )}
+          </div>
         </CardFooter>
       </Card>
     ))}

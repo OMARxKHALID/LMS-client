@@ -20,6 +20,9 @@ import {
   Loader2,
   DollarSign,
   AlertCircle,
+  CheckCircle,
+  AlertTriangle,
+  BookOpen,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,6 +37,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/helpers/utils";
 import { updateBook } from "@/redux/slice/bookSlice";
 import { useBook } from "@/hooks/useBook";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function SingleBook() {
   const [isBorrowing, setIsBorrowing] = useState(false);
@@ -177,12 +181,11 @@ export default function SingleBook() {
 
     setIsPurchasing(true);
     try {
-      const response = await purchaseBook({
+      await purchaseBook({
         purchased_book,
         purchased_by,
         quantity: 1,
       });
-      console.log("🚀 ~ handlePurchase ~ response:", response);
 
       const updatedBook = {
         ...book,
@@ -247,7 +250,6 @@ export default function SingleBook() {
           </CardContent>
         </Card>
 
-        {/* Book Details */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="text-3xl">{book.title}</CardTitle>
@@ -322,6 +324,17 @@ export default function SingleBook() {
             </div>
             <div className="flex gap-2">
               <Badge>{`${book.available_copies} Available`}</Badge>
+              {hasAlreadyBorrowed ? (
+                <Badge variant="destructive">
+                  <AlertCircle className="mr-1 h-4 w-4" />
+                  Already Borrowed
+                </Badge>
+              ) : (
+                <Badge variant="success">
+                  <CheckCircle className="mr-1 h-4 w-4" />
+                  Available for Borrowing
+                </Badge>
+              )}
             </div>
 
             <div className="flex gap-2 flex-col md:flex-row">
@@ -352,7 +365,7 @@ export default function SingleBook() {
                 </PopoverContent>
               </Popover>
 
-              <div className="flex gap-2 flex-col md:flex-row">
+              <div className="flex gap-2 flex-col md:flex-row ">
                 <Button onClick={handleBorrow} disabled={isBorrowing}>
                   {isBorrowing ? (
                     <>
@@ -375,6 +388,26 @@ export default function SingleBook() {
                 </Button>
               </div>
             </div>
+            {hasAlreadyBorrowed && (
+              <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Already Borrowed</AlertTitle>
+                <AlertDescription>
+                  You have already borrowed this book. Please return it before
+                  borrowing again.
+                </AlertDescription>
+              </Alert>
+            )}
+            {!hasAlreadyBorrowed && book.available_copies > 0 && (
+              <Alert>
+                <BookOpen className="h-4 w-4" />
+                <AlertTitle>Available for Borrowing</AlertTitle>
+                <AlertDescription>
+                  This book is available for borrowing! Choose a return date and
+                  borrow now.
+                </AlertDescription>
+              </Alert>
+            )}
           </CardContent>
         </Card>
       </div>
