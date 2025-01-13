@@ -63,10 +63,9 @@ const bookSchema = z.object({
     .min(1, "Must have at least one copy")
     .max(100, "Cannot exceed 100 copies"),
   category: z.string().min(1, "Category is required"),
-  location: z.string().min(1, "Location is required"),
-  book_data: z.array(z.any()).optional(),
+  pdf_files: z.array(z.any()).optional(),
   price: z.coerce.number().optional(),
-  borrowed_fine: z.coerce.number().optional(),
+  borrow_fine: z.coerce.number().optional(),
   borrow_price: z.coerce.number().optional(),
 });
 
@@ -97,30 +96,11 @@ export default function CreateBook() {
       cover_image_url: "",
       total_copies: 1,
       category: "",
-      location: "",
       price: 0,
-      borrowed_fine: 0,
+      borrow_fine: 0,
       borrow_price: 0,
     },
   });
-
-  const { watch, setValue } = form;
-
-  const price = watch("price");
-  const borrowPrice = watch("borrow_price");
-
-  const handlePriceChange = (value) => {
-    const priceValue = parseFloat(value) || 0; // Parse the new price value
-    setValue("price", priceValue); // Update the price field
-
-    // Calculate the borrow price based on 10% of the price
-    const calculatedBorrowPrice = parseFloat((priceValue * 0.1).toFixed(2));
-
-    // Only update borrow_price if it's unset or matches the previous calculated value
-    if (!borrowPrice || borrowPrice === parseFloat((price * 0.1).toFixed(2))) {
-      setValue("borrow_price", calculatedBorrowPrice);
-    }
-  };
 
   const onSubmit = async (data) => {
     if (!data.title || !data.author || !data.isbn) {
@@ -137,9 +117,9 @@ export default function CreateBook() {
 
         const formData = {
           ...data,
-          book_data: pdfUrls,
+          pdf_files: pdfUrls,
           price: data.price || 0,
-          borrowed_fine: data.borrowed_fine || 0,
+          borrow_fine: data.borrowed_fine || 0,
         };
 
         await createBook(formData);
@@ -377,20 +357,6 @@ export default function CreateBook() {
 
             <FormField
               control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter shelf location" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="price"
               render={({ field }) => (
                 <FormItem>
@@ -401,7 +367,6 @@ export default function CreateBook() {
                       min="0"
                       placeholder="Enter book price"
                       {...field}
-                      onChange={(e) => handlePriceChange(e.target.value)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -430,7 +395,7 @@ export default function CreateBook() {
 
             <FormField
               control={form.control}
-              name="borrowed_fine"
+              name="borrow_fine"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Borrowed Fine</FormLabel>

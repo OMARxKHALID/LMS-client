@@ -62,10 +62,9 @@ const bookSchema = z.object({
     .min(1, "Must have at least one copy")
     .max(100, "Cannot exceed 100 copies"),
   category: z.string().min(1, "Category is required"),
-  location: z.string().min(1, "Location is required"),
-  book_data: z.array(z.any()).optional(),
+  pdf_files: z.array(z.any()).optional(),
   price: z.coerce.number().optional(),
-  borrowed_fine: z.coerce.number().optional(),
+  borrow_fine: z.coerce.number().optional(),
   borrow_price: z.coerce.number().optional(),
 });
 
@@ -82,7 +81,9 @@ export default function EditBook() {
   const { uploadToCloudinary, isUploading } = useCloudinary();
   const [pdfs, setPdfs] = useState([]);
 
-  const book = books.find((book) => book._id === id);
+  const book = books.find((book) => {
+    return book._id === id;
+  });
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newCategory, setNewCategory] = useState("");
@@ -96,13 +97,12 @@ export default function EditBook() {
       publisher: "",
       publication_date: "",
       description: "",
-      book_data: [],
+      pdf_files: [],
       cover_image_url: "",
       total_copies: 1,
       category: "",
-      location: "",
       price: 0,
-      borrowed_fine: 0,
+      borrow_fine: 0,
       borrow_price: 0,
     },
   });
@@ -119,10 +119,9 @@ export default function EditBook() {
         pdf_files: book.pdf_files || [],
         cover_image_url: book.cover_image_url || "",
         total_copies: book.total_copies,
-        category: book.category?._id || "",
-        location: book.location,
+        category: book.category || "",
         price: book.price || 0,
-        borrowed_fine: book.borrowed_fine || 0,
+        borrow_fine: book.borrow_fine || 0,
         borrow_price: book.borrow_price || 0,
       });
 
@@ -145,29 +144,11 @@ export default function EditBook() {
     }
   }, [book, form]);
 
-  const { watch, setValue } = form;
-
-  const price = watch("price");
-  const borrowPrice = watch("borrow_price");
-
-  const handlePriceChange = (value) => {
-    const priceValue = parseFloat(value) || 0; // Parse the new price value
-    setValue("price", priceValue); // Update the price field
-
-    // Calculate the borrow price based on 10% of the price
-    const calculatedBorrowPrice = parseFloat((priceValue * 0.1).toFixed(2));
-
-    // Only update borrow_price if it's unset or matches the previous calculated value
-    if (!borrowPrice || borrowPrice === parseFloat((price * 0.1).toFixed(2))) {
-      setValue("borrow_price", calculatedBorrowPrice);
-    }
-  };
-
   const onSubmit = async (data) => {
     startTransition(async () => {
       try {
         const newPdfs = pdfs.filter((pdf) => !pdf.isExisting);
-        let pdfUrls = data.book_data || [];
+        let pdfUrls = data.pdf_files || [];
 
         if (newPdfs.length > 0) {
           const newPdfUrls = await uploadToCloudinary(newPdfs);
@@ -181,7 +162,7 @@ export default function EditBook() {
 
         const formData = {
           ...data,
-          book_data: pdfUrls,
+          pdf_files: pdfUrls,
         };
 
         if (!data.title || !data.author) {
@@ -333,9 +314,11 @@ export default function EditBook() {
                           selected={
                             field.value ? new Date(field.value) : undefined
                           }
-                          onSelect={(date) =>
-                            field.onChange(date?.toISOString())
-                          }
+                          onSelect={(date) => {
+                            if (date) {
+                              field.onChange(date.toISOString());
+                            }
+                          }}
                           initialFocus
                         />
                       </PopoverContent>
@@ -439,20 +422,6 @@ export default function EditBook() {
 
             <FormField
               control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter shelf location" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="price"
               render={({ field }) => (
                 <FormItem>
@@ -463,7 +432,6 @@ export default function EditBook() {
                       min="0"
                       placeholder="Enter book price"
                       {...field}
-                      onChange={(e) => handlePriceChange(e.target.value)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -492,15 +460,15 @@ export default function EditBook() {
 
             <FormField
               control={form.control}
-              name="borrowed_fine"
+              name="borrow_fine"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Borrowed Fine</FormLabel>
+                  <FormLabel>Borrow Fine</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
                       min="0"
-                      placeholder="Enter borrowed fine"
+                      placeholder="Enter borrow fine"
                       {...field}
                     />
                   </FormControl>

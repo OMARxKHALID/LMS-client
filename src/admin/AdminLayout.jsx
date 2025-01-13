@@ -216,7 +216,7 @@ export default function AdminLayout() {
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center w-full text-left">
                     <User2 className="h-4 w-4 mr-2" />
-                    <span>{user?.username || "User"}</span>
+                    <span>{user?.user_name || "User"}</span>
                     <ChevronUp className="ml-auto h-4 w-4" />
                   </button>
                 </DropdownMenuTrigger>

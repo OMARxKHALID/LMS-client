@@ -30,7 +30,7 @@ import TotalBorrowedBooksTable from "./components/ui/TotalBorrowedBooks";
 import UploadedBooksTable from "./components/ui/UploadedBooks";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import usePagination from "@/hooks/usePagination";
-import PaginationControls from "./components/ui/PaginationControls";
+import PaginationControls from "../components/ui/pagination-controls";
 
 const calculateProgress = (borrowed, total) => {
   return total > 0 ? (borrowed / total) * 100 : 0;

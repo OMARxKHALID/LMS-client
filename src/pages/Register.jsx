@@ -27,7 +27,7 @@ import {
 // Define the validation schema using Zod
 const schema = z
   .object({
-    username: z.string().min(1, "Username is required"),
+    user_name: z.string().min(1, "user_name is required"),
     full_name: z.string().min(1, "Full name is required"),
     email: z.string().email("Please enter a valid email address"),
     password: z
@@ -63,7 +63,7 @@ export default function Register() {
       await signUp({
         email: data.email,
         password: data.password,
-        username: data.username,
+        user_name: data.user_name,
         full_name: data.full_name,
         role: data.role,
       });
@@ -97,19 +97,19 @@ export default function Register() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="user_name">user_name</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
-                    id="username"
+                    id="user_name"
                     placeholder="johndoe"
                     className="pl-9"
-                    {...register("username")}
+                    {...register("user_name")}
                   />
                 </div>
-                {errors.username && (
+                {errors.user_name && (
                   <p className="text-sm text-red-500">
-                    {errors.username.message}
+                    {errors.user_name.message}
                   </p>
                 )}
               </div>

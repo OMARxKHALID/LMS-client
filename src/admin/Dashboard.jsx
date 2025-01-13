@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Toaster } from "@/components/ui/toaster";
 import { isPast } from "date-fns";
 import {
   RotateCcw,
@@ -30,19 +29,18 @@ import TotalBorrowedBooksTable from "./components/ui/TotalBorrowedBooks";
 import UploadedBooksTable from "./components/ui/UploadedBooks";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import usePagination from "@/hooks/usePagination";
-import PaginationControls from "./components/ui/PaginationControls";
+import PaginationControls from "../components/ui/pagination-controls";
 
 const calculateProgress = (borrowed, total) => {
   return total > 0 ? (borrowed / total) * 100 : 0;
 };
 
 export default function Dashboard() {
-  const [isReturning, setIsReturning] = useState(null);
+  const [isReturning, setIsReturning] = useState(false);
   const { getBorrowRecords, returnBook } = useBorrow();
   const { toast } = useToast();
   const { borrows, loading } = useSelector((state) => state.borrow);
   const { user } = useSelector((state) => state.auth);
-
   const { role } = user;
 
   const [showOverdueNotice, setShowOverdueNotice] = useState(true);
@@ -82,14 +80,14 @@ export default function Dashboard() {
 
   const totalBooks = borrows.length;
   const borrowedBooks = borrows.filter(
-    (borrow) => !borrow.return_date && borrow.borrowed_by._id === user._id
+    (borrow) => !borrow.return_date && borrow.borrowed_by?._id === user?._id
   ).length;
 
   const overdueBooks = borrows.filter(
     (borrow) =>
       !borrow.return_date &&
       isPast(new Date(borrow.expected_return_date)) &&
-      borrow.borrowed_by._id === user._id
+      borrow.borrowed_by?._id === user?._id
   ).length;
 
   const dueSoonBooks = borrows.filter((borrow) => {
@@ -99,7 +97,7 @@ export default function Dashboard() {
       !borrow.return_date &&
       dueDate > now &&
       dueDate - now < 3 * 24 * 60 * 60 * 1000 &&
-      borrow.borrowed_by._id === user._id
+      borrow.borrowed_by?._id === user?._id
     );
   }).length;
 
@@ -107,17 +105,17 @@ export default function Dashboard() {
     {
       label: "currentBorrows",
       items: borrows.filter(
-        (borrow) => borrow.borrowed_by._id === user._id && !borrow.return_date
+        (borrow) => borrow.borrowed_by?._id === user?._id && !borrow.return_date
       ),
     },
     {
       label: "totalBorrowedBooks",
-      items: borrows.filter((borrow) => borrow.borrowed_by._id === user._id),
+      items: borrows.filter((borrow) => borrow.borrowed_by?._id === user?._id),
     },
     { label: "uploadedBooks", items: borrows },
   ];
 
-  // for currently borrowed books
+  // Pagination logic for each section
   const {
     paginatedItems: currentBorrows,
     currentPage: currentBorrowedPage,
@@ -125,7 +123,6 @@ export default function Dashboard() {
     setCurrentPage: setCurrentBorrowedPage,
   } = usePagination(paginationOptions[0].items, 5);
 
-  // for total borrowed books
   const {
     paginatedItems: currentTotalBorrowedBooks,
     currentPage: currentTotalBorrowedPage,
@@ -133,7 +130,6 @@ export default function Dashboard() {
     setCurrentPage: setCurrentTotalBorrowedPage,
   } = usePagination(paginationOptions[1].items, 5);
 
-  // for uploaded books
   const {
     paginatedItems: currentUploadedBooks,
     currentPage: currentUploadedPage,
@@ -169,6 +165,7 @@ export default function Dashboard() {
       </CardHeader>
       <CardContent>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+          {/* Card Components for Borrowed Books Overview */}
           <Card className="bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900 dark:to-blue-800">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">
@@ -177,13 +174,7 @@ export default function Dashboard() {
               <Library className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {
-                  borrows.filter(
-                    (borrow) => borrow.borrowed_by._id === user._id
-                  ).length
-                }
-              </div>
+              <div className="text-2xl font-bold">{totalBooks}</div>
               <p className="text-xs text-muted-foreground">
                 Books borrowed by you
               </p>
@@ -261,6 +252,7 @@ export default function Dashboard() {
               <TabsTrigger value="uploaded">Uploaded Books</TabsTrigger>
             )}
           </TabsList>
+
           <TabsContent value="current">
             {currentBorrows.length === 0 ? (
               <Card>
@@ -294,20 +286,33 @@ export default function Dashboard() {
               </>
             )}
           </TabsContent>
+
           <TabsContent value="history">
-            <>
-              <TotalBorrowedBooksTable
-                currentTotalBorrowedBooks={currentTotalBorrowedBooks}
-              />
-              {totalBorrowedBooksPages > 1 && (
-                <PaginationControls
-                  currentPage={currentTotalBorrowedPage}
-                  totalPages={totalBorrowedBooksPages}
-                  setCurrentPage={setCurrentTotalBorrowedPage}
+            {currentTotalBorrowedBooks.length === 0 ? (
+              <Card>
+                <div className="text-center py-6">
+                  <Library className="h-12 w-12 mx-auto text-muted-foreground" />
+                  <h3 className="mt-2 text-lg font-semibold">
+                    No borrowing history
+                  </h3>
+                </div>
+              </Card>
+            ) : (
+              <>
+                <TotalBorrowedBooksTable
+                  currentTotalBorrowedBooks={currentTotalBorrowedBooks}
                 />
-              )}
-            </>
+                {totalBorrowedBooksPages > 1 && (
+                  <PaginationControls
+                    currentPage={currentTotalBorrowedPage}
+                    totalPages={totalBorrowedBooksPages}
+                    setCurrentPage={setCurrentTotalBorrowedPage}
+                  />
+                )}
+              </>
+            )}
           </TabsContent>
+
           {role === "admin" && (
             <TabsContent value="uploaded">
               {currentUploadedBooks.length === 0 ? (
@@ -318,32 +323,26 @@ export default function Dashboard() {
                       No books uploaded
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Upload books to offer for borrowing
+                      Admin can upload books here
                     </p>
-                    <Button className="mt-4" asChild>
-                      <Link to="/admin/create-book">Upload New Book</Link>
-                    </Button>
                   </div>
                 </Card>
               ) : (
-                <>
-                  <UploadedBooksTable
-                    currentUploadedBooks={currentUploadedBooks}
-                  />
-                  {totalUploadedPages > 1 && (
-                    <PaginationControls
-                      currentPage={currentUploadedPage}
-                      totalPages={totalUploadedPages}
-                      setCurrentPage={setCurrentUploadedPage}
-                    />
-                  )}
-                </>
+                <UploadedBooksTable
+                  currentUploadedBooks={currentUploadedBooks}
+                />
+              )}
+              {totalUploadedPages > 1 && (
+                <PaginationControls
+                  currentPage={currentUploadedPage}
+                  totalPages={totalUploadedPages}
+                  setCurrentPage={setCurrentUploadedPage}
+                />
               )}
             </TabsContent>
           )}
         </Tabs>
       </CardContent>
-      <Toaster />
     </Card>
   );
 }

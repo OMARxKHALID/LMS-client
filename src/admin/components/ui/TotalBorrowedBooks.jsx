@@ -49,7 +49,7 @@ const TotalBorrowedBooksTable = ({ currentTotalBorrowedBooks = [] }) => {
                 <TableCell>
                   ${total_borrow_price ? total_borrow_price.toFixed(2) : "N/A"}
                 </TableCell>
-                <TableCell>{borrowed_by?.username || "Unknown"}</TableCell>
+                <TableCell>{borrowed_by?.user_name || "Unknown"}</TableCell>
                 <TableCell>
                   {borrowed_date
                     ? format(new Date(borrowed_date), "MMM dd, yyyy")

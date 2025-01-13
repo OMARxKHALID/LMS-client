@@ -138,12 +138,9 @@ export default function SingleBook() {
       };
 
       dispatch(updateBook(updatedBook));
-
       toast({
         title: "Borrow Successful",
-        description: `${title} has been borrowed successfully. Total cost: $${response.total_borrow_price.toFixed(
-          2
-        )}.`,
+        description: `${title} has been borrowed successfully. Total cost: $${response?.borrow?.total_borrow_price}.`,
       });
     } catch (error) {
       const errorMessage = error?.message || "An unexpected error occurred.";

@@ -29,7 +29,7 @@ export default function Header() {
               <Book className="h-4 w-4 text-primary" />
               <span>Browse Books</span>
             </Link>
-            <Link to="/about" className="text-gray-500 hover:text-gray-900">
+            <Link to="/about-us" className="text-gray-500 hover:text-gray-900">
               About Us
             </Link>
           </nav>
@@ -41,7 +41,7 @@ export default function Header() {
               <Link to="/admin">
                 <div className="flex items-center space-x-2 cursor-pointer">
                   <UserCircle className="h-5 w-5 text-primary" />
-                  <span className="text-sm text-primary">{user.username}</span>
+                  <span className="text-sm text-primary">{user.user_name}</span>
                 </div>
               </Link>
               <Button variant="outline" onClick={signOut} size="sm">
@@ -99,7 +99,7 @@ export default function Header() {
                   <div className="flex items-center space-x-2 cursor-pointer">
                     <UserCircle className="h-5 w-5 text-primary" />
                     <span className="text-sm text-primary">
-                      {user.username}
+                      {user.user_name}
                     </span>
                   </div>
                 </Link>

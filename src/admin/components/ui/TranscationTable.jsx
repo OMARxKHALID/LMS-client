@@ -46,11 +46,11 @@ const TransactionTable = ({ transactions, loading }) => {
             <TableRow key={transaction._id}>
               <TableCell className="font-medium">{transaction._id}</TableCell>
               <TableCell>{transaction.book.title}</TableCell>
-              <TableCell>{transaction.user.username}</TableCell>
+              <TableCell>{transaction.user.user_name}</TableCell>
               <TableCell>{transaction.quantity}</TableCell>
-              <TableCell>${transaction.totalPrice.toFixed(2)}</TableCell>
+              <TableCell>${transaction.total_price}</TableCell>
               <TableCell>
-                {format(new Date(transaction.transactionDate), "MMM dd, yyyy")}
+                {format(new Date(transaction.transaction_date), "MMM dd, yyyy")}
               </TableCell>
               <TableCell>
                 <span

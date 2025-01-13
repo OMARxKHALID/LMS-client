@@ -184,7 +184,7 @@ const Earnings = () => {
                   <TableRow key={index}>
                     <TableCell className="font-medium">{book.title}</TableCell>
                     <TableCell>{book.author}</TableCell>
-                    <TableCell>{borrows.length}</TableCell>
+                    <TableCell>{book.copies_borrowed}</TableCell>
                     <TableCell>${book.earnings.toFixed(2)}</TableCell>
                   </TableRow>
                 ))}

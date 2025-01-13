@@ -16,7 +16,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useSelector } from "react-redux";
@@ -31,9 +30,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Extend the schema to include address and walletBalance
+// Extend the schema to include address and wallet_balance
 const profileFormSchema = z.object({
-  username: z.string().min(3).max(50),
+  user_name: z.string().min(3).max(50),
   email: z.string().email(),
   role: z.string().optional(),
   address: z.object({
@@ -41,9 +40,9 @@ const profileFormSchema = z.object({
     city: z.string().optional(),
     state: z.string().optional(),
     country: z.string().optional(),
-    postalCode: z.string().optional(),
+    postal_code: z.string().optional(),
   }),
-  walletBalance: z.number().optional(),
+  wallet_balance: z.number().optional(),
 });
 
 export default function Profile() {
@@ -55,11 +54,11 @@ export default function Profile() {
   const form = useForm({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      username: user?.username || "",
+      user_name: user?.user_name || "",
       email: user?.email || "",
       role: user?.role || "",
       address: user?.address || {},
-      walletBalance: user?.walletBalance || 0,
+      wallet_balance: user?.wallet_balance || 0,
     },
   });
 
@@ -67,7 +66,7 @@ export default function Profile() {
 
   const onSubmit = async (data) => {
     try {
-      await updateProfile(user._id, data);
+      await updateProfile(data);
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
@@ -98,7 +97,7 @@ export default function Profile() {
               <User2 className="h-10 w-10 text-muted-foreground" />
             </div>
             <div>
-              <h3 className="text-lg font-medium">{user?.username}</h3>
+              <h3 className="text-lg font-medium">{user?.user_name}</h3>
               <p className="text-sm text-muted-foreground">{user?.email}</p>
             </div>
           </div>
@@ -107,10 +106,10 @@ export default function Profile() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
-                name="username"
+                name="user_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Username</FormLabel>
+                    <FormLabel>User Name</FormLabel>
                     <FormControl>
                       <Input {...field} disabled />
                     </FormControl>
@@ -130,33 +129,46 @@ export default function Profile() {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="wallet_balance"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Wallet Balance</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="number" disabled />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              {isEditing && user?.user_name === "admin" && (
+                <FormField
+                  control={form.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>User Type</FormLabel>
+                      <FormControl>
+                        <Select
+                          value={field.value}
+                          onValueChange={(value) => field.onChange(value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select user type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">admin</SelectItem>
+                            <SelectItem value="user">user</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              )}
+
               {isEditing && (
                 <>
-                  {user?.username === "admin" && (
-                    <FormField
-                      control={form.control}
-                      name="role"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>User Type</FormLabel>
-                          <FormControl>
-                            <Select
-                              value={field.value}
-                              onValueChange={(value) => field.onChange(value)}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select user type" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="admin">admin</SelectItem>
-                                <SelectItem value="user">user</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  )}
                   <FormField
                     control={form.control}
                     name="address.street"
@@ -207,24 +219,12 @@ export default function Profile() {
                   />
                   <FormField
                     control={form.control}
-                    name="address.postalCode"
+                    name="address.postal_code"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Postal Code</FormLabel>
                         <FormControl>
                           <Input {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="walletBalance"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Wallet Balance</FormLabel>
-                        <FormControl>
-                          <Input {...field} type="number" />
                         </FormControl>
                       </FormItem>
                     )}

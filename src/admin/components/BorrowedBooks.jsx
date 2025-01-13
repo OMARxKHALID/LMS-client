@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { useSelector } from "react-redux";
 import { useBook } from "@/hooks/useBook";
+import PaginationControls from "../../components/ui/pagination-controls";
 
 export default function BorrowedBooks() {
   const { borrows } = useSelector((state) => state.borrow);
@@ -37,8 +38,12 @@ export default function BorrowedBooks() {
   const filterBooks = (books, query) => {
     return books.filter(
       (book) =>
-        book.borrowed_book.title.toLowerCase().includes(query.toLowerCase()) ||
-        book.borrowed_book.author.toLowerCase().includes(query.toLowerCase())
+        book.borrowed_book?.title
+          ?.toLowerCase()
+          ?.includes(query?.toLowerCase()) ||
+        book.borrowed_book?.author
+          ?.toLowerCase()
+          ?.includes(query?.toLowerCase())
     );
   };
 
@@ -51,9 +56,13 @@ export default function BorrowedBooks() {
             new Date(b.expected_return_date).getTime()
           );
         case "title":
-          return a.borrowed_book.title.localeCompare(b.borrowed_book.title);
+          return a?.borrowed_book?.title?.localeCompare(
+            b?.borrowed_book?.title
+          );
         case "author":
-          return a.borrowed_book.author.localeCompare(b.borrowed_book.author);
+          return a?.borrowed_book?.author?.localeCompare(
+            b?.borrowed_book?.author
+          );
         default:
           return 0;
       }
@@ -119,7 +128,7 @@ export default function BorrowedBooks() {
         </TabsList>
 
         <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
-          <div className="relative flex-1">
+          <div className="relative flex-1 w-full">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search books..."
@@ -129,7 +138,7 @@ export default function BorrowedBooks() {
             />
           </div>
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -152,7 +161,7 @@ export default function BorrowedBooks() {
       </Tabs>
 
       {totalPages > 1 && (
-        <Pagination
+        <PaginationControls
           totalPages={totalPages}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
@@ -225,36 +234,5 @@ const NoBooksFound = () => (
     <p className="text-sm text-muted-foreground">
       Try adjusting your search or filters
     </p>
-  </div>
-);
-
-const Pagination = ({ totalPages, currentPage, setCurrentPage }) => (
-  <div className="flex justify-center gap-2 mt-6">
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-      disabled={currentPage === 1}
-    >
-      Previous
-    </Button>
-    {[...Array(totalPages)].map((_, i) => (
-      <Button
-        key={i}
-        variant={currentPage === i + 1 ? "default" : "outline"}
-        size="sm"
-        onClick={() => setCurrentPage(i + 1)}
-      >
-        {i + 1}
-      </Button>
-    ))}
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-      disabled={currentPage === totalPages}
-    >
-      Next
-    </Button>
   </div>
 );

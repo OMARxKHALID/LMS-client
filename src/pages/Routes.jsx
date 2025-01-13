@@ -1,6 +1,8 @@
 import Home from "./Home";
 import Login from "./Login";
 import Register from "./Register";
+import About from "./AboutUs";
+
 import RequestPasswordReset from "./RequestPasswordReset";
 import ResetPassword from "./ResetPassword";
 import Dashboard from "@/admin/Dashboard";
@@ -20,6 +22,7 @@ export const publicRoutes = [
   { path: "/", element: <Home />, showFooter: true },
   { path: "/books", element: <BookCatalog />, showFooter: true },
   { path: "/books/:id", element: <SingleBook />, showFooter: true },
+  { path: "/about-us", element: <About />, showFooter: true },
 ];
 
 export const authRoutes = [

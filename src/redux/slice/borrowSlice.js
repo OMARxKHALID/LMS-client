@@ -7,18 +7,21 @@ const borrowSlice = createSlice({
     loading: false,
   },
   reducers: {
-    setBorrows: (state, action) => {
-      state.borrows = action.payload;
-    },
     addBorrow: (state, action) => {
       state.borrows.push(action.payload);
+    },
+    setBorrows: (state, action) => {
+      state.borrows = action.payload;
+      state.loading = false;
     },
     updateReturnDate: (state, action) => {
       const index = state.borrows.findIndex(
         (borrow) => borrow._id === action.payload._id
       );
       if (index !== -1) {
-        state.borrows[index] = action.payload;
+        state.borrows[index] = {
+          ...state.borrows[index],
+        };
       }
     },
     setLoading: (state, action) => {

@@ -1,17 +1,11 @@
 import { useState, useEffect } from "react";
 import BookCard from "@/components/ui/books/book-card";
 import SearchFilters from "@/components/ui/books/search-filters";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationPrevious,
-  PaginationNext,
-} from "@/components/ui/pagination";
 import { Card } from "@/components/ui/card";
 import { useSelector } from "react-redux";
 import { useBook } from "@/hooks/useBook";
 import { useCategory } from "@/hooks/useCategory";
+import PaginationControls from "@/components/ui/pagination-controls";
 
 export default function BookCatalog() {
   const { getBooks } = useBook();
@@ -48,7 +42,7 @@ export default function BookCatalog() {
     // Filter by category
     if (selectedCategory !== "all") {
       filteredBooks = filteredBooks.filter(
-        (book) => book.category._id === selectedCategory
+        (book) => book.category === selectedCategory
       );
     }
 
@@ -74,14 +68,6 @@ export default function BookCatalog() {
   const handleCategoryChange = (value) => {
     setSelectedCategory(value);
     setCurrentPage(1);
-  };
-
-  const handlePreviousPage = () => {
-    setCurrentPage((prev) => Math.max(prev - 1, 1));
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   };
 
   return (
@@ -128,27 +114,11 @@ export default function BookCatalog() {
           )}
 
           {totalPages > 1 && (
-            <Pagination className="mt-8">
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={handlePreviousPage}
-                    disabled={currentPage === 1}
-                  />
-                </PaginationItem>
-                <PaginationItem>
-                  <span className="flex items-center px-4 text-sm text-muted-foreground">
-                    Page {currentPage} of {totalPages}
-                  </span>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={handleNextPage}
-                    disabled={currentPage === totalPages}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              setCurrentPage={setCurrentPage}
+            />
           )}
         </>
       )}

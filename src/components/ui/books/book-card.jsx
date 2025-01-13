@@ -5,12 +5,11 @@ import { Link } from "react-router";
 export default function BookCard({ book }) {
   return (
     <Card className="h-full flex flex-col ">
-      <div className="relative aspect-[3/4] w-full">
+      <div className="aspect-[2/3] w-full overflow-hidden rounded-t-lg">
         <img
           src={book?.cover_image_url}
           alt={book?.title}
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="h-full w-full object-cover"
         />
       </div>
       <CardContent className="flex-grow p-4">

@@ -31,15 +31,17 @@ const BorrowedBooksTable = ({
         </TableHeader>
         <TableBody>
           {currentBorrows.map((borrow) => {
+            console.log("🚀 ~ {currentBorrows.map ~ borrow:", borrow);
             const {
               _id,
               borrowed_book,
               expected_return_date,
-              borrowed_by,
               total_borrow_price,
-              late_fine,
+              total_borrowed_fine,
               total_price,
+              borrowed_by,
             } = borrow;
+
             const isOverdue = isPast(new Date(expected_return_date));
 
             return (
@@ -68,14 +70,16 @@ const BorrowedBooksTable = ({
                   )}
                 </TableCell>
                 <TableCell>
-                  ${late_fine ? late_fine.toFixed(2) : "0.00"}
+                  ${total_borrowed_fine ? total_borrowed_fine : "0.00"}
                 </TableCell>
                 <TableCell>
                   <Button
                     size="sm"
                     variant="destructive"
-                    onClick={() => handleReturnBook(_id, borrowed_by)}
-                    disabled={isReturning === _id}
+                    onClick={() => {
+                      handleReturnBook(_id, borrowed_by);
+                    }}
+                    disabled={isReturning === _id || status === "returned"}
                   >
                     {isReturning === _id ? (
                       <Loader2 className="h-4 w-4 animate-spin" />

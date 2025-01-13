@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { useSelector } from "react-redux";
 import { useBook } from "@/hooks/useBook";
+import PaginationControls from "../../components/ui/pagination-controls";
 
 export default function PurchasedBooks() {
   const { user } = useSelector((state) => state.auth);
@@ -36,7 +37,7 @@ export default function PurchasedBooks() {
 
   // Filter books that are purchased and uploaded by the current user
   const purchasedBooks = books.filter(
-    (book) => book.isPurchased && book.uploaded_by === user._id
+    (book) => book.is_purchased && book.uploaded_by === user._id
   );
 
   const filterBooks = (books, query) => {
@@ -69,19 +70,18 @@ export default function PurchasedBooks() {
   );
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6 flex-wrap">
-        <div className="w-full sm:w-auto">
-          <h1 className="text-2xl sm:text-xl font-bold tracking-tight">
-            Purchased Books
-          </h1>
-          <p className="text-muted-foreground">
+    <div className="container mx-auto p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Purchased Books</h1>
+          <p className="text-sm text-muted-foreground">
             View and download purchased book PDFs
           </p>
         </div>
         <Button
           variant="outline"
           size="sm"
+          className="w-full sm:w-auto"
           onClick={() => {
             setSearchQuery("");
             setSortBy("title");
@@ -92,9 +92,8 @@ export default function PurchasedBooks() {
           Refresh
         </Button>
       </div>
-
       <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
-        <div className="relative flex-1">
+        <div className="relative flex-1 w-full">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search books..."
@@ -104,7 +103,7 @@ export default function PurchasedBooks() {
           />
         </div>
         <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
           <SelectContent>
@@ -114,41 +113,41 @@ export default function PurchasedBooks() {
         </Select>
       </div>
 
-      <div className="space-y-4">
-        <BooksGrid books={currentBooks} />
-        {currentBooks.length === 0 && <NoBooksFound />}
-      </div>
-
-      {totalPages > 1 && (
-        <Pagination
-          totalPages={totalPages}
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-        />
+      {currentBooks.length === 0 ? (
+        <NoBooksFound />
+      ) : (
+        <>
+          <BooksGrid books={currentBooks} />
+          {totalPages > 1 && (
+            <PaginationControls
+              totalPages={totalPages}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+            />
+          )}
+        </>
       )}
     </div>
   );
 }
 
 const BooksGrid = ({ books }) => (
-  <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
     {books.map((book) => (
       <Card key={book._id} className="overflow-hidden flex flex-col">
         <CardHeader className="space-y-1">
           <div className="flex justify-between items-start">
-            <CardTitle className="line-clamp-1 text-base sm:text-lg">
+            <CardTitle className="line-clamp-1 text-base">
               {book.title}
             </CardTitle>
             <Badge className="bg-blue-500/10 text-blue-500" variant="secondary">
               Purchased
             </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            {book.author}
-          </p>
+          <p className="text-xs text-muted-foreground">{book.author}</p>
         </CardHeader>
         <CardContent className="flex-grow">
-          <div className="flex flex-col space-y-2 text-xs sm:text-sm">
+          <div className="flex flex-col space-y-2 text-xs">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Purchased On:</span>
               <span>{new Date(book.purchased_date).toLocaleDateString()}</span>
@@ -156,12 +155,12 @@ const BooksGrid = ({ books }) => (
           </div>
         </CardContent>
         <CardFooter>
-          <div className="w-full flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 sm:space-x-2">
+          <div className="w-full flex flex-col space-y-2">
             {book.pdf_files && book.pdf_files.length > 0 ? (
               <>
                 <Button
                   size="sm"
-                  className="w-full sm:w-auto"
+                  className="w-full"
                   onClick={() => window.open(book.pdf_files[0], "_blank")}
                 >
                   <Eye className="w-4 h-4 mr-2" />
@@ -169,7 +168,7 @@ const BooksGrid = ({ books }) => (
                 </Button>
                 <Button
                   size="sm"
-                  className="w-full sm:w-auto"
+                  className="w-full"
                   onClick={() => {
                     const link = document.createElement("a");
                     link.href = book.pdf_files[0];
@@ -198,36 +197,5 @@ const NoBooksFound = () => (
     <p className="text-sm text-muted-foreground">
       Try adjusting your search or filters
     </p>
-  </div>
-);
-
-const Pagination = ({ totalPages, currentPage, setCurrentPage }) => (
-  <div className="flex justify-center gap-2 mt-6">
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-      disabled={currentPage === 1}
-    >
-      Previous
-    </Button>
-    {[...Array(totalPages)].map((_, i) => (
-      <Button
-        key={i}
-        variant={currentPage === i + 1 ? "default" : "outline"}
-        size="sm"
-        onClick={() => setCurrentPage(i + 1)}
-      >
-        {i + 1}
-      </Button>
-    ))}
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-      disabled={currentPage === totalPages}
-    >
-      Next
-    </Button>
   </div>
 );

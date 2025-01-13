@@ -36,8 +36,8 @@ export function useBorrow() {
       const result = await response.json();
 
       if (!response.ok) {
-        if (result.message) {
-          throw new Error(result.message);
+        if (result.error) {
+          throw new Error(result.error);
         } else {
           throw new Error(
             "An unexpected error occurred while borrowing the book."
@@ -61,11 +61,12 @@ export function useBorrow() {
         throw new Error("Error returning book");
       }
 
-      const updatedBorrow = await response.json();
+      const data = await response.json();
+
       // Ensure this is not called multiple times unnecessarily
-      if (updatedBorrow.status !== "returned") return;
-      dispatch(updateReturnDate(updatedBorrow.borrow));
-      return updatedBorrow;
+      if (data.status !== "returned") return;
+      dispatch(updateReturnDate(data));
+      return data;
     } catch (error) {
       throw new Error(error.message || "An unexpected error occurred.");
     }
