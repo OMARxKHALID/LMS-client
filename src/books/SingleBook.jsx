@@ -52,12 +52,15 @@ export default function SingleBook() {
   const { books, isLoading } = useSelector((state) => state.books);
   const { user } = useSelector((state) => state.auth);
   const { borrows } = useSelector((state) => state.borrow);
+  const { categories } = useSelector((state) => state.categories);
 
   const { borrowBook, getBorrowRecords } = useBorrow();
   const { purchaseBook } = useBook();
 
   const book = books.find((book) => book._id === bookId);
-
+  const category = categories.find(
+    (category) => category._id === book?.category
+  );
   const calculateDueDate = () => {
     return selectedDueDate ? selectedDueDate.toISOString() : null;
   };
@@ -287,7 +290,7 @@ export default function SingleBook() {
                 <div className="flex items-center space-x-2">
                   <User className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Categories:</span>
-                  <span>{book.category?.name}</span>
+                  <span>{category?.name}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <MapPin className="h-4 w-4 text-muted-foreground" />

@@ -143,7 +143,7 @@ export default function ManageBooks() {
             <TableRow>
               <TableHead>Book</TableHead>
               <TableHead>Author</TableHead>
-              <TableHead>Published Date</TableHead>
+              <TableHead>Price</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -161,10 +161,7 @@ export default function ManageBooks() {
                 <TableRow key={book._id}>
                   <TableCell>{book.title}</TableCell>
                   <TableCell>{book.author}</TableCell>
-                  <TableCell>
-                    {book.publication_date &&
-                      format(new Date(book.publication_date), "MMMM d, yyyy")}
-                  </TableCell>
+                  <TableCell>{book.price}$</TableCell>
                   <TableCell>
                     <Badge
                       variant={book.total_copies > 0 ? "default" : "secondary"}
