@@ -35,7 +35,6 @@ const TransactionTable = ({ transactions, loading }) => {
             <TableHead>Transaction ID</TableHead>
             <TableHead>Book</TableHead>
             <TableHead>User</TableHead>
-            <TableHead>Quantity</TableHead>
             <TableHead>Total Price</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Status</TableHead>
@@ -47,7 +46,6 @@ const TransactionTable = ({ transactions, loading }) => {
               <TableCell className="font-medium">{transaction._id}</TableCell>
               <TableCell>{transaction.book.title}</TableCell>
               <TableCell>{transaction.user.user_name}</TableCell>
-              <TableCell>{transaction.quantity}</TableCell>
               <TableCell>${transaction.total_price}</TableCell>
               <TableCell>
                 {format(new Date(transaction.transaction_date), "MMM dd, yyyy")}

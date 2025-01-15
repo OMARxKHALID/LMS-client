@@ -103,17 +103,9 @@ export default function BorrowedBooks() {
             View and access your borrowed book PDFs
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            setSearchQuery("");
-            setSortBy("dueDate");
-            setCurrentPage(1);
-          }}
-        >
+        <Button variant="outline" size="sm" onClick={() => getBooks()}>
           <RefreshCcw className="h-4 w-4 mr-2" />
-          <button onClick={getBooks}>Refresh</button>
+          <a>Refresh</a>
         </Button>
       </div>
 

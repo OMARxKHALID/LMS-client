@@ -20,6 +20,7 @@ import {
 import { useSelector } from "react-redux";
 import { useBook } from "@/hooks/useBook";
 import PaginationControls from "../../components/ui/pagination-controls";
+import { downloadPDF } from "@/utils/downloadPDF";
 
 export default function PurchasedBooks() {
   const { user } = useSelector((state) => state.auth);
@@ -170,10 +171,7 @@ const BooksGrid = ({ books }) => (
                   size="sm"
                   className="w-full"
                   onClick={() => {
-                    const link = document.createElement("a");
-                    link.href = book.pdf_files[0];
-                    link.download = book.title + ".pdf";
-                    link.click();
+                    downloadPDF(book.pdf_files[0], book.title);
                   }}
                 >
                   <Download className="w-4 h-4 mr-2" />

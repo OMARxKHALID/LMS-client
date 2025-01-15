@@ -1,52 +1,67 @@
-import { format } from "date-fns";
+import { Bar, BarChart as BBarChart, CartesianGrid, XAxis } from "recharts";
 import {
-  Bar,
-  BarChart as RechartsBarChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Cell,
-} from "recharts";
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+
+// Chart configuration
+const chartConfig = {
+  visitors: {
+    label: "Visitors",
+  },
+  desktop: {
+    label: "Borrowed",
+    color: "hsl(var(--chart-1))",
+  },
+  mobile: {
+    label: "Purchased",
+    color: "hsl(var(--chart-2))",
+  },
+};
+
+// Helper function to format date into day of the week
+const formatDateToDay = (dateString) => {
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(date);
+};
 
 export const BarChart = ({ data, timeFrame }) => {
+  let filteredData = data.map((item) => ({
+    date: item.date,
+    Purchased: item.purchased,
+    Borrowed: item.borrowed,
+  }));
+
+  // Filtering data based on the selected time frame
+  if (timeFrame === "week") {
+    filteredData = filteredData.slice(-7);
+  }
+  if (timeFrame === "month") {
+    filteredData = filteredData.slice(-30);
+  }
+
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <RechartsBarChart data={data}>
+    <ChartContainer
+      config={chartConfig}
+      className="aspect-auto h-[250px] w-full"
+    >
+      <BBarChart data={filteredData}>
+        <CartesianGrid vertical={false} />
         <XAxis
-          dataKey="day"
-          stroke="#888888"
-          fontSize={12}
+          dataKey="date"
           tickLine={false}
+          tickMargin={10}
           axisLine={false}
-          tickFormatter={
-            (value) =>
-              timeFrame === "year"
-                ? value.slice(0, 3) // for "year" timeframe
-                : format(new Date(value), "EEE") // Format as day name for other timeframes
-          }
+          tickFormatter={(value) => formatDateToDay(value).slice(0, 3)}
         />
-        <YAxis
-          stroke="#888888"
-          fontSize={12}
-          tickLine={false}
-          axisLine={false}
-          tickFormatter={(value) => `$${value.toFixed(0)}`}
+        <ChartTooltip
+          cursor={false}
+          content={<ChartTooltipContent indicator="dashed" />}
         />
-        <Tooltip
-          contentStyle={{
-            background: "hsl(var(--background))",
-            border: "1px solid hsl(var(--border))",
-          }}
-          itemStyle={{ color: "hsl(var(--foreground))" }}
-          formatter={(value) => [`$${value.toFixed(2)}`, "Earnings"]}
-        />
-        <Bar dataKey="earnings" radius={[4, 4, 0, 0]}>
-          {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} />
-          ))}
-        </Bar>
-      </RechartsBarChart>
-    </ResponsiveContainer>
+        <Bar dataKey="Borrowed" fill="hsl(var(--chart-1))" radius={4} />
+        <Bar dataKey="Purchased" fill="hsl(var(--chart-2))" radius={4} />
+      </BBarChart>
+    </ChartContainer>
   );
 };
