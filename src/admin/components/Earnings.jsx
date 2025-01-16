@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BarChart } from "./ui/bar-chart";
-import { PieChart } from "./ui/pie-chart";
+import { EarningsPieChart } from "./ui/pie-chart";
 import {
   Table,
   TableBody,
@@ -87,10 +87,6 @@ const Earnings = () => {
     "bg-gradient-to-br from-yellow-100 to-yellow-50 dark:from-yellow-900 dark:to-yellow-800",
   ];
 
-  const categoryData = Object.entries(earnings.earningsByCategory || {}).map(
-    ([name, value]) => ({ name, value })
-  );
-
   const topSellingBooks = earnings.topSellingBooks || [];
 
   const handleExportCsv = () => {
@@ -128,15 +124,6 @@ const Earnings = () => {
                 <SelectItem value="month">This Month</SelectItem>
               </SelectContent>
             </Select>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleExportCsv}
-              className="text-sm flex items-center"
-            >
-              <Download className="h-5 w-5" />
-              <span className="sr-only">Export CSV</span>
-            </Button>
           </div>
         </div>
       </CardHeader>
@@ -187,7 +174,7 @@ const Earnings = () => {
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
-                  <PieChart data={categoryData} />
+                  <EarningsPieChart data={earnings?.earningsByCategory} />
                 </div>
               </CardContent>
             </Card>
@@ -197,7 +184,18 @@ const Earnings = () => {
         <Card className="mt-6">
           <CardHeader>
             <CardTitle className="text-lg font-semibold">
-              Top Selling Books
+              <div className="flex items-center space-x-4 text-right justify-between">
+                Top Selling Books
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleExportCsv}
+                  className="text-sm flex items-center"
+                >
+                  <Download className="h-5 w-5" />
+                  <span className="sr-only">Export CSV</span>
+                </Button>
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent>

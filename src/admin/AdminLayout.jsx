@@ -26,6 +26,7 @@ import {
   ChevronUp,
   DollarSign,
   History,
+  Home,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useAuth } from "@/hooks/useAuth";
@@ -67,10 +68,13 @@ export default function AdminLayout() {
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
       <SidebarProvider>
-        <Sidebar className="w-full md:w-64 flex-shrink-0">
+        <Sidebar className="w-full md:w-56 flex-shrink-0">
           <SidebarHeader>
             <div className="flex items-center justify-between px-4">
               <h2 className="text-lg font-semibold">Admin Panel</h2>
+              <Link to="/">
+                <Home className="h-5 w-5" />
+              </Link>
             </div>
           </SidebarHeader>
 
@@ -78,10 +82,12 @@ export default function AdminLayout() {
             <SidebarGroup>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={isActiveRoute("/admin")}>
+                  <SidebarMenuButton asChild>
                     <Link
                       to="/admin"
-                      className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      className={`flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 ${
+                        isActiveRoute("/admin") ? "bg-gray-100" : ""
+                      }`}
                     >
                       <LayoutDashboard className="h-5 w-5 mr-3" />
                       <span>Dashboard</span>
@@ -90,16 +96,18 @@ export default function AdminLayout() {
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroup>
+
             <SidebarGroup>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActiveRoute("/admin/borrowed-books")}
-                  >
+                  <SidebarMenuButton asChild>
                     <Link
                       to="/admin/borrowed-books"
-                      className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      className={`flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 ${
+                        isActiveRoute("/admin/borrowed-books")
+                          ? "bg-gray-100"
+                          : ""
+                      }`}
                     >
                       <History className="h-5 w-5 mr-3" />
                       <span>Borrowed Books</span>
@@ -108,16 +116,18 @@ export default function AdminLayout() {
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroup>
+
             <SidebarGroup>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActiveRoute("/admin/purchased-books")}
-                  >
+                  <SidebarMenuButton asChild>
                     <Link
                       to="/admin/purchased-books"
-                      className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      className={`flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 ${
+                        isActiveRoute("/admin/purchased-books")
+                          ? "bg-gray-100"
+                          : ""
+                      }`}
                     >
                       <History className="h-5 w-5 mr-3" />
                       <span>Purchased Books</span>
@@ -126,18 +136,20 @@ export default function AdminLayout() {
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroup>
+
             {user.role === "admin" && (
               <>
                 <SidebarGroup>
                   <SidebarMenu>
                     <SidebarMenuItem>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isActiveRoute("/admin/manage-books")}
-                      >
+                      <SidebarMenuButton asChild>
                         <Link
                           to="/admin/manage-books"
-                          className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                          className={`flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 ${
+                            isActiveRoute("/admin/manage-books")
+                              ? "bg-gray-100"
+                              : ""
+                          }`}
                         >
                           <BookOpen className="h-5 w-5 mr-3" />
                           <span>Manage Books</span>
@@ -145,13 +157,14 @@ export default function AdminLayout() {
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isActiveRoute("/admin/create-book")}
-                      >
+                      <SidebarMenuButton asChild>
                         <Link
                           to="/admin/create-book"
-                          className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 pl-10"
+                          className={`flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 ${
+                            isActiveRoute("/admin/create-book")
+                              ? "bg-gray-100"
+                              : ""
+                          }`}
                         >
                           <BookCopy className="h-5 w-5 mr-3" />
                           <span>Add New Book</span>
@@ -159,13 +172,14 @@ export default function AdminLayout() {
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isActiveRoute("/admin/manage-categories")}
-                      >
+                      <SidebarMenuButton asChild>
                         <Link
                           to="/admin/manage-categories"
-                          className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                          className={`flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 ${
+                            isActiveRoute("/admin/manage-categories")
+                              ? "bg-gray-100"
+                              : ""
+                          }`}
                         >
                           <FolderTree className="h-5 w-5 mr-3" />
                           <span>Categories</span>
@@ -174,16 +188,18 @@ export default function AdminLayout() {
                     </SidebarMenuItem>
                   </SidebarMenu>
                 </SidebarGroup>
+
                 <SidebarGroup>
                   <SidebarMenu>
                     <SidebarMenuItem>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isActiveRoute("/admin/earnings")}
-                      >
+                      <SidebarMenuButton asChild>
                         <Link
                           to="/admin/earnings"
-                          className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                          className={`flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 ${
+                            isActiveRoute("/admin/earnings")
+                              ? "bg-gray-100"
+                              : ""
+                          }`}
                         >
                           <DollarSign className="h-5 w-5 mr-3" />
                           <span>Earnings</span>
@@ -194,16 +210,18 @@ export default function AdminLayout() {
                 </SidebarGroup>
               </>
             )}
+
             <SidebarGroup>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActiveRoute("/admin/transcations")}
-                  >
+                  <SidebarMenuButton asChild>
                     <Link
                       to="/admin/transactions"
-                      className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      className={`flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 ${
+                        isActiveRoute("/admin/transactions")
+                          ? "bg-gray-100"
+                          : ""
+                      }`}
                     >
                       <History className="h-5 w-5 mr-3" />
                       <span>Transactions</span>
@@ -214,14 +232,14 @@ export default function AdminLayout() {
             </SidebarGroup>
           </SidebarContent>
 
-          <SidebarFooter className="border-t p-2">
+          <SidebarFooter className="border-t p-1">
             <div className="flex items-center justify-between space-x-1">
               <ModeToggle />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center w-full text-left">
                     <User2 className="h-4 w-4 mr-2" />
-                    <span>{user?.user_name || "User"}</span>
+                    <span className="text-sm">{user?.user_name || "User"}</span>
                     <ChevronUp className="ml-auto h-4 w-4" />
                   </button>
                 </DropdownMenuTrigger>
@@ -267,7 +285,8 @@ export default function AdminLayout() {
                   </Tooltip>
                 </TooltipProvider>
               </div>
-              <div className="flex-1 w-full">
+
+              <div className="flex-1 w-full sm:w-auto">
                 <Outlet />
               </div>
             </div>

@@ -10,19 +10,12 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import { Loader2, User, Mail, Lock, Store, ShoppingBag } from "lucide-react";
+import { Loader2, User, Mail, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const schema = z
   .object({
@@ -34,7 +27,6 @@ const schema = z
       .min(8, "Password must be at least 8 characters")
       .regex(/[A-Z]/, "Password must contain at least one uppercase letter"),
     confirmPassword: z.string().min(1, "Confirm Password is required"),
-    role: z.string().min(1, "User type is required"),
   })
   .refine((values) => values.password === values.confirmPassword, {
     message: "Passwords must match!",
@@ -50,21 +42,17 @@ export default function Register() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    watch,
-    setValue,
   } = useForm({
     resolver: zodResolver(schema),
   });
 
   const onSubmit = async (data) => {
-    console.log(data);
     try {
       await signUp({
         email: data.email,
         password: data.password,
         user_name: data.user_name,
         full_name: data.full_name,
-        role: data.role,
       });
       toast({
         title: "Success",
@@ -182,39 +170,6 @@ export default function Register() {
                 )}
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="role">User Type</Label>
-              <div className="relative">
-                <Select
-                  onValueChange={(value) => {
-                    setValue("role", value, { shouldValidate: true });
-                  }}
-                  defaultValue={watch("role")}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select User Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">
-                      <div className="flex items-center gap-2">
-                        <ShoppingBag className="h-4 w-4" />
-                        <span>admin</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="user">
-                      <div className="flex items-center gap-2">
-                        <Store className="h-4 w-4" />
-                        <span>user</span>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.role && (
-                  <p className="text-sm text-red-500">{errors.role.message}</p>
-                )}
-              </div>
-            </div>
-
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>

@@ -36,9 +36,8 @@ export const BarChart = ({ data, timeFrame }) => {
   // Filtering data based on the selected time frame
   if (timeFrame === "week") {
     filteredData = filteredData.slice(-7);
-  }
-  if (timeFrame === "month") {
-    filteredData = filteredData.slice(-30);
+  } else if (timeFrame === "month") {
+    filteredData = filteredData.slice(-15);
   }
 
   return (

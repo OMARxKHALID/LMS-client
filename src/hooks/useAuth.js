@@ -3,6 +3,7 @@ import {
   setUser,
   setUsers,
   updateUser,
+  updateUsersRole,
 } from "@/redux/slice/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -80,7 +81,7 @@ export function useAuth() {
 
   const requestPasswordReset = async ({ email }) => {
     try {
-      const response = await fetch(`${BASE_URL}/request-password-reset`, {
+      const response = await fetch(`${BASE_URL}/password/reset-request`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -100,7 +101,7 @@ export function useAuth() {
 
   const resetPassword = async ({ token, newPassword }) => {
     try {
-      const response = await fetch(`${BASE_URL}/reset-password/${token}`, {
+      const response = await fetch(`${BASE_URL}/password/reset/${token}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: newPassword }),
@@ -118,9 +119,9 @@ export function useAuth() {
     }
   };
 
-  const updateProfile = async (profileData) => {
+  const updateProfile = async (profileData, userId) => {
     try {
-      const response = await fetch(`${BASE_URL}/user/${user._id}`, {
+      const response = await fetch(`${BASE_URL}/profile/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -146,7 +147,7 @@ export function useAuth() {
 
   const getAllUsers = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/users`, {
+      const response = await fetch(`${BASE_URL}/admin/users`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -172,7 +173,7 @@ export function useAuth() {
 
   const revokeUserAccess = async (userId, status) => {
     try {
-      const response = await fetch(`${BASE_URL}/users/${userId}`, {
+      const response = await fetch(`${BASE_URL}/admin/users/${userId}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -194,6 +195,31 @@ export function useAuth() {
     }
   };
 
+  const updateUserRole = async (role, userId) => {
+    try {
+      const response = await fetch(`${BASE_URL}/admin/users/${userId}/role`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth_token}`,
+        },
+        credentials: "include",
+        body: JSON.stringify({ role }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update user role");
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("user role update error:", error.message);
+      throw error;
+    }
+  };
+
   return {
     signIn,
     signUp,
@@ -203,5 +229,6 @@ export function useAuth() {
     updateProfile,
     getAllUsers,
     revokeUserAccess,
+    updateUserRole,
   };
 }

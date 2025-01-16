@@ -66,7 +66,7 @@ export default function Profile() {
 
   const onSubmit = async (data) => {
     try {
-      await updateProfile(data);
+      await updateProfile(data, user._id);
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",

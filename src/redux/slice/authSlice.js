@@ -21,8 +21,29 @@ const authSlice = createSlice({
         Object.assign(state.user, action.payload);
       }
     },
+    updateUsersRole: (state, action) => {
+      state.users = state.users.map((user) =>
+        user._id === action.payload.userId
+          ? { ...user, role: action.payload.role }
+          : user
+      );
+    },
+    updateUsersStatus: (state, action) => {
+      state.users = state.users.map((user) =>
+        user._id === action.payload.userId
+          ? { ...user, status: action.payload.status }
+          : user
+      );
+    },
   },
 });
 
-export const { setUser, clearUser, updateUser, setUsers } = authSlice.actions;
+export const {
+  setUser,
+  clearUser,
+  updateUser,
+  setUsers,
+  updateUsersRole,
+  updateUsersStatus,
+} = authSlice.actions;
 export default authSlice.reducer;
