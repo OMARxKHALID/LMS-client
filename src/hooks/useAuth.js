@@ -1,4 +1,9 @@
-import { clearUser, setUser, updateUser } from "@/redux/slice/authSlice";
+import {
+  clearUser,
+  setUser,
+  setUsers,
+  updateUser,
+} from "@/redux/slice/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 export function useAuth() {
@@ -125,7 +130,6 @@ export function useAuth() {
         body: JSON.stringify(profileData),
       });
 
-      // If the response is not ok, throw an error
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Profile update failed");
@@ -140,6 +144,56 @@ export function useAuth() {
     }
   };
 
+  const getAllUsers = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/users`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth_token}`,
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch users");
+      }
+
+      const usersData = await response.json();
+      dispatch(setUsers(usersData));
+
+      return usersData;
+    } catch (error) {
+      console.error("Get all users error:", error.message);
+      throw error;
+    }
+  };
+
+  const revokeUserAccess = async (userId, status) => {
+    try {
+      const response = await fetch(`${BASE_URL}/users/${userId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth_token}`,
+        },
+        credentials: "include",
+        body: JSON.stringify({ status }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update user status");
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error("Error updating user status:", error.message);
+      throw error;
+    }
+  };
+
   return {
     signIn,
     signUp,
@@ -147,5 +201,7 @@ export function useAuth() {
     requestPasswordReset,
     resetPassword,
     updateProfile,
+    getAllUsers,
+    revokeUserAccess,
   };
 }

@@ -16,11 +16,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, Pencil, Trash } from "lucide-react";
 import { useCategory } from "@/hooks/useCategory";
 import { useSelector } from "react-redux";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function ManageCategories() {
   const [isEditing, setIsEditing] = useState(false);
@@ -28,11 +28,10 @@ export default function ManageCategories() {
   const [editingCategory, setEditingCategory] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { getCategories } = useCategory();
-
-  const { toast } = useToast();
+  const { getCategories, createCategory, updateCategory, deleteCategory } =
+    useCategory();
   const { categories } = useSelector((state) => state.categories);
-  const { createCategory, updateCategory, deleteCategory } = useCategory();
+  const { toast } = useToast();
 
   useEffect(() => {
     getCategories();
@@ -40,40 +39,37 @@ export default function ManageCategories() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
     if (!newCategory.trim()) {
       toast({
         variant: "destructive",
         title: "Error",
         description: "Category name cannot be empty.",
       });
-      setIsSubmitting(false);
       return;
     }
+
+    setIsSubmitting(true);
 
     try {
       if (isEditing) {
         await updateCategory(editingCategory._id, { name: newCategory });
         toast({
-          title: "Category updated",
-          description: "The category has been updated successfully.",
+          title: "Success",
+          description: "Category updated successfully.",
         });
       } else {
         await createCategory({ name: newCategory });
         toast({
-          title: "Category created",
-          description: "New category has been created successfully.",
+          title: "Success",
+          description: "New category created successfully.",
         });
       }
-      setNewCategory("");
-      setIsEditing(false);
-      setEditingCategory(null);
+      resetForm();
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Something went wrong. Please try again.",
+        description: error.message || "Something went wrong.",
       });
     } finally {
       setIsSubmitting(false);
@@ -87,133 +83,116 @@ export default function ManageCategories() {
   };
 
   const handleDelete = async (categoryId) => {
-    if (!categoryId) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Invalid category ID.",
-      });
-      return;
-    }
     try {
       await deleteCategory(categoryId);
       toast({
-        title: "Category deleted",
-        description: "The category has been deleted successfully.",
+        title: "Success",
+        description: "Category deleted successfully.",
       });
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description:
-          error.message || "Failed to delete category. Please try again.",
+        description: error.message || "Unable to delete category.",
       });
     }
   };
 
+  const resetForm = () => {
+    setIsEditing(false);
+    setNewCategory("");
+    setEditingCategory(null);
+  };
+
   return (
-    <div className="mx-auto space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Categories</h2>
-          <p className="text-muted-foreground">
-            Manage your book categories here
-          </p>
-        </div>
-      </div>
-
-      <div className="grid gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Add New Category</CardTitle>
-            <CardDescription>
-              Create a new category or edit existing ones
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="flex gap-4">
-              <div className="flex-1">
-                <Input
-                  placeholder="Enter category name"
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  required
-                />
-              </div>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {isEditing ? "Updating..." : "Creating..."}
-                  </>
-                ) : (
-                  <>
-                    <Plus className="mr-2 h-4 w-4" />
-                    {isEditing ? "Update Category" : "Add Category"}
-                  </>
-                )}
-              </Button>
-              {isEditing && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setIsEditing(false);
-                    setEditingCategory(null);
-                    setNewCategory("");
-                  }}
-                >
-                  Cancel
-                </Button>
-              )}
-            </form>
-          </CardContent>
-        </Card>
-
-        <div className="border-2 border-gray-200 rounded-lg overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Category Name</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {categories.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan="2" className="text-center">
-                    No categories available.
-                  </TableCell>
-                </TableRow>
+    <div className="container mx-auto py-10">
+      {/* Header Card */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Manage Categories</CardTitle>
+          <CardDescription>Organize your categories with ease.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="flex gap-4 mb-6">
+            <Input
+              placeholder="Enter category name"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              className="flex-1"
+              required
+            />
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {isEditing ? "Updating..." : "Creating..."}
+                </>
               ) : (
-                categories.map((category) => (
-                  <TableRow key={category._id}>
-                    <TableCell className="font-medium">
-                      {category.name}
-                    </TableCell>
-                    <TableCell className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleEdit(category)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        onClick={() => handleDelete(category._id)}
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
+                <>
+                  <Plus className="mr-2 h-4 w-4" />
+                  {isEditing ? "Update" : "Create"}
+                </>
               )}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
+            </Button>
+            {isEditing && (
+              <Button variant="outline" type="button" onClick={resetForm}>
+                Cancel
+              </Button>
+            )}
+          </form>
+
+          {/* Categories Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Existing Categories</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[400px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Category Name</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {categories.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan="2" className="text-center">
+                          No categories available.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      categories.map((category) => (
+                        <TableRow key={category._id}>
+                          <TableCell>{category.name}</TableCell>
+                          <TableCell className="flex justify-end gap-2 mr-1">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => handleEdit(category)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="icon"
+                              onClick={() => handleDelete(category._id)}
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </CardContent>
+      </Card>
     </div>
   );
 }

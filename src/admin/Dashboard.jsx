@@ -78,7 +78,9 @@ export default function Dashboard() {
     }
   };
 
-  const totalBooks = borrows.length;
+  const totalBooks = borrows.filter(
+    (borrow) => borrow.borrowed_by?._id === user?._id
+  ).length;
   const borrowedBooks = borrows.filter(
     (borrow) => !borrow.return_date && borrow.borrowed_by?._id === user?._id
   ).length;

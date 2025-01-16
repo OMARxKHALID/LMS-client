@@ -97,12 +97,20 @@ export function useBook() {
         },
         body: JSON.stringify(purchasedBookData),
       });
+      const result = await response.json();
 
       if (!response.ok) {
-        throw new Error("Error purchasing a book");
+        if (result.message) {
+          throw new Error(result.message);
+        } else {
+          throw new Error(
+            "An unexpected error occurred while purchasing the book."
+          );
+        }
       }
 
-      const updatedBook = await response.json();
+      const updatedBook = result;
+
       dispatch(purchasedBook(updatedBook));
       return updatedBook;
     } catch (error) {

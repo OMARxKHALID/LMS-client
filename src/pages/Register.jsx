@@ -24,7 +24,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Define the validation schema using Zod
 const schema = z
   .object({
     user_name: z.string().min(1, "user_name is required"),

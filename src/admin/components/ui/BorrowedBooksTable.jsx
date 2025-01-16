@@ -31,7 +31,6 @@ const BorrowedBooksTable = ({
         </TableHeader>
         <TableBody>
           {currentBorrows.map((borrow) => {
-            console.log("🚀 ~ {currentBorrows.map ~ borrow:", borrow);
             const {
               _id,
               borrowed_book,

@@ -36,14 +36,15 @@ export function useBorrow() {
       const result = await response.json();
 
       if (!response.ok) {
-        if (result.error) {
-          throw new Error(result.error);
+        if (result.message) {
+          throw new Error(result.message);
         } else {
           throw new Error(
             "An unexpected error occurred while borrowing the book."
           );
         }
       }
+
       dispatch(addBorrow(result.borrow));
       return result;
     } catch (error) {

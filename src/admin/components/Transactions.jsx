@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTransaction } from "@/hooks/useTransaction";
 import { useSelector } from "react-redux";
 import TransactionTable from "./ui/TranscationTable";
+import PaginationControls from "@/components/ui/pagination-controls";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -34,23 +35,27 @@ function Transactions() {
       ? transactions
       : transactions.filter((t) => t.user._id === userId);
 
-  const totalTransactions = filteredTransactions.length;
-  const successfulTransactions = filteredTransactions.filter(
+  const sortedTransactions = [...filteredTransactions].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
+
+  const totalTransactions = sortedTransactions.length;
+  const successfulTransactions = sortedTransactions.filter(
     (t) => t.status === "success"
   ).length;
-  const pendingTransactions = filteredTransactions.filter(
+  const pendingTransactions = sortedTransactions.filter(
     (t) => t.status === "pending"
   ).length;
-  const failedTransactions = filteredTransactions.filter(
+  const failedTransactions = sortedTransactions.filter(
     (t) => t.status === "failed"
   ).length;
 
-  const paginatedTransactions = filteredTransactions.slice(
+  const paginatedTransactions = sortedTransactions.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
 
-  const totalPages = Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(sortedTransactions.length / ITEMS_PER_PAGE);
 
   return (
     <Card className="col-span-full">
@@ -172,31 +177,11 @@ function Transactions() {
             />
           </TabsContent>
         </Tabs>
-
-        <div className="flex items-center justify-between mt-4">
-          <p className="text-sm text-muted-foreground">
-            Showing {Math.min(ITEMS_PER_PAGE, filteredTransactions.length)} of{" "}
-            {filteredTransactions.length} transactions
-          </p>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
+        <PaginationControls
+          totalPages={totalPages}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
       </CardContent>
     </Card>
   );

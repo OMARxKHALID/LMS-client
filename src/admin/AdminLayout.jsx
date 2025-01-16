@@ -36,19 +36,24 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ModeToggle } from "@/components/ui/mode-toggle";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
   const { signOut } = useAuth();
+  const { toast } = useToast();
 
   const handleSignOut = async () => {
     try {
       await signOut();
       navigate("/");
     } catch (error) {
-      console.error("Error during sign out:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to sign out.",
+      });
     }
   };
 
@@ -231,6 +236,13 @@ export default function AdminLayout() {
                       Profile
                     </Link>
                   </DropdownMenuItem>
+                  {user.role === "admin" && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin/manage-users" className="w-full">
+                        Manage Users
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onSelect={handleSignOut}>
                     Sign out
                   </DropdownMenuItem>

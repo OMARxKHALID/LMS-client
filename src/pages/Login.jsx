@@ -1,4 +1,4 @@
-import { useNavigate, Link } from "react-router";
+import { useLocation, useNavigate, Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,13 +16,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
-import {
-  useRive,
-  useStateMachineInput,
-  Layout,
-  Fit,
-  Alignment,
-} from "rive-react";
+import { useRiveAnimation } from "@/hooks/useRive";
 import "@/styles/teddy.css";
 
 const loginSchema = z.object({
@@ -30,11 +24,10 @@ const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-const STATE_MACHINE_NAME = "Login Machine";
-
 export default function Login() {
-  const { signIn } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
+  const { signIn } = useAuth();
   const { toast } = useToast();
 
   const {
@@ -45,39 +38,9 @@ export default function Login() {
     resolver: zodResolver(loginSchema),
   });
 
-  const { rive: riveInstance, RiveComponent } = useRive({
-    src: "teddy.riv",
-    stateMachines: STATE_MACHINE_NAME,
-    autoplay: true,
-    layout: new Layout({
-      fit: Fit.Cover,
-      alignment: Alignment.Center,
-    }),
-  });
+  const { RiveComponent, isCheckingInput, isHandsUpInput } = useRiveAnimation();
 
-  const isCheckingInput = useStateMachineInput(
-    riveInstance,
-    STATE_MACHINE_NAME,
-    "isChecking"
-  );
-
-  const isHandsUpInput = useStateMachineInput(
-    riveInstance,
-    STATE_MACHINE_NAME,
-    "isHandsUp"
-  );
-
-  const trigSuccessInput = useStateMachineInput(
-    riveInstance,
-    STATE_MACHINE_NAME,
-    "trigSuccess"
-  );
-
-  const trigFailInput = useStateMachineInput(
-    riveInstance,
-    STATE_MACHINE_NAME,
-    "trigFail"
-  );
+  const from = location.state?.from?.pathname || "/";
 
   const onSubmit = async (data) => {
     try {
@@ -86,14 +49,12 @@ export default function Login() {
         password: data.password,
       });
       if (response.message === "LOGGED-IN") {
-        trigSuccessInput.fire();
         toast({
           title: "Success",
           description: "Login successfully",
         });
-        navigate("/admin");
+        navigate(from);
       } else {
-        trigFailInput.fire();
         toast({
           title: "Error",
           description: "Incorrect password",
@@ -101,8 +62,6 @@ export default function Login() {
         });
       }
     } catch (error) {
-      trigFailInput.fire();
-      console.error("Login error:", error);
       toast({
         title: "Error",
         description: error.message || "Invalid credentials",
