@@ -24,7 +24,7 @@ function Transactions() {
   const { transactions, loading } = useSelector((state) => state.transactions);
   const { user } = useSelector((state) => state.auth);
 
-  const { _id: userId, role } = user || [];
+  const { role } = user || [];
 
   useEffect(() => {
     getTransactions();
@@ -33,7 +33,7 @@ function Transactions() {
   const filteredTransactions =
     role === "admin"
       ? transactions
-      : transactions.filter((t) => t.user._id === userId);
+      : transactions.filter((t) => user?.transactions.includes(t._id));
 
   const sortedTransactions = [...filteredTransactions].sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)

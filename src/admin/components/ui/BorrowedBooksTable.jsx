@@ -20,23 +20,22 @@ const BorrowedBooksTable = ({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>#</TableHead>
             <TableHead>Book</TableHead>
             <TableHead>Price</TableHead>
             <TableHead>Borrow Price</TableHead>
             <TableHead>Due Date</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Fine</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {currentBorrows.map((borrow) => {
+          {currentBorrows.map((borrow, index) => {
             const {
               _id,
               borrowed_book,
               expected_return_date,
               total_borrow_price,
-              total_borrowed_fine,
               total_price,
               borrowed_by,
             } = borrow;
@@ -45,6 +44,7 @@ const BorrowedBooksTable = ({
 
             return (
               <TableRow key={_id}>
+                <TableCell>{index + 1}</TableCell>
                 <TableCell>
                   {borrowed_book ? borrowed_book?.title : "Loading..."}
                 </TableCell>
@@ -52,7 +52,7 @@ const BorrowedBooksTable = ({
                 <TableCell>${total_borrow_price}</TableCell>
                 <TableCell>
                   {expected_return_date
-                    ? format(new Date(expected_return_date), "MMM dd, yyyy")
+                    ? format(new Date(expected_return_date), "MMM dd")
                     : "N/A"}
                 </TableCell>
                 <TableCell>
@@ -67,9 +67,6 @@ const BorrowedBooksTable = ({
                       <span className="text-muted-foreground">Due soon</span>
                     </div>
                   )}
-                </TableCell>
-                <TableCell>
-                  ${total_borrowed_fine ? total_borrowed_fine : "0.00"}
                 </TableCell>
                 <TableCell>
                   <Button

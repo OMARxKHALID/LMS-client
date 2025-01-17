@@ -140,6 +140,7 @@ export default function ManageBooks() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>#</TableHead>
               <TableHead>Book</TableHead>
               <TableHead>Author</TableHead>
               <TableHead>Price</TableHead>
@@ -156,8 +157,9 @@ export default function ManageBooks() {
                 </TableCell>
               </TableRow>
             ) : (
-              getCurrentBooks().map((book) => (
+              getCurrentBooks().map((book, index) => (
                 <TableRow key={book._id}>
+                  <TableCell>{index + 1}</TableCell>
                   <TableCell>{book.title}</TableCell>
                   <TableCell>{book.author}</TableCell>
                   <TableCell>{book.price}$</TableCell>

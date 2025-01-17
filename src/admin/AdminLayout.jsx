@@ -160,13 +160,13 @@ export default function AdminLayout() {
                       <SidebarMenuButton asChild>
                         <Link
                           to="/admin/create-book"
-                          className={`flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 ${
+                          className={`flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 pl-10 ${
                             isActiveRoute("/admin/create-book")
                               ? "bg-gray-100"
                               : ""
                           }`}
                         >
-                          <BookCopy className="h-5 w-5 mr-3" />
+                          <BookCopy className="h-5 w-5 mr-3 " />
                           <span>Add New Book</span>
                         </Link>
                       </SidebarMenuButton>

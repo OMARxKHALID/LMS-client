@@ -32,6 +32,7 @@ const TransactionTable = ({ transactions, loading }) => {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>#</TableHead>
             <TableHead>Transaction ID</TableHead>
             <TableHead>Book</TableHead>
             <TableHead>User</TableHead>
@@ -41,14 +42,15 @@ const TransactionTable = ({ transactions, loading }) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {transactions.map((transaction) => (
+          {transactions.map((transaction, index) => (
             <TableRow key={transaction._id}>
+              <TableCell>{index + 1}</TableCell>
               <TableCell className="font-medium">{transaction._id}</TableCell>
               <TableCell>{transaction.book.title}</TableCell>
               <TableCell>{transaction.user.user_name}</TableCell>
               <TableCell>${transaction.total_price}</TableCell>
               <TableCell>
-                {format(new Date(transaction.transaction_date), "MMM dd, yyyy")}
+                {format(new Date(transaction.transaction_date), "MMM dd")}
               </TableCell>
               <TableCell>
                 <span

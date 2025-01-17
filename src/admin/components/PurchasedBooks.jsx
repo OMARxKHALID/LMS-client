@@ -36,10 +36,14 @@ export default function PurchasedBooks() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  // Filter books that are purchased and uploaded by the current user
-  const purchasedBooks = books.filter(
-    (book) => book.is_purchased && book.uploaded_by === user._id
-  );
+  const purchasedBooks = books.filter((book) => book.is_purchased);
+
+  const filteredBooks =
+    user?.role === "admin"
+      ? purchasedBooks
+      : purchasedBooks.filter((book) =>
+          user?.purchased_books.includes(book._id)
+        );
 
   const filterBooks = (books, query) => {
     return books.filter(
@@ -62,8 +66,10 @@ export default function PurchasedBooks() {
     });
   };
 
-  const filteredBooks = filterBooks(purchasedBooks, searchQuery);
-  const sortedBooks = sortBooks(filteredBooks, sortBy);
+  const sortedBooks = sortBooks(
+    filterBooks(filteredBooks, searchQuery),
+    sortBy
+  );
   const totalPages = Math.ceil(sortedBooks.length / itemsPerPage);
   const currentBooks = sortedBooks.slice(
     (currentPage - 1) * itemsPerPage,

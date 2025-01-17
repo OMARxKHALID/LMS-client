@@ -199,28 +199,34 @@ const Earnings = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Author</TableHead>
-                  <TableHead>Copies Borrowed</TableHead>
-                  <TableHead>Copies Purchased</TableHead>
-                  <TableHead>Earnings</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {topSellingBooks.map((book, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">{book.title}</TableCell>
-                    <TableCell>{book.author}</TableCell>
-                    <TableCell>{book.copies_borrowed}</TableCell>
-                    <TableCell>{book.copies_purchased}</TableCell>
-                    <TableCell>${book.earnings.toFixed(2)}</TableCell>
+            <div className="border rounded-lg overflow-hidden mb-4">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>#</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Author</TableHead>
+                    <TableHead>Copies Borrowed</TableHead>
+                    <TableHead>Copies Purchased</TableHead>
+                    <TableHead>Earnings</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {topSellingBooks.map((book, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell className="font-medium">
+                        {book.title}
+                      </TableCell>
+                      <TableCell>{book.author}</TableCell>
+                      <TableCell>{book.copies_borrowed}</TableCell>
+                      <TableCell>{book.copies_purchased}</TableCell>
+                      <TableCell>${book.earnings.toFixed(2)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       </CardContent>

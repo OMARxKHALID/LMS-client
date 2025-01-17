@@ -25,6 +25,7 @@ import PaginationControls from "../../components/ui/pagination-controls";
 export default function BorrowedBooks() {
   const { borrows } = useSelector((state) => state.borrow);
   const { user } = useSelector((state) => state.auth);
+  const { role } = user || [];
   const { getBooks } = useBook();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,7 +34,10 @@ export default function BorrowedBooks() {
   const [activeTab, setActiveTab] = useState("current");
   const itemsPerPage = 6;
 
-  const borrowedBooks = borrows.filter((b) => b.borrowed_by._id === user._id);
+  const filteredborrowedBooks =
+    role === "admin"
+      ? borrows
+      : borrows.filter((b) => user?.borrowed_books.includes(b._id));
 
   const filterBooks = (books, query) => {
     return books.filter(
@@ -82,7 +86,7 @@ export default function BorrowedBooks() {
     }
   };
 
-  const filteredBooks = filterBooks(borrowedBooks, searchQuery);
+  const filteredBooks = filterBooks(filteredborrowedBooks, searchQuery);
   const sortedBooks = sortBooks(filteredBooks, sortBy);
   const filteredByTab =
     activeTab === "current"
@@ -195,7 +199,8 @@ const BooksGrid = ({ books, getStatusColor }) => (
         </CardContent>
         <CardFooter>
           <div className="w-full">
-            {book.borrowed_book.pdf_files &&
+            {!book.return_date &&
+            book.borrowed_book.pdf_files &&
             book.borrowed_book.pdf_files.length > 0 ? (
               <Button
                 size="sm"
@@ -207,11 +212,7 @@ const BooksGrid = ({ books, getStatusColor }) => (
                 <Eye className="w-4 h-4 mr-2" />
                 View PDF
               </Button>
-            ) : (
-              <p className="text-center text-sm text-muted-foreground">
-                No PDF available
-              </p>
-            )}
+            ) : null}
           </div>
         </CardFooter>
       </Card>

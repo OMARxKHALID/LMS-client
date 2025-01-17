@@ -6,7 +6,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CheckCircle2, Clock } from "lucide-react";
 import { format } from "date-fns";
 
 const TotalBorrowedBooksTable = ({ currentTotalBorrowedBooks = [] }) => {
@@ -15,6 +14,7 @@ const TotalBorrowedBooksTable = ({ currentTotalBorrowedBooks = [] }) => {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>#</TableHead>
             <TableHead>Book</TableHead>
             <TableHead>Price</TableHead>
             <TableHead>Borrow Price</TableHead>
@@ -27,7 +27,7 @@ const TotalBorrowedBooksTable = ({ currentTotalBorrowedBooks = [] }) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {currentTotalBorrowedBooks.map((borrow) => {
+          {currentTotalBorrowedBooks.map((borrow, index) => {
             const {
               _id,
               borrowed_book,
@@ -42,6 +42,7 @@ const TotalBorrowedBooksTable = ({ currentTotalBorrowedBooks = [] }) => {
 
             return (
               <TableRow key={_id}>
+                <TableCell>{index + 1}</TableCell>
                 <TableCell>{borrowed_book?.title || "Loading..."}</TableCell>
                 <TableCell>
                   ${total_price ? total_price.toFixed(2) : "N/A"}
@@ -52,17 +53,17 @@ const TotalBorrowedBooksTable = ({ currentTotalBorrowedBooks = [] }) => {
                 <TableCell>{borrowed_by?.user_name || "Unknown"}</TableCell>
                 <TableCell>
                   {borrowed_date
-                    ? format(new Date(borrowed_date), "MMM dd, yyyy")
+                    ? format(new Date(borrowed_date), "MMM dd")
                     : "N/A"}
                 </TableCell>
                 <TableCell>
                   {expected_return_date
-                    ? format(new Date(expected_return_date), "MMM dd, yyyy")
+                    ? format(new Date(expected_return_date), "MMM dd")
                     : "N/A"}
                 </TableCell>
                 <TableCell>
                   {return_date
-                    ? format(new Date(return_date), "MMM dd, yyyy")
+                    ? format(new Date(return_date), "MMM dd")
                     : "N/A"}
                 </TableCell>
                 <TableCell>
@@ -70,15 +71,13 @@ const TotalBorrowedBooksTable = ({ currentTotalBorrowedBooks = [] }) => {
                 </TableCell>
                 <TableCell>
                   {return_date ? (
-                    <div className="flex items-center">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mr-2" />
-                      <span className="text-green-500">Returned</span>
-                    </div>
+                    <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-green-100 text-green-700">
+                      Returned
+                    </span>
                   ) : (
-                    <div className="flex items-center">
-                      <Clock className="h-4 w-4 text-yellow-500 mr-2" />
-                      <span className="text-yellow-500">Borrowed</span>
-                    </div>
+                    <span className=" inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-red-100 text-red-700">
+                      Borrowed
+                    </span>
                   )}
                 </TableCell>
               </TableRow>

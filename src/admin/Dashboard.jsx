@@ -26,7 +26,7 @@ import { Link } from "react-router";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import BorrowedBooksTable from "./components/ui/BorrowedBooksTable";
 import TotalBorrowedBooksTable from "./components/ui/TotalBorrowedBooks";
-import UploadedBooksTable from "./components/ui/UploadedBooks";
+// import UploadedBooksTable from "./components/ui/UploadedBooks";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import usePagination from "@/hooks/usePagination";
 import PaginationControls from "../components/ui/pagination-controls";
@@ -41,8 +41,11 @@ export default function Dashboard() {
   const { toast } = useToast();
   const { borrows, loading } = useSelector((state) => state.borrow);
   const { user } = useSelector((state) => state.auth);
-  const { role } = user;
+  //   const { role } = user;
 
+  const sortedborrows = [...borrows].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
   const [showOverdueNotice, setShowOverdueNotice] = useState(true);
 
   useEffect(() => {
@@ -78,43 +81,36 @@ export default function Dashboard() {
     }
   };
 
-  const totalBooks = borrows.filter(
-    (borrow) => borrow.borrowed_by?._id === user?._id
-  ).length;
-  const borrowedBooks = borrows.filter(
-    (borrow) => !borrow.return_date && borrow.borrowed_by?._id === user?._id
+  const totalBooks = sortedborrows.length;
+  const borrowedBooks = sortedborrows.filter(
+    (borrow) => !borrow.return_date
   ).length;
 
-  const overdueBooks = borrows.filter(
+  const overdueBooks = sortedborrows.filter(
     (borrow) =>
-      !borrow.return_date &&
-      isPast(new Date(borrow.expected_return_date)) &&
-      borrow.borrowed_by?._id === user?._id
+      !borrow.return_date && isPast(new Date(borrow.expected_return_date))
   ).length;
 
-  const dueSoonBooks = borrows.filter((borrow) => {
+  const dueSoonBooks = sortedborrows.filter((borrow) => {
     const dueDate = new Date(borrow.expected_return_date);
     const now = new Date();
     return (
       !borrow.return_date &&
       dueDate > now &&
-      dueDate - now < 3 * 24 * 60 * 60 * 1000 &&
-      borrow.borrowed_by?._id === user?._id
+      dueDate - now < 3 * 24 * 60 * 60 * 1000
     );
   }).length;
 
   const paginationOptions = [
     {
       label: "currentBorrows",
-      items: borrows.filter(
-        (borrow) => borrow.borrowed_by?._id === user?._id && !borrow.return_date
-      ),
+      items: sortedborrows.filter((borrow) => !borrow.return_date),
     },
     {
       label: "totalBorrowedBooks",
-      items: borrows.filter((borrow) => borrow.borrowed_by?._id === user?._id),
+      items: sortedborrows,
     },
-    { label: "uploadedBooks", items: borrows },
+    // { label: "uploadedBooks", items: sortedborrows },
   ];
 
   // Pagination logic for each section
@@ -123,21 +119,21 @@ export default function Dashboard() {
     currentPage: currentBorrowedPage,
     totalPages: totalBorrowedPages,
     setCurrentPage: setCurrentBorrowedPage,
-  } = usePagination(paginationOptions[0].items, 5);
+  } = usePagination(paginationOptions[0].items, 8);
 
   const {
     paginatedItems: currentTotalBorrowedBooks,
     currentPage: currentTotalBorrowedPage,
     totalPages: totalBorrowedBooksPages,
     setCurrentPage: setCurrentTotalBorrowedPage,
-  } = usePagination(paginationOptions[1].items, 5);
+  } = usePagination(paginationOptions[1].items, 8);
 
-  const {
-    paginatedItems: currentUploadedBooks,
-    currentPage: currentUploadedPage,
-    totalPages: totalUploadedPages,
-    setCurrentPage: setCurrentUploadedPage,
-  } = usePagination(paginationOptions[2].items, 5);
+  //   const {
+  //     paginatedItems: currentUploadedBooks,
+  //     currentPage: currentUploadedPage,
+  //     totalPages: totalUploadedPages,
+  //     setCurrentPage: setCurrentUploadedPage,
+  //   } = usePagination(paginationOptions[2].items, 5);
 
   if (loading) {
     return (
@@ -249,9 +245,9 @@ export default function Dashboard() {
           <TabsList className="w-full justify-start overflow-x-auto">
             <TabsTrigger value="current">Currently Borrowed</TabsTrigger>
             <TabsTrigger value="history">Borrowing History</TabsTrigger>
-            {role === "admin" && (
+            {/* {role === "admin" && (
               <TabsTrigger value="uploaded">Uploaded Books</TabsTrigger>
-            )}
+            )} */}
           </TabsList>
 
           <TabsContent value="current">
@@ -314,7 +310,7 @@ export default function Dashboard() {
             )}
           </TabsContent>
 
-          {role === "admin" && (
+          {/* {role === "admin" && (
             <TabsContent value="uploaded">
               {currentUploadedBooks.length === 0 ? (
                 <Card>
@@ -341,7 +337,7 @@ export default function Dashboard() {
                 />
               )}
             </TabsContent>
-          )}
+          )} */}
         </Tabs>
       </CardContent>
     </Card>
