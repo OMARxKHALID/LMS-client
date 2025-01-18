@@ -21,6 +21,7 @@ import {
 import { useSelector } from "react-redux";
 import { useBook } from "@/hooks/useBook";
 import PaginationControls from "../../components/ui/pagination-controls";
+import { useNavigate } from "react-router";
 
 export default function BorrowedBooks() {
   const { borrows } = useSelector((state) => state.borrow);
@@ -166,59 +167,63 @@ export default function BorrowedBooks() {
     </div>
   );
 }
-const BooksGrid = ({ books, getStatusColor }) => (
-  <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-    {books.map((book) => (
-      <Card key={book._id} className="overflow-hidden flex flex-col">
-        <CardHeader className="space-y-1">
-          <div className="flex justify-between items-start">
-            <CardTitle className="line-clamp-1 text-base sm:text-lg">
-              {book.borrowed_book.title}
-            </CardTitle>
-            <Badge className={getStatusColor(book.status)} variant="secondary">
-              {book.status.charAt(0).toUpperCase() + book.status.slice(1)}
-            </Badge>
-          </div>
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            {book.borrowed_book.author}
-          </p>
-        </CardHeader>
-        <CardContent className="flex-grow">
-          <div className="flex flex-col space-y-2 text-xs sm:text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Borrowed:</span>
-              <span>{new Date(book.borrowed_date).toLocaleDateString()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Due Date:</span>
-              <span>
-                {new Date(book.expected_return_date).toLocaleDateString()}
-              </span>
-            </div>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <div className="w-full">
-            {!book.return_date &&
-            book.borrowed_book.pdf_files &&
-            book.borrowed_book.pdf_files.length > 0 ? (
-              <Button
-                size="sm"
-                className="w-full"
-                onClick={() =>
-                  window.open(book.borrowed_book.pdf_files[0], "_blank")
-                }
+const BooksGrid = ({ books, getStatusColor }) => {
+  const navigate = useNavigate(); // For React Router
+  return (
+    <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      {books.map((book) => (
+        <Card key={book._id} className="overflow-hidden flex flex-col">
+          <CardHeader className="space-y-1">
+            <div className="flex justify-between items-start">
+              <CardTitle className="line-clamp-1 text-base sm:text-lg">
+                {book.borrowed_book.title}
+              </CardTitle>
+              <Badge
+                className={getStatusColor(book.status)}
+                variant="secondary"
               >
-                <Eye className="w-4 h-4 mr-2" />
-                View PDF
-              </Button>
-            ) : null}
-          </div>
-        </CardFooter>
-      </Card>
-    ))}
-  </div>
-);
+                {book.status.charAt(0).toUpperCase() + book.status.slice(1)}
+              </Badge>
+            </div>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              {book.borrowed_book.author}
+            </p>
+          </CardHeader>
+          <CardContent className="flex-grow">
+            <div className="flex flex-col space-y-2 text-xs sm:text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Borrowed:</span>
+                <span>{new Date(book.borrowed_date).toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Due Date:</span>
+                <span>
+                  {new Date(book.expected_return_date).toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <div className="w-full">
+              {!book.return_date &&
+              book.borrowed_book.pdf_files &&
+              book.borrowed_book.pdf_files.length > 0 ? (
+                <Button
+                  size="sm"
+                  className="w-full"
+                  onClick={() => navigate(`/admin/read/${book._id}`)}
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  View PDF
+                </Button>
+              ) : null}
+            </div>
+          </CardFooter>
+        </Card>
+      ))}
+    </div>
+  );
+};
 
 const NoBooksFound = () => (
   <div className="flex flex-col items-center justify-center h-[400px] border rounded-lg bg-muted/10">
