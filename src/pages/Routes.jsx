@@ -18,7 +18,7 @@ import Transactions from "@/admin/components/Transactions";
 import BorrowedBooks from "@/admin/components/BorrowedBooks";
 import PurchasedBooks from "@/admin/components/PurchasedBooks";
 import ManageUsers from "@/admin/components/ManageUsers";
-import ReadBook from "@/admin/components/ReadBooks";
+import ReadBook from "@/admin/components/read/ReadBooks";
 
 export const publicRoutes = [
   { path: "/", element: <Home />, showFooter: true },
