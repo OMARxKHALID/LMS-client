@@ -21,6 +21,7 @@ import { useSelector } from "react-redux";
 import { useBook } from "@/hooks/useBook";
 import PaginationControls from "../../components/ui/pagination-controls";
 import { downloadPDF } from "@/utils/downloadPDF";
+import { useNavigate } from "react-router";
 
 export default function PurchasedBooks() {
   const { user } = useSelector((state) => state.auth);
@@ -137,62 +138,71 @@ export default function PurchasedBooks() {
     </div>
   );
 }
-
-const BooksGrid = ({ books }) => (
-  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-    {books.map((book) => (
-      <Card key={book._id} className="overflow-hidden flex flex-col">
-        <CardHeader className="space-y-1">
-          <div className="flex justify-between items-start">
-            <CardTitle className="line-clamp-1 text-base">
-              {book.title}
-            </CardTitle>
-            <Badge className="bg-blue-500/10 text-blue-500" variant="secondary">
-              Purchased
-            </Badge>
-          </div>
-          <p className="text-xs text-muted-foreground">{book.author}</p>
-        </CardHeader>
-        <CardContent className="flex-grow">
-          <div className="flex flex-col space-y-2 text-xs">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Purchased On:</span>
-              <span>{new Date(book.purchased_date).toLocaleDateString()}</span>
+const BooksGrid = ({ books }) => {
+  const navigate = useNavigate();
+  return (
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      {books.map((book) => (
+        <Card key={book._id} className="overflow-hidden flex flex-col">
+          <CardHeader className="space-y-1">
+            <div className="flex justify-between items-start">
+              <CardTitle className="line-clamp-1 text-base">
+                {book.title}
+              </CardTitle>
+              <Badge
+                className="bg-blue-500/10 text-blue-500"
+                variant="secondary"
+              >
+                Purchased
+              </Badge>
             </div>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <div className="w-full flex flex-col space-y-2">
-            {book.pdf_files && book.pdf_files.length > 0 ? (
-              <>
-                <Button
-                  size="sm"
-                  className="w-full"
-                  onClick={() => window.open(book.pdf_files[0], "_blank")}
-                >
-                  <Eye className="w-4 h-4 mr-2" />
-                  View PDF
-                </Button>
-                <Button
-                  size="sm"
-                  className="w-full"
-                  onClick={() => {
-                    downloadPDF(book.pdf_files[0], book.title);
-                  }}
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download PDF
-                </Button>
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">No PDF available</p>
-            )}
-          </div>
-        </CardFooter>
-      </Card>
-    ))}
-  </div>
-);
+            <p className="text-xs text-muted-foreground">{book.author}</p>
+          </CardHeader>
+          <CardContent className="flex-grow">
+            <div className="flex flex-col space-y-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Purchased On:</span>
+                <span>
+                  {new Date(book.purchased_date).toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <div className="w-full flex flex-col space-y-2">
+              {book.pdf_files && book.pdf_files.length > 0 ? (
+                <>
+                  <Button
+                    size="sm"
+                    className="w-full"
+                    onClick={() => navigate(`/admin/read/${book._id}`)}
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    View PDF
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="w-full"
+                    onClick={() => {
+                      downloadPDF(book.pdf_files[0], book.title);
+                    }}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download PDF
+                  </Button>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No PDF available
+                </p>
+              )}
+            </div>
+          </CardFooter>
+        </Card>
+      ))}
+    </div>
+  );
+};
 
 const NoBooksFound = () => (
   <div className="flex flex-col items-center justify-center h-[400px] border rounded-lg bg-muted/10">

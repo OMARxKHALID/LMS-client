@@ -9,7 +9,9 @@ const ReadBooks = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { borrows } = useSelector((state) => state.borrow);
-  const book = borrows.find((b) => b._id === id);
+  const book = borrows.find(
+    (borrow) => borrow.borrowed_book?._id === id || borrow._id === id
+  );
   const pdfURL = book?.borrowed_book?.pdf_files?.[0];
 
   if (!pdfURL) {
@@ -28,7 +30,7 @@ const ReadBooks = () => {
 
   return (
     <div className="container mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
             {book?.borrowed_book?.title || "Untitled"}

@@ -168,7 +168,7 @@ export default function BorrowedBooks() {
   );
 }
 const BooksGrid = ({ books, getStatusColor }) => {
-  const navigate = useNavigate(); // For React Router
+  const navigate = useNavigate();
   return (
     <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
       {books.map((book) => (
