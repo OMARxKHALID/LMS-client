@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { BookOpenCheck, UserCircle, Book, Menu, X } from "lucide-react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import { ModeToggle } from "@/components/ui/mode-toggle";
+import { useBorrow } from "@/hooks/useBorrow";
+import Notifications from "@/components/ui/notifications";
 
 export default function Header() {
   const { user } = useSelector((state) => state.auth);
+  const { borrows } = useSelector((state) => state.borrow);
+  const { getBorrowRecords } = useBorrow();
   const { signOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    getBorrowRecords();
+  }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -34,8 +42,9 @@ export default function Header() {
             </Link>
           </nav>
         </div>
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="hidden md:flex items-center space-x-2">
           <ModeToggle />
+          <Notifications borrows={borrows} />
           {user ? (
             <div className="flex items-center space-x-4">
               <Link to="/admin">
@@ -92,7 +101,6 @@ export default function Header() {
               About Us
             </Link>
             <ModeToggle />
-
             {user ? (
               <>
                 <Link to="/admin" onClick={toggleMenu}>

@@ -179,7 +179,7 @@ const PDFViewer = ({ pdfURL }) => {
 
   return (
     <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
-      <div className="h-[calc(100vh-130px)] sm:h-[calc(100vh-100px)]">
+      <div className="h-[calc(100vh-130px)] sm:h-[calc(100vh-100px)] border">
         <Viewer
           fileUrl={pdfURL}
           plugins={[

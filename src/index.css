@@ -68,3 +68,7 @@
     font-family: "Space Mono", monospace;
   }
 }
+
+.rpv-default-layout__container {
+  border: none !important;
+}
