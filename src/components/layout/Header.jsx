@@ -16,8 +16,10 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
-    getBorrowRecords();
-  }, []);
+    if (user) {
+      getBorrowRecords();
+    }
+  }, [user]);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 

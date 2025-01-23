@@ -81,6 +81,10 @@ export default function EditBook() {
   const { uploadToCloudinary, isUploading } = useCloudinary();
   const [pdfs, setPdfs] = useState([]);
 
+  useEffect(() => {
+    getCategories();
+  }, []);
+
   const book = books.find((book) => {
     return book._id === id;
   });

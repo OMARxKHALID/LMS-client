@@ -9,12 +9,42 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2, AlertTriangle, Clock } from "lucide-react";
 import { format, isPast } from "date-fns";
+import { useSelector } from "react-redux";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useState } from "react";
 
 const BorrowedBooksTable = ({
   currentBorrows,
   handleReturnBook,
   isReturning,
 }) => {
+  const { user } = useSelector((state) => state.auth);
+  const [open, setOpen] = useState(false);
+  const [selectedBorrow, setSelectedBorrow] = useState(null);
+
+  const handleReturnClick = (_id, borrowed_by) => {
+    if (borrowed_by.user_name !== user.user_name) {
+      setSelectedBorrow({ _id, borrowed_by });
+      setOpen(true);
+    } else {
+      handleReturnBook(_id, borrowed_by);
+    }
+  };
+
+  const confirmReturn = () => {
+    if (selectedBorrow) {
+      handleReturnBook(selectedBorrow._id, selectedBorrow.borrowed_by);
+      setOpen(false);
+    }
+  };
+
   return (
     <div className="border rounded-lg overflow-hidden mb-4">
       <Table>
@@ -24,6 +54,7 @@ const BorrowedBooksTable = ({
             <TableHead>Book</TableHead>
             <TableHead>Price</TableHead>
             <TableHead>Borrow Price</TableHead>
+            <TableHead>Borrowed By</TableHead>
             <TableHead>Due Date</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Action</TableHead>
@@ -41,7 +72,6 @@ const BorrowedBooksTable = ({
             } = borrow;
 
             const isOverdue = isPast(new Date(expected_return_date));
-
             return (
               <TableRow key={_id}>
                 <TableCell>{index + 1}</TableCell>
@@ -50,6 +80,7 @@ const BorrowedBooksTable = ({
                 </TableCell>
                 <TableCell>${total_price}</TableCell>
                 <TableCell>${total_borrow_price}</TableCell>
+                <TableCell>{borrowed_by.user_name}</TableCell>
                 <TableCell>
                   {expected_return_date
                     ? format(new Date(expected_return_date), "MMM dd")
@@ -70,11 +101,10 @@ const BorrowedBooksTable = ({
                 </TableCell>
                 <TableCell>
                   <Button
+                    className="cursor"
                     size="sm"
                     variant="destructive"
-                    onClick={() => {
-                      handleReturnBook(_id, borrowed_by);
-                    }}
+                    onClick={() => handleReturnClick(_id, borrowed_by)}
                     disabled={isReturning === _id || status === "returned"}
                   >
                     {isReturning === _id ? (
@@ -89,6 +119,26 @@ const BorrowedBooksTable = ({
           })}
         </TableBody>
       </Table>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Return</DialogTitle>
+            <DialogDescription>
+              Do you really want to return the book borrowed by{" "}
+              {selectedBorrow?.borrowed_by.user_name}?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmReturn}>
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

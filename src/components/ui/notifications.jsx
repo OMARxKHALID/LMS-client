@@ -29,6 +29,15 @@ const Notifications = ({ borrows }) => {
     },
   };
 
+  // Calculate dynamic height
+  const calculateHeight = () => {
+    const totalBooks =
+      notifications.dueSoonBooks.length + notifications.overdueBooks.length;
+    // Each book card has an approximate height of 80px (adjust as needed)
+    const height = totalBooks * 80;
+    return height > 300 ? 300 : height;
+  };
+
   return (
     <HoverCard open={showNotifications} onOpenChange={setShowNotifications}>
       <HoverCardTrigger asChild>
@@ -47,7 +56,9 @@ const Notifications = ({ borrows }) => {
         </Button>
       </HoverCardTrigger>
       <HoverCardContent className="w-80" align="end">
-        <ScrollArea className="h-[300px]">
+        <ScrollArea
+          style={{ height: `${calculateHeight()}px`, maxHeight: "300px" }}
+        >
           {notifications.dueSoonBooks.length > 0 && (
             <div className="mb-4">
               <h4 className="mb-2 font-semibold text-sm">Due Soon</h4>
