@@ -29,7 +29,7 @@ const ReadBooks = () => {
   }
 
   return (
-    <div className="container mx-auto">
+    <>
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
@@ -44,7 +44,7 @@ const ReadBooks = () => {
         </Button>
       </div>
       <PDFViewer pdfURL={pdfURL} />
-    </div>
+    </>
   );
 };
 

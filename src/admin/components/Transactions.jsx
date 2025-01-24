@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BookOpen, DollarSign, RotateCcw, Clock } from "lucide-react";
+import { BookOpen, DollarSign, RotateCcw, Clock, Download } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +15,7 @@ import { useTransaction } from "@/hooks/useTransaction";
 import { useSelector } from "react-redux";
 import TransactionTable from "./ui/TranscationTable";
 import PaginationControls from "@/components/ui/pagination-controls";
+import { exportToCsv } from "@/utils/exportCSV";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -57,6 +58,17 @@ function Transactions() {
 
   const totalPages = Math.ceil(sortedTransactions.length / ITEMS_PER_PAGE);
 
+  const handleExportCsv = () => {
+    const dataForExport = sortedTransactions.map((transaction) => ({
+      ID: transaction._id,
+      Amount: transaction.amount,
+      Status: transaction.status,
+      Date: new Date(transaction.createdAt).toLocaleString(),
+    }));
+
+    exportToCsv(dataForExport, "transactions.csv");
+  };
+
   return (
     <Card className="col-span-full">
       <CardHeader>
@@ -69,10 +81,21 @@ function Transactions() {
               Your transaction activity at a glance
             </CardDescription>
           </div>
-          <Button variant="outline" onClick={getTransactions}>
-            <RotateCcw className="mr-2 h-4 w-4" />
-            Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={getTransactions}>
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Refresh
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleExportCsv}
+              className="text-sm flex items-center"
+            >
+              <Download className="h-5 w-5" />
+              <span className="sr-only">Export CSV</span>
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>

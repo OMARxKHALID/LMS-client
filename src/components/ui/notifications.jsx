@@ -33,7 +33,9 @@ const Notifications = ({ borrows }) => {
   const calculateHeight = () => {
     const totalBooks =
       notifications.dueSoonBooks.length + notifications.overdueBooks.length;
-    // Each book card has an approximate height of 80px (adjust as needed)
+    // If there are no notifications, return a minimum height
+    if (totalBooks === 0) return 100;
+    // Each book card has an approximate height of 80px
     const height = totalBooks * 80;
     return height > 300 ? 300 : height;
   };
@@ -59,44 +61,52 @@ const Notifications = ({ borrows }) => {
         <ScrollArea
           style={{ height: `${calculateHeight()}px`, maxHeight: "300px" }}
         >
-          {notifications.dueSoonBooks.length > 0 && (
-            <div className="mb-4">
-              <h4 className="mb-2 font-semibold text-sm">Due Soon</h4>
-              {notifications.dueSoonBooks.map((book) => (
-                <div key={book._id} className="mb-2 p-2 rounded-lg bg-muted/50">
-                  <p className="font-medium text-sm">
-                    {book.borrowed_book.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Due: {format(new Date(book.expected_return_date), "PPP")}
-                  </p>
+          {notifications.total > 0 ? (
+            <>
+              {notifications.dueSoonBooks.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="mb-2 font-semibold text-sm">Due Soon</h4>
+                  {notifications.dueSoonBooks.map((book) => (
+                    <div
+                      key={book._id}
+                      className="mb-2 p-2 rounded-lg bg-muted/50"
+                    >
+                      <p className="font-medium text-sm">
+                        {book.borrowed_book.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Due:{" "}
+                        {format(new Date(book.expected_return_date), "PPP")}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
-          {notifications.overdueBooks.length > 0 && (
-            <div>
-              <h4 className="mb-2 font-semibold text-sm text-red-500">
-                Overdue Books
-              </h4>
-              {notifications.overdueBooks.map((book) => (
-                <div
-                  key={book._id}
-                  className="mb-2 p-2 rounded-lg bg-red-100 dark:bg-red-900/20"
-                >
-                  <p className="font-medium text-sm">
-                    {book.borrowed_book.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Due: {format(new Date(book.expected_return_date), "PPP")}
-                  </p>
+              )}
+              {notifications.overdueBooks.length > 0 && (
+                <div>
+                  <h4 className="mb-2 font-semibold text-sm text-red-500">
+                    Overdue Books
+                  </h4>
+                  {notifications.overdueBooks.map((book) => (
+                    <div
+                      key={book._id}
+                      className="mb-2 p-2 rounded-lg bg-red-100 dark:bg-red-900/20"
+                    >
+                      <p className="font-medium text-sm">
+                        {book.borrowed_book.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Due:{" "}
+                        {format(new Date(book.expected_return_date), "PPP")}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
-          {notifications.total === 0 && (
-            <div className="text-center text-sm text-muted-foreground py-4">
-              No notifications
+              )}
+            </>
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-sm text-muted-foreground">No notifications</p>
             </div>
           )}
         </ScrollArea>

@@ -1,19 +1,40 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { BookOpenCheck, UserCircle, Book, Menu, X } from "lucide-react";
+import {
+  BookOpenCheck,
+  UserCircle,
+  Book,
+  Menu,
+  ChevronDown,
+  LogOut,
+  User,
+  Settings,
+  Bookmark,
+  HomeIcon,
+  HelpCircle,
+} from "lucide-react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { useBorrow } from "@/hooks/useBorrow";
-import Notifications from "@/components/ui/notifications";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/utils/utils";
+import Notifications from "../ui/notifications";
 
 export default function Header() {
   const { user } = useSelector((state) => state.auth);
   const { borrows } = useSelector((state) => state.borrow);
   const { getBorrowRecords } = useBorrow();
   const { signOut } = useAuth();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     if (user) {
@@ -21,124 +42,169 @@ export default function Header() {
     }
   }, [user]);
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const mainNavItems = [
+    { label: "Home", href: "/", icon: HomeIcon },
+    { label: "Browse Books", href: "/books", icon: Book },
+    { label: "About Us", href: "/about-us", icon: HelpCircle },
+  ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b backdrop-blur">
-      <div className="container h-14 flex items-center justify-between">
-        <div className="flex items-center space-x-6">
-          <Link to="/" className="flex items-center space-x-2 cursor-pointer">
-            <BookOpenCheck className="h-6 w-6 text-primary" />
-            <span className="font-bold text-primary">Codebook Hub</span>
-          </Link>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container px-4 h-16">
+        <div className="flex h-full items-center justify-between">
+          <div className="flex items-center">
+            <Link to="/" className="flex items-center space-x-2">
+              <BookOpenCheck className="h-6 w-6 text-primary" />
+              <span className="font-bold text-xl bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent hidden sm:inline-block">
+                Codebook Hub
+              </span>
+            </Link>
+          </div>
           <nav className="hidden md:flex items-center space-x-6">
-            <Link
-              to="/books"
-              className="text-primary hover:text-primary/80 cursor-pointer flex items-center space-x-2"
-            >
-              <Book className="h-4 w-4 text-primary" />
-              <span>Browse Books</span>
-            </Link>
-            <Link to="/about-us" className="text-gray-500 hover:text-gray-900">
-              About Us
-            </Link>
+            {mainNavItems.map(({ label, href, icon: Icon }) => (
+              <Link
+                key={href}
+                to={href}
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary flex items-center space-x-2",
+                  location.pathname === href && "text-primary"
+                )}
+              >
+                <Icon className="h-4 w-4" />
+                <span>{label}</span>
+              </Link>
+            ))}
           </nav>
-        </div>
-        <div className="hidden md:flex items-center space-x-2">
-          <ModeToggle />
-          <Notifications borrows={borrows} />
-          {user ? (
-            <div className="flex items-center space-x-4">
-              <Link to="/admin">
-                <div className="flex items-center space-x-2 cursor-pointer">
-                  <UserCircle className="h-5 w-5 text-primary" />
-                  <span className="text-sm text-primary">{user.user_name}</span>
-                </div>
-              </Link>
-              <Button variant="outline" onClick={signOut} size="sm">
-                Sign Out
-              </Button>
-            </div>
-          ) : (
-            <div className="flex items-center space-x-4">
-              <Link to="/login">
-                <Button variant="outline" size="sm">
-                  Log In
-                </Button>
-              </Link>
-              <Link to="/register">
-                <Button size="sm">Get Started</Button>
-              </Link>
-            </div>
-          )}
-        </div>
-        <button
-          className="md:hidden text-primary"
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
-        >
-          {isMenuOpen ? (
-            <X className="h-6 w-6" />
-          ) : (
-            <Menu className="h-6 w-6" />
-          )}
-        </button>
-      </div>
-      {isMenuOpen && (
-        <div className="md:hidden">
-          <nav className="flex flex-col space-y-4 p-4 border-t">
-            <Link
-              to="/books"
-              className="text-primary hover:text-primary/80 cursor-pointer flex items-center space-x-2"
-              onClick={toggleMenu}
-            >
-              <Book className="h-4 w-4 text-primary" />
-              <span>Browse Books</span>
-            </Link>
-            <Link
-              to="/about"
-              className="text-gray-500 hover:text-gray-900"
-              onClick={toggleMenu}
-            >
-              About Us
-            </Link>
+          <div className="flex items-center space-x-4">
             <ModeToggle />
+
+            {user && <Notifications borrows={borrows} />}
+
             {user ? (
-              <>
-                <Link to="/admin" onClick={toggleMenu}>
-                  <div className="flex items-center space-x-2 cursor-pointer">
-                    <UserCircle className="h-5 w-5 text-primary" />
-                    <span className="text-sm text-primary">
-                      {user.user_name}
-                    </span>
-                  </div>
-                </Link>
-                <Button
-                  variant="outline"
-                  onClick={signOut}
-                  size="sm"
-                  className="w-full"
-                >
-                  Sign Out
-                </Button>
-              </>
+              <UserMenu user={user} signOut={signOut} />
             ) : (
-              <>
-                <Link to="/login" onClick={toggleMenu}>
-                  <Button variant="outline" size="sm" className="w-full">
+              <div className="hidden md:flex items-center space-x-2">
+                <Link to="/login">
+                  <Button variant="ghost" size="sm">
                     Sign In
                   </Button>
                 </Link>
-                <Link to="/register" onClick={toggleMenu}>
-                  <Button size="sm" className="w-full">
-                    Get Started
-                  </Button>
+                <Link to="/register">
+                  <Button size="sm">Get Started</Button>
                 </Link>
-              </>
+              </div>
             )}
-          </nav>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild className="md:hidden">
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-[calc(100vw-2rem)] md:w-56 mr-4"
+              >
+                <DropdownMenuLabel>Menu</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+
+                {mainNavItems.map(({ label, href, icon: Icon }) => (
+                  <DropdownMenuItem key={href} asChild>
+                    <Link to={href} className="w-full">
+                      <Icon className="mr-2 h-4 w-4" />
+                      {label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+
+                {!user && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/login" className="w-full">
+                        <User className="mr-2 h-4 w-4" />
+                        Sign In
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/register" className="w-full">
+                        <UserCircle className="mr-2 h-4 w-4" />
+                        Get Started
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
+
+                {user && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="w-full">
+                        <User className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin/manage-books" className="w-full">
+                        <Bookmark className="mr-2 h-4 w-4" />
+                        My Books
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin/profile" className="w-full">
+                        <Settings className="mr-2 h-4 w-4" />
+                        Settings
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={signOut}
+                      className="text-red-600"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign Out
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-      )}
+      </div>
     </header>
   );
 }
+
+const UserMenu = ({ user, signOut }) => (
+  <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <Button variant="ghost" className="flex items-center space-x-2">
+        <UserCircle className="h-5 w-5" />
+        <span className="hidden sm:inline-block">{user.user_name}</span>
+        <ChevronDown className="h-4 w-4" />
+      </Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem asChild>
+        <Link to="/admin" className="cursor-pointer">
+          <User className="mr-2 h-4 w-4" /> Dashboard
+        </Link>
+      </DropdownMenuItem>
+      <DropdownMenuItem asChild>
+        <Link to="/admin/manage-books" className="cursor-pointer">
+          <Bookmark className="mr-2 h-4 w-4" /> My Books
+        </Link>
+      </DropdownMenuItem>
+      <DropdownMenuItem asChild>
+        <Link to="/admin/profile" className="cursor-pointer">
+          <Settings className="mr-2 h-4 w-4" /> Settings
+        </Link>
+      </DropdownMenuItem>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem onClick={signOut} className="text-red-600">
+        <LogOut className="mr-2 h-4 w-4" /> Sign Out
+      </DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
+);

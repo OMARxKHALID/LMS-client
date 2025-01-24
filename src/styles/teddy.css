@@ -16,16 +16,23 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .rive-wrapper {
     aspect-ratio: 3/2;
-    max-height: 200px;
+    max-height: 240px;
+  }
+}
+
+@media (max-width: 640px) {
+  .rive-wrapper {
+    aspect-ratio: 2/1;
+    max-height: 180px;
   }
 }
 
 @media (max-width: 480px) {
   .rive-wrapper {
     aspect-ratio: 2/1;
-    max-height: 150px;
+    max-height: 120px;
   }
 }

@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { useSelector } from "react-redux";
 import { useBook } from "@/hooks/useBook";
-import PaginationControls from "../../components/ui/pagination-controls";
+import PaginationControls from "@/components/ui/pagination-controls";
 import { downloadPDF } from "@/utils/downloadPDF";
 import { useNavigate } from "react-router";
 

@@ -26,15 +26,30 @@ const saveStateToLocalStorage = (state) => {
 
 const preloadedState = loadPreloadedState();
 
+const combinedReducer = {
+  auth: authReducer,
+  books: bookReducer,
+  categories: categoryReducer,
+  borrow: borrowReducer,
+  earning: earningReducer,
+  transactions: transactionReducer,
+};
+
+const rootReducer = (state, action) => {
+  if (action.type === "RESET_STORE") {
+    // Clear localStorage
+    localStorage.removeItem("reduxState");
+    // Reset state of all reducers
+    state = undefined;
+  }
+  return Object.keys(combinedReducer).reduce((acc, key) => {
+    acc[key] = combinedReducer[key](state?.[key], action);
+    return acc;
+  }, {});
+};
+
 export const store = configureStore({
-  reducer: {
-    auth: authReducer,
-    books: bookReducer,
-    categories: categoryReducer,
-    borrow: borrowReducer,
-    earning: earningReducer,
-    transactions: transactionReducer,
-  },
+  reducer: rootReducer,
   preloadedState,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -15,7 +15,6 @@ import {
   BookCopy,
   User,
   Building2,
-  CalendarDays,
   MapPin,
   Loader2,
   DollarSign,
@@ -38,6 +37,8 @@ import { cn } from "@/utils/utils";
 import { updateBook } from "@/redux/slice/bookSlice";
 import { useBook } from "@/hooks/useBook";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { motion } from "framer-motion";
+import RelatedBooks from "@/components/ui/books/related-books";
 
 export default function SingleBook() {
   const [isBorrowing, setIsBorrowing] = useState(false);
@@ -213,204 +214,266 @@ export default function SingleBook() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (!book) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px]">
-        <h2 className="text-2xl font-bold">Book not found</h2>
-        <p className="text-muted-foreground mt-2">
-          The book you&apos;re looking for doesn&apos;t exist or has been
-          removed.
-        </p>
-        <Button onClick={() => navigate("/books")} className="mt-4">
-          Back to Books
-        </Button>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-grid-small-black/[0.2] dark:bg-grid-small-white/[0.2]">
+        <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/50 to-background"></div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative z-10 text-center space-y-4"
+        >
+          <h2 className="text-3xl font-bold">Book not found</h2>
+          <p className="text-muted-foreground">
+            The book you&apos;re looking for doesn&apos;t exist or has been
+            removed.
+          </p>
+          <Button onClick={() => navigate("/books")} className="mt-4">
+            Back to Books
+          </Button>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Book Cover */}
-        <Card className="lg:col-span-1">
-          <CardContent className="p-6">
-            <div className="relative aspect-[2/3] w-full rounded-lg overflow-hidden">
-              <img
-                src={book.cover_image_url || "/images/placeholder.jpg"}
-                alt={book.title}
-                className="object-cover w-full h-full"
-              />
-            </div>
-          </CardContent>
-        </Card>
+    <div className="flex flex-col min-h-screen">
+      <section className="relative py-16 bg-gradient-to-b from-background to-muted/50">
+        <div className="absolute inset-0 bg-grid-small-black/[0.2] dark:bg-grid-small-white/[0.2] opacity-50" />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="container relative z-10 mx-auto px-4"
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Book Cover Card */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Card className="lg:col-span-1 backdrop-blur-sm border-border/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <CardContent className="p-6">
+                  <div className="relative aspect-[2/3] w-full rounded-lg overflow-hidden shadow-md">
+                    <img
+                      src={book.cover_image_url || "/images/placeholder.jpg"}
+                      alt={book.title}
+                      className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
 
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-3xl">{book.title}</CardTitle>
-            <CardDescription className="text-lg">
-              by {book.author}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <BookCopy className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">ISBN:</span>
-                  <span>{book.isbn}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Building2 className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Publisher:</span>
-                  <span>{book.publisher}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Published:</span>
-                  <span>
-                    {book.publication_date &&
-                      format(new Date(book.publication_date), "MMMM d, yyyy")}
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Price:</span>
-                  <span>
-                    {book.price ? `$${book.price.toFixed(2)}/book` : "N/A"}
-                  </span>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <User className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Categories:</span>
-                  <span>{category?.name}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Location:</span>
-                  <span>{book.location || "Not specified"}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Borrow Period:</span>
-                  <span>User-defined</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <AlertCircle className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">
-                    Late Return Fine:
-                  </span>
-                  <span>
-                    {book.borrowed_fine
-                      ? `$${book.borrowed_fine.toFixed(2)}/day`
-                      : "N/A"}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <Separator />
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">About this book</h3>
-              <p className="text-muted-foreground">
-                {book.description || "No description available."}
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <Badge>{`${book.available_copies} Available`}</Badge>
-              {hasAlreadyBorrowed ? (
-                <Badge variant="destructive">
-                  <AlertCircle className="mr-1 h-4 w-4" />
-                  Already Borrowed
-                </Badge>
-              ) : (
-                <Badge variant="success">
-                  <CheckCircle className="mr-1 h-4 w-4" />
-                  Available for Borrowing
-                </Badge>
-              )}
-            </div>
-
-            <div className="flex gap-2 flex-col md:flex-row">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !selectedDueDate && "text-muted-foreground"
-                    )}
-                  >
-                    {selectedDueDate ? (
-                      format(selectedDueDate, "PPP")
+            {/* Book Details Card */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="lg:col-span-2"
+            >
+              <Card className="backdrop-blur-sm border-border/50 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+                    {book.title}
+                  </CardTitle>
+                  <CardDescription className="text-base sm:text-lg">
+                    by {book.author}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 sm:space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="flex items-center space-x-2 text-sm sm:text-base">
+                        <BookCopy className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">ISBN:</span>
+                        <span>{book.isbn}</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm sm:text-base">
+                        <Building2 className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">
+                          Publisher:
+                        </span>
+                        <span>{book.publisher}</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm sm:text-base">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">
+                          Published:
+                        </span>
+                        <span>
+                          {book.publication_date &&
+                            format(
+                              new Date(book.publication_date),
+                              "MMMM d, yyyy"
+                            )}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm sm:text-base">
+                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">Price:</span>
+                        <span>
+                          {book.price
+                            ? `$${book.price.toFixed(2)}/book`
+                            : "N/A"}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="flex items-center space-x-2 text-sm sm:text-base">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">
+                          Categories:
+                        </span>
+                        <span>{category?.name}</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm sm:text-base">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">Location:</span>
+                        <span>{book.location || "Not specified"}</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm sm:text-base">
+                        <AlertCircle className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-muted-foreground ">
+                          Late Fine:
+                        </span>
+                        <span>
+                          {book.borrowed_fine
+                            ? `$${book.borrowed_fine.toFixed(2)}/day`
+                            : "N/A"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="space-y-3 sm:space-y-4">
+                    <h3 className="text-base sm:text-lg font-semibold">
+                      About this book
+                    </h3>
+                    <p className="text-sm sm:text-base text-muted-foreground">
+                      {book.description || "No description available."}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge className="text-xs sm:text-sm">{`${book.available_copies} Available`}</Badge>
+                    {hasAlreadyBorrowed ? (
+                      <Badge
+                        variant="destructive"
+                        className="text-xs sm:text-sm"
+                      >
+                        <AlertCircle className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                        Already Borrowed
+                      </Badge>
                     ) : (
-                      <span>Pick a return date</span>
+                      <Badge variant="success" className="text-xs sm:text-sm">
+                        <CheckCircle className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                        Available for Borrowing
+                      </Badge>
                     )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <CalendarComponent
-                    mode="single"
-                    selected={selectedDueDate}
-                    onSelect={setSelectedDueDate}
-                    initialFocus
-                    disabled={(date) => date < new Date()}
-                  />
-                </PopoverContent>
-              </Popover>
+                  </div>
 
-              <div className="flex gap-2 flex-col md:flex-row ">
-                <Button onClick={handleBorrow} disabled={isBorrowing}>
-                  {isBorrowing ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Borrowing...
-                    </>
-                  ) : (
-                    "Borrow"
+                  <div className="flex gap-2 flex-col sm:flex-row">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full justify-start text-left font-normal text-sm sm:text-base",
+                            !selectedDueDate && "text-muted-foreground"
+                          )}
+                        >
+                          {selectedDueDate ? (
+                            format(selectedDueDate, "PPP")
+                          ) : (
+                            <span>Pick a return date</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <CalendarComponent
+                          mode="single"
+                          selected={selectedDueDate}
+                          onSelect={setSelectedDueDate}
+                          initialFocus
+                          disabled={(date) => date < new Date()}
+                        />
+                      </PopoverContent>
+                    </Popover>
+
+                    <div className="flex gap-2 flex-col sm:flex-row w-full sm:w-auto">
+                      <Button
+                        onClick={handleBorrow}
+                        disabled={isBorrowing}
+                        className="text-sm sm:text-base"
+                      >
+                        {isBorrowing ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            Borrowing...
+                          </>
+                        ) : (
+                          "Borrow"
+                        )}
+                      </Button>
+                      <Button
+                        onClick={handlePurchase}
+                        disabled={isPurchasing}
+                        className="text-sm sm:text-base"
+                      >
+                        {isPurchasing ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            Purchasing...
+                          </>
+                        ) : (
+                          "Buy"
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  {hasAlreadyBorrowed && (
+                    <Alert variant="destructive">
+                      <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <AlertTitle className="text-sm sm:text-base">
+                        Already Borrowed
+                      </AlertTitle>
+                      <AlertDescription className="text-xs sm:text-sm">
+                        You have already borrowed this book. Please return it
+                        before borrowing again.
+                      </AlertDescription>
+                    </Alert>
                   )}
-                </Button>
-                <Button onClick={handlePurchase} disabled={isPurchasing}>
-                  {isPurchasing ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Purchasing...
-                    </>
-                  ) : (
-                    "Buy"
+                  {!hasAlreadyBorrowed && book.available_copies > 0 && (
+                    <Alert>
+                      <BookOpen className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <AlertTitle className="text-sm sm:text-base">
+                        Available for Borrowing
+                      </AlertTitle>
+                      <AlertDescription className="text-xs sm:text-sm">
+                        This book is available for borrowing! Choose a return
+                        date and borrow now.
+                      </AlertDescription>
+                    </Alert>
                   )}
-                </Button>
-              </div>
-            </div>
-            {hasAlreadyBorrowed && (
-              <Alert variant="destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>Already Borrowed</AlertTitle>
-                <AlertDescription>
-                  You have already borrowed this book. Please return it before
-                  borrowing again.
-                </AlertDescription>
-              </Alert>
-            )}
-            {!hasAlreadyBorrowed && book.available_copies > 0 && (
-              <Alert>
-                <BookOpen className="h-4 w-4" />
-                <AlertTitle>Available for Borrowing</AlertTitle>
-                <AlertDescription>
-                  This book is available for borrowing! Choose a return date and
-                  borrow now.
-                </AlertDescription>
-              </Alert>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </motion.div>
+      </section>
+      <RelatedBooks
+        books={books.filter(
+          (b) => b.category === book.category && b._id !== book._id
+        )}
+        currentBookId={book._id}
+      />
     </div>
   );
 }

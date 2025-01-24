@@ -18,6 +18,7 @@ import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useRiveAnimation } from "@/hooks/useRive";
 import "@/styles/teddy.css";
+import { motion } from "framer-motion";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address").min(1, "Email is required"),
@@ -71,12 +72,18 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center px-2 min-h-[calc(115vh-14rem)]">
-      <div className="w-full max-w-lg">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-grid-small-black/[0.2] dark:bg-grid-small-white/[0.2]">
+      <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/50 to-background"></div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="container relative z-10 px-4 w-full max-w-lg"
+      >
         <div className="rive-wrapper">
           <RiveComponent className="rive-container" />
         </div>
-        <Card className="rounded-t-none">
+        <Card className="rounded-t-none backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
             <CardDescription>Enter your credentials to log in</CardDescription>
@@ -152,7 +159,7 @@ export default function Login() {
             </div>
           </CardFooter>
         </Card>
-      </div>
+      </motion.div>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import AdminLayout from "@/admin/AdminLayout";
 import { publicRoutes, authRoutes, adminRoutes } from "@/pages/Routes";
 import Layout from "./Layout";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import FAQ from "@/pages/FAQ";
 
 function App() {
   return (
@@ -48,6 +49,15 @@ function App() {
             />
           ))}
         </Route>
+
+        <Route
+          path="/faq"
+          element={
+            <Layout showFooter>
+              <FAQ />
+            </Layout>
+          }
+        />
       </Routes>
     </ThemeProvider>
   );

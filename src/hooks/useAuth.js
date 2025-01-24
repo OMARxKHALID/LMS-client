@@ -3,7 +3,6 @@ import {
   setUser,
   setUsers,
   updateUser,
-  updateUsersRole,
 } from "@/redux/slice/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -71,7 +70,11 @@ export function useAuth() {
         throw new Error("Sign-out failed");
       }
 
+      // First clear the user
       dispatch(clearUser());
+      // Then reset the entire store
+      dispatch({ type: "RESET_STORE" });
+
       return null;
     } catch (error) {
       console.error("Sign-out error:", error.message);
