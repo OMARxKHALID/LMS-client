@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Mail, Twitter } from "lucide-react";
+import { Github, Instagram, Mail } from "lucide-react";
 import { Link } from "react-router";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -50,10 +50,10 @@ export default function Footer() {
               Subscribe to our newsletter for new arrivals and exclusive offers
             </p>
           </div>
-          <div className="w-full max-w-sm space-y-2">
+          <div className="w-full max-w-sm">
             <form onSubmit={handleSubmit} className="flex space-x-2">
               <Input
-                className="max-w-lg flex-1 bg-background/60 backdrop-blur-sm"
+                className="flex-1 bg-background/60 backdrop-blur-sm"
                 placeholder="Enter your email"
                 type="email"
                 value={email}
@@ -79,30 +79,28 @@ export default function Footer() {
             transition={{ delay: 0.2 }}
             className="flex space-x-4"
           >
-            <Link
+            <a
               className="text-muted-foreground hover:text-primary transition-colors"
-              href="/privacy-policy"
+              href="https://github.com/OMARxKHALID"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              <Facebook className="h-6 w-6" />
-            </Link>
-            <Link
+              <Github className="h-6 w-6" />
+            </a>
+            <a
               className="text-muted-foreground hover:text-primary transition-colors"
-              href="#"
-            >
-              <Twitter className="h-6 w-6" />
-            </Link>
-            <Link
-              className="text-muted-foreground hover:text-primary transition-colors"
-              href="#"
+              href="https://www.instagram.com/omarxoxo._/"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <Instagram className="h-6 w-6" />
-            </Link>
-            <Link
+            </a>
+            <a
               className="text-muted-foreground hover:text-primary transition-colors"
-              href="#"
+              href="mailto:mirxaumar1212@gmail.com"
             >
               <Mail className="h-6 w-6" />
-            </Link>
+            </a>
           </motion.div>
           <motion.div
             initial={{ opacity: 0 }}
@@ -112,25 +110,19 @@ export default function Footer() {
           >
             <Link
               className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              href="#"
+              to="/about-us"
             >
-              Terms & Conditions
+              About Us
             </Link>
             <Link
               className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              href="#"
+              to="/faq"
             >
-              Privacy Policy
-            </Link>
-            <Link
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              href="#"
-            >
-              Cookie Policy
+              FAQ's
             </Link>
           </motion.div>
           <p className="text-xs text-muted-foreground">
-            © 2024 Library System. All rights reserved.
+            © 2024 Codebook Hub. All rights reserved. OMARxKHALID
           </p>
         </motion.div>
       </div>

@@ -46,17 +46,18 @@ export default function Header() {
     { label: "Home", href: "/", icon: HomeIcon },
     { label: "Browse Books", href: "/books", icon: Book },
     { label: "About Us", href: "/about-us", icon: HelpCircle },
+    { label: "FAQ", href: "/faq", icon: HelpCircle },
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/75 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
       <div className="container px-4 h-16">
         <div className="flex h-full items-center justify-between">
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
               <BookOpenCheck className="h-6 w-6 text-primary" />
               <span className="font-bold text-xl bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent hidden sm:inline-block">
-                Codebook Hub
+                Codebook
               </span>
             </Link>
           </div>
@@ -90,7 +91,9 @@ export default function Header() {
                   </Button>
                 </Link>
                 <Link to="/register">
-                  <Button size="sm">Get Started</Button>
+                  <Button size="sm" className="bg-primary hover:bg-primary/90">
+                    Get Started
+                  </Button>
                 </Link>
               </div>
             )}
@@ -143,12 +146,14 @@ export default function Header() {
                         Dashboard
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/admin/manage-books" className="w-full">
-                        <Bookmark className="mr-2 h-4 w-4" />
-                        My Books
-                      </Link>
-                    </DropdownMenuItem>
+                    {user.role !== "user" && (
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin/manage-books" className="w-full">
+                          <Bookmark className="mr-2 h-4 w-4" />
+                          My Books
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem asChild>
                       <Link to="/admin/profile" className="w-full">
                         <Settings className="mr-2 h-4 w-4" />
@@ -191,11 +196,14 @@ const UserMenu = ({ user, signOut }) => (
           <User className="mr-2 h-4 w-4" /> Dashboard
         </Link>
       </DropdownMenuItem>
-      <DropdownMenuItem asChild>
-        <Link to="/admin/manage-books" className="cursor-pointer">
-          <Bookmark className="mr-2 h-4 w-4" /> My Books
-        </Link>
-      </DropdownMenuItem>
+      {user.role !== "user" && (
+        <DropdownMenuItem asChild>
+          <Link to="/admin/manage-books" className="cursor-pointer">
+            <Bookmark className="mr-2 h-4 w-4" />
+            My Books
+          </Link>
+        </DropdownMenuItem>
+      )}
       <DropdownMenuItem asChild>
         <Link to="/admin/profile" className="cursor-pointer">
           <Settings className="mr-2 h-4 w-4" /> Settings

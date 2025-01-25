@@ -89,7 +89,8 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-grid-small-black/[0.2] dark:bg-grid-small-white/[0.2]">
-        <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/50 to-background"></div>
+        {/* Add a stronger blur effect to the gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/50 to-background backdrop-blur-sm"></div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -154,7 +155,8 @@ export default function Home() {
         </motion.div>
       </section>
 
-      <section className="py-20 bg-muted/30 backdrop-blur-md">
+      {/* Update the stats section background */}
+      <section className="py-20 bg-muted/20 backdrop-blur-lg border-y border-border/50">
         <div className="container px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
@@ -309,7 +311,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-20 bg-muted/30">
+      {/* Update the testimonials section background */}
+      <section className="py-20 bg-muted/20 backdrop-blur-lg border-y border-border/50">
         <div className="container px-4">
           <motion.h2
             initial={{ opacity: 0 }}

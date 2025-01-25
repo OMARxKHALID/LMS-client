@@ -43,21 +43,20 @@ export default function FAQ() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <section className="relative min-h-[40vh] flex items-center justify-center overflow-hidden bg-grid-small-black/[0.2] dark:bg-grid-small-white/[0.2]">
-        <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/50 to-background"></div>
+      <section className="relative min-h-[50vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-background/80 to-background">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="container relative z-10 px-4 text-center"
+          className="container relative z-10 px-6 text-center"
         >
-          <HelpCircle className="w-12 h-12 mx-auto mb-4 text-primary" />
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
+          <HelpCircle className="w-12 h-12 md:w-14 md:h-14 mx-auto mb-6 text-primary" />
+          <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold tracking-tight mb-6">
             <span className="bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
               Frequently Asked Questions
             </span>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
             Find answers to common questions about our library services
           </p>
         </motion.div>
@@ -66,14 +65,14 @@ export default function FAQ() {
       <motion.section
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="py-20 bg-muted/30 backdrop-blur-md"
+        className="py-16 md:py-24 lg:py-32 bg-muted/30 backdrop-blur-md"
       >
-        <div className="container px-4">
+        <div className="container px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="max-w-3xl mx-auto backdrop-blur-sm border border-border/50 rounded-lg p-6 hover:border-primary/50 transition-all"
+            className="max-w-4xl lg:max-w-6xl mx-auto backdrop-blur-sm border border-border/50 rounded-xl p-6 md:p-12 hover:border-primary/50 transition-all"
           >
             <Accordion type="single" collapsible className="w-full">
               {faqs.map((faq, index) => (
@@ -84,10 +83,10 @@ export default function FAQ() {
                   transition={{ delay: index * 0.1 }}
                 >
                   <AccordionItem value={`item-${index}`}>
-                    <AccordionTrigger className="hover:text-primary transition-colors">
+                    <AccordionTrigger className="hover:text-primary transition-colors text-base md:text-lg lg:text-xl font-medium">
                       {faq.question}
                     </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground">
+                    <AccordionContent className="text-muted-foreground text-sm md:text-base lg:text-lg leading-relaxed mt-2">
                       {faq.answer}
                     </AccordionContent>
                   </AccordionItem>
