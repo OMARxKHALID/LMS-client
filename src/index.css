@@ -68,7 +68,7 @@
     font-family: "Space Mono", monospace;
   }
 }
-
+// remove border from rpv-default-layout__container
 .rpv-default-layout__container {
   border: none !important;
 }
