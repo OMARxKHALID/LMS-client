@@ -26,7 +26,6 @@ import { Link } from "react-router";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import BorrowedBooksTable from "./components/ui/BorrowedBooksTable";
 import TotalBorrowedBooksTable from "./components/ui/TotalBorrowedBooks";
-// import UploadedBooksTable from "./components/ui/UploadedBooks";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import usePagination from "@/hooks/usePagination";
 import PaginationControls from "../components/ui/pagination-controls";
@@ -41,11 +40,17 @@ export default function Dashboard() {
   const { toast } = useToast();
   const { borrows, loading } = useSelector((state) => state.borrow);
   const { user } = useSelector((state) => state.auth);
-  //   const { role } = user;
+  const { role } = user;
 
-  const sortedborrows = [...borrows].sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  );
+  const sortedborrows = [...borrows]
+    .filter((borrow) => {
+      if (role === "admin") {
+        return true;
+      }
+      return borrow.borrowed_by._id === user._id;
+    })
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
   const [showOverdueNotice, setShowOverdueNotice] = useState(true);
 
   useEffect(() => {
@@ -110,7 +115,6 @@ export default function Dashboard() {
       label: "totalBorrowedBooks",
       items: sortedborrows,
     },
-    // { label: "uploadedBooks", items: sortedborrows },
   ];
 
   // Pagination logic for each section
@@ -128,17 +132,10 @@ export default function Dashboard() {
     setCurrentPage: setCurrentTotalBorrowedPage,
   } = usePagination(paginationOptions[1].items, 8);
 
-  //   const {
-  //     paginatedItems: currentUploadedBooks,
-  //     currentPage: currentUploadedPage,
-  //     totalPages: totalUploadedPages,
-  //     setCurrentPage: setCurrentUploadedPage,
-  //   } = usePagination(paginationOptions[2].items, 5);
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <Loader2 className="w-8 h-8 animate-spin" />
       </div>
     );
   }
@@ -146,29 +143,31 @@ export default function Dashboard() {
   return (
     <Card className="col-span-full">
       <CardHeader>
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
+        <div className="flex flex-col items-start justify-between space-y-2 sm:flex-row sm:items-center sm:space-y-0">
           <div>
             <CardTitle className="text-2xl font-bold">
-              Dashboard Overview
+              {user.role === "admin" ? "Admin Dashboard" : "Dashboard Overview"}
             </CardTitle>
             <CardDescription>
-              Your borrowing activity at a glance
+              {user.role === "admin"
+                ? "Monitor all borrowing activity"
+                : "Your borrowing activity at a glance"}
             </CardDescription>
           </div>
           <Button variant="outline" onClick={getBorrowRecords}>
-            <RotateCcw className="mr-2 h-4 w-4" />
+            <RotateCcw className="w-4 h-4 mr-2" />
             Refresh
           </Button>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+        <div className="grid gap-4 mb-6 md:grid-cols-2 lg:grid-cols-4">
           <Card className="bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900 dark:to-blue-800">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">
                 Total Borrowed Books
               </CardTitle>
-              <Library className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <Library className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{totalBooks}</div>
@@ -183,7 +182,7 @@ export default function Dashboard() {
               <CardTitle className="text-sm font-medium">
                 Currently Borrowed
               </CardTitle>
-              <BookOpen className="h-4 w-4 text-green-600 dark:text-green-400" />
+              <BookOpen className="w-4 h-4 text-green-600 dark:text-green-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{borrowedBooks}</div>
@@ -197,7 +196,7 @@ export default function Dashboard() {
           <Card className="bg-gradient-to-br from-yellow-100 to-yellow-50 dark:from-yellow-900 dark:to-yellow-800">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Due Soon</CardTitle>
-              <Clock className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+              <Clock className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{dueSoonBooks}</div>
@@ -212,7 +211,7 @@ export default function Dashboard() {
               <CardTitle className="text-sm font-medium">
                 Overdue Books
               </CardTitle>
-              <BookX className="h-4 w-4 text-red-600 dark:text-red-400" />
+              <BookX className="w-4 h-4 text-red-600 dark:text-red-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{overdueBooks}</div>
@@ -225,7 +224,7 @@ export default function Dashboard() {
 
         {showOverdueNotice && overdueBooks > 0 && (
           <Alert variant="destructive" className="relative mb-3">
-            <AlertTriangle className="h-4 w-4" />
+            <AlertTriangle className="w-4 h-4" />
             <AlertTitle>Overdue Books Notice</AlertTitle>
             <AlertDescription>
               You have {overdueBooks} overdue{" "}
@@ -236,25 +235,22 @@ export default function Dashboard() {
               className="absolute top-2 right-2 text-destructive"
               onClick={() => setShowOverdueNotice(false)}
             >
-              <X className="h-4 w-4" />
+              <X className="w-4 h-4" />
             </button>
           </Alert>
         )}
 
         <Tabs defaultValue="current" className="w-full">
-          <TabsList className="w-full justify-start overflow-x-auto">
+          <TabsList className="justify-start w-full overflow-x-auto">
             <TabsTrigger value="current">Currently Borrowed</TabsTrigger>
             <TabsTrigger value="history">Borrowing History</TabsTrigger>
-            {/* {role === "admin" && (
-              <TabsTrigger value="uploaded">Uploaded Books</TabsTrigger>
-            )} */}
           </TabsList>
 
           <TabsContent value="current">
             {currentBorrows.length === 0 ? (
               <Card>
-                <div className="text-center py-6">
-                  <BookOpen className="h-12 w-12 mx-auto text-muted-foreground" />
+                <div className="py-6 text-center">
+                  <BookOpen className="w-12 h-12 mx-auto text-muted-foreground" />
                   <h3 className="mt-2 text-lg font-semibold">
                     No books currently borrowed
                   </h3>
@@ -287,8 +283,8 @@ export default function Dashboard() {
           <TabsContent value="history">
             {currentTotalBorrowedBooks.length === 0 ? (
               <Card>
-                <div className="text-center py-6">
-                  <Library className="h-12 w-12 mx-auto text-muted-foreground" />
+                <div className="py-6 text-center">
+                  <Library className="w-12 h-12 mx-auto text-muted-foreground" />
                   <h3 className="mt-2 text-lg font-semibold">
                     No borrowing history
                   </h3>
@@ -309,35 +305,6 @@ export default function Dashboard() {
               </>
             )}
           </TabsContent>
-
-          {/* {role === "admin" && (
-            <TabsContent value="uploaded">
-              {currentUploadedBooks.length === 0 ? (
-                <Card>
-                  <div className="text-center py-6">
-                    <Library className="h-12 w-12 mx-auto text-muted-foreground" />
-                    <h3 className="mt-2 text-lg font-semibold">
-                      No books uploaded
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Admin can upload books here
-                    </p>
-                  </div>
-                </Card>
-              ) : (
-                <UploadedBooksTable
-                  currentUploadedBooks={currentUploadedBooks}
-                />
-              )}
-              {totalUploadedPages > 1 && (
-                <PaginationControls
-                  currentPage={currentUploadedPage}
-                  totalPages={totalUploadedPages}
-                  setCurrentPage={setCurrentUploadedPage}
-                />
-              )}
-            </TabsContent>
-          )} */}
         </Tabs>
       </CardContent>
     </Card>

@@ -26,7 +26,6 @@ import { useNavigate } from "react-router";
 export default function BorrowedBooks() {
   const { borrows } = useSelector((state) => state.borrow);
   const { user } = useSelector((state) => state.auth);
-  const { role } = user || [];
   const { getBooks } = useBook();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,10 +34,11 @@ export default function BorrowedBooks() {
   const [activeTab, setActiveTab] = useState("current");
   const itemsPerPage = 6;
 
-  const filteredborrowedBooks =
-    role === "admin"
+  // Filter borrows based on user role
+  const filteredBorrows =
+    user?.role === "admin"
       ? borrows
-      : borrows.filter((b) => user?.borrowed_books.includes(b._id));
+      : borrows.filter((borrow) => borrow.borrowed_by?._id === user?._id);
 
   const filterBooks = (books, query) => {
     return books.filter(
@@ -87,7 +87,8 @@ export default function BorrowedBooks() {
     }
   };
 
-  const filteredBooks = filterBooks(filteredborrowedBooks, searchQuery);
+  // Apply filters and sorting to role-filtered borrows
+  const filteredBooks = filterBooks(filteredBorrows, searchQuery);
   const sortedBooks = sortBooks(filteredBooks, sortBy);
   const filteredByTab =
     activeTab === "current"
@@ -100,16 +101,22 @@ export default function BorrowedBooks() {
   );
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
+    <div className="container p-6 mx-auto">
+      <div className="flex flex-col items-center justify-between mb-6 sm:flex-row">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Borrowed Books</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {user?.role === "admin"
+              ? "All Borrowed Books"
+              : "My Borrowed Books"}
+          </h1>
           <p className="text-muted-foreground">
-            View and access your borrowed book PDFs
+            {user?.role === "admin"
+              ? "View and manage all borrowed books"
+              : "View and access your borrowed book PDFs"}
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={() => getBooks()}>
-          <RefreshCcw className="h-4 w-4 mr-2" />
+          <RefreshCcw className="w-4 h-4 mr-2" />
           <a>Refresh</a>
         </Button>
       </div>
@@ -124,7 +131,7 @@ export default function BorrowedBooks() {
           <TabsTrigger value="history">Borrowing History</TabsTrigger>
         </TabsList>
 
-        <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
+        <div className="flex flex-col items-center gap-4 mb-4 sm:flex-row">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -170,12 +177,12 @@ export default function BorrowedBooks() {
 const BooksGrid = ({ books, getStatusColor }) => {
   const navigate = useNavigate();
   return (
-    <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {books.map((book) => (
-        <Card key={book._id} className="overflow-hidden flex flex-col">
+        <Card key={book._id} className="flex flex-col overflow-hidden">
           <CardHeader className="space-y-1">
-            <div className="flex justify-between items-start">
-              <CardTitle className="line-clamp-1 text-base sm:text-lg">
+            <div className="flex items-start justify-between">
+              <CardTitle className="text-base line-clamp-1 sm:text-lg">
                 {book.borrowed_book.title}
               </CardTitle>
               <Badge
@@ -227,7 +234,7 @@ const BooksGrid = ({ books, getStatusColor }) => {
 
 const NoBooksFound = () => (
   <div className="flex flex-col items-center justify-center h-[400px] border rounded-lg bg-muted/10">
-    <FileText className="h-10 w-10 text-muted-foreground mb-4" />
+    <FileText className="w-10 h-10 mb-4 text-muted-foreground" />
     <h3 className="text-lg font-medium">No books found</h3>
     <p className="text-sm text-muted-foreground">
       Try adjusting your search or filters

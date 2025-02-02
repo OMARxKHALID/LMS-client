@@ -39,6 +39,7 @@ import { useBook } from "@/hooks/useBook";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { motion } from "framer-motion";
 import RelatedBooks from "@/components/ui/books/related-books";
+import { updateUser } from "@/redux/slice/authSlice";
 
 export default function SingleBook() {
   const [isBorrowing, setIsBorrowing] = useState(false);
@@ -142,6 +143,12 @@ export default function SingleBook() {
       };
 
       dispatch(updateBook(updatedBook));
+      dispatch(
+        updateUser({
+          ...user,
+          borrowed_books: [...user.borrowed_books, response?.borrow?._id],
+        })
+      );
       toast({
         title: "Borrow Successful",
         description: `${title} has been borrowed successfully. Total cost: $${response?.borrow?.total_borrow_price}.`,
@@ -195,6 +202,12 @@ export default function SingleBook() {
       };
 
       dispatch(updateBook(updatedBook));
+      dispatch(
+        updateUser({
+          ...user,
+          purchased_books: [...user.purchased_books, book._id],
+        })
+      );
 
       toast({
         title: "Purchase Successful",
@@ -215,7 +228,7 @@ export default function SingleBook() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -227,7 +240,7 @@ export default function SingleBook() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative z-10 text-center space-y-4"
+          className="relative z-10 space-y-4 text-center"
         >
           <h2 className="text-3xl font-bold">Book not found</h2>
           <p className="text-muted-foreground">
@@ -249,16 +262,16 @@ export default function SingleBook() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="container relative z-10 mx-auto px-4"
+          className="container relative z-10 px-4 mx-auto"
         >
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             {/* Book Cover Card */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <Card className="lg:col-span-1 backdrop-blur-sm border-border/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <Card className="transition-shadow duration-300 shadow-lg lg:col-span-1 backdrop-blur-sm border-border/50 hover:shadow-xl">
                 <CardContent className="p-6">
                   <div className="relative aspect-[2/3] w-full rounded-lg overflow-hidden shadow-md">
                     <img
@@ -266,7 +279,7 @@ export default function SingleBook() {
                       alt={book.title}
                       className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute inset-0 transition-opacity duration-300 opacity-0 bg-gradient-to-t from-background/80 to-transparent hover:opacity-100" />
                   </div>
                 </CardContent>
               </Card>
@@ -279,9 +292,9 @@ export default function SingleBook() {
               transition={{ delay: 0.3 }}
               className="lg:col-span-2"
             >
-              <Card className="backdrop-blur-sm border-border/50 shadow-lg">
+              <Card className="shadow-lg backdrop-blur-sm border-border/50">
                 <CardHeader>
-                  <CardTitle className="text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+                  <CardTitle className="text-2xl text-transparent sm:text-3xl lg:text-4xl bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
                     {book.title}
                   </CardTitle>
                   <CardDescription className="text-base sm:text-lg">
@@ -289,22 +302,22 @@ export default function SingleBook() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4 sm:space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 sm:gap-6">
                     <div className="space-y-3 sm:space-y-4">
                       <div className="flex items-center space-x-2 text-sm sm:text-base">
-                        <BookCopy className="h-4 w-4 text-muted-foreground" />
+                        <BookCopy className="w-4 h-4 text-muted-foreground" />
                         <span className="text-muted-foreground">ISBN:</span>
                         <span>{book.isbn}</span>
                       </div>
                       <div className="flex items-center space-x-2 text-sm sm:text-base">
-                        <Building2 className="h-4 w-4 text-muted-foreground" />
+                        <Building2 className="w-4 h-4 text-muted-foreground" />
                         <span className="text-muted-foreground">
                           Publisher:
                         </span>
                         <span>{book.publisher}</span>
                       </div>
                       <div className="flex items-center space-x-2 text-sm sm:text-base">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <Calendar className="w-4 h-4 text-muted-foreground" />
                         <span className="text-muted-foreground">
                           Published:
                         </span>
@@ -317,7 +330,7 @@ export default function SingleBook() {
                         </span>
                       </div>
                       <div className="flex items-center space-x-2 text-sm sm:text-base">
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                        <DollarSign className="w-4 h-4 text-muted-foreground" />
                         <span className="text-muted-foreground">Price:</span>
                         <span>
                           {book.price
@@ -328,19 +341,19 @@ export default function SingleBook() {
                     </div>
                     <div className="space-y-3 sm:space-y-4">
                       <div className="flex items-center space-x-2 text-sm sm:text-base">
-                        <User className="h-4 w-4 text-muted-foreground" />
+                        <User className="w-4 h-4 text-muted-foreground" />
                         <span className="text-muted-foreground">
                           Categories:
                         </span>
                         <span>{category?.name}</span>
                       </div>
                       <div className="flex items-center space-x-2 text-sm sm:text-base">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <MapPin className="w-4 h-4 text-muted-foreground" />
                         <span className="text-muted-foreground">Location:</span>
                         <span>{book.location || "Not specified"}</span>
                       </div>
                       <div className="flex items-center space-x-2 text-sm sm:text-base">
-                        <AlertCircle className="h-4 w-4 text-muted-foreground" />
+                        <AlertCircle className="w-4 h-4 text-muted-foreground" />
                         <span className="text-muted-foreground ">
                           Late Fine:
                         </span>
@@ -354,7 +367,7 @@ export default function SingleBook() {
                   </div>
                   <Separator />
                   <div className="space-y-3 sm:space-y-4">
-                    <h3 className="text-base sm:text-lg font-semibold">
+                    <h3 className="text-base font-semibold sm:text-lg">
                       About this book
                     </h3>
                     <p className="text-sm sm:text-base text-muted-foreground">
@@ -368,18 +381,18 @@ export default function SingleBook() {
                         variant="destructive"
                         className="text-xs sm:text-sm"
                       >
-                        <AlertCircle className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                        <AlertCircle className="w-3 h-3 mr-1 sm:h-4 sm:w-4" />
                         Already Borrowed
                       </Badge>
                     ) : (
                       <Badge variant="success" className="text-xs sm:text-sm">
-                        <CheckCircle className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                        <CheckCircle className="w-3 h-3 mr-1 sm:h-4 sm:w-4" />
                         Available for Borrowing
                       </Badge>
                     )}
                   </div>
 
-                  <div className="flex gap-2 flex-col sm:flex-row">
+                  <div className="flex flex-col gap-2 sm:flex-row">
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
@@ -407,7 +420,7 @@ export default function SingleBook() {
                       </PopoverContent>
                     </Popover>
 
-                    <div className="flex gap-2 flex-col sm:flex-row w-full sm:w-auto">
+                    <div className="flex flex-col w-full gap-2 sm:flex-row sm:w-auto">
                       <Button
                         onClick={handleBorrow}
                         disabled={isBorrowing}
@@ -415,7 +428,7 @@ export default function SingleBook() {
                       >
                         {isBorrowing ? (
                           <>
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                             Borrowing...
                           </>
                         ) : (
@@ -429,7 +442,7 @@ export default function SingleBook() {
                       >
                         {isPurchasing ? (
                           <>
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                             Purchasing...
                           </>
                         ) : (
@@ -440,7 +453,7 @@ export default function SingleBook() {
                   </div>
                   {hasAlreadyBorrowed && (
                     <Alert variant="destructive">
-                      <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <AlertTriangle className="w-3 h-3 sm:h-4 sm:w-4" />
                       <AlertTitle className="text-sm sm:text-base">
                         Already Borrowed
                       </AlertTitle>
@@ -452,7 +465,7 @@ export default function SingleBook() {
                   )}
                   {!hasAlreadyBorrowed && book.available_copies > 0 && (
                     <Alert>
-                      <BookOpen className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <BookOpen className="w-3 h-3 sm:h-4 sm:w-4" />
                       <AlertTitle className="text-sm sm:text-base">
                         Available for Borrowing
                       </AlertTitle>

@@ -25,7 +25,9 @@ import { useNavigate } from "react-router";
 
 export default function PurchasedBooks() {
   const { user } = useSelector((state) => state.auth);
+  console.log("🚀 ~ PurchasedBooks ~ user:", user);
   const { books } = useSelector((state) => state.books);
+  console.log("🚀 ~ PurchasedBooks ~ books:", books);
   const { getBooks } = useBook();
 
   useEffect(() => {
@@ -37,14 +39,14 @@ export default function PurchasedBooks() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  const purchasedBooks = books.filter((book) => book.is_purchased);
-
-  const filteredBooks =
-    user?.role === "admin"
-      ? purchasedBooks
-      : purchasedBooks.filter((book) =>
-          user?.purchased_books.includes(book._id)
-        );
+  const purchasedBooks = books.filter((book) => {
+    if (user.role === "admin") {
+      // Admin sees all purchased books
+      return book.is_purchased;
+    }
+    // Users see only their purchased books
+    return book.is_purchased && user?.purchased_books.includes(book._id);
+  });
 
   const filterBooks = (books, query) => {
     return books.filter(
@@ -68,7 +70,7 @@ export default function PurchasedBooks() {
   };
 
   const sortedBooks = sortBooks(
-    filterBooks(filteredBooks, searchQuery),
+    filterBooks(purchasedBooks, searchQuery),
     sortBy
   );
   const totalPages = Math.ceil(sortedBooks.length / itemsPerPage);
@@ -78,12 +80,18 @@ export default function PurchasedBooks() {
   );
 
   return (
-    <div className="container mx-auto p-4 sm:p-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+    <div className="container p-4 mx-auto sm:p-6">
+      <div className="flex flex-col items-start justify-between gap-4 mb-6 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Purchased Books</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {user.role === "admin"
+              ? "All Purchased Books"
+              : "My Purchased Books"}
+          </h1>
           <p className="text-sm text-muted-foreground">
-            View and download purchased book PDFs
+            {user.role === "admin"
+              ? "View all books purchased by users"
+              : "View and download your purchased book PDFs"}
           </p>
         </div>
         <Button
@@ -96,11 +104,11 @@ export default function PurchasedBooks() {
             setCurrentPage(1);
           }}
         >
-          <RefreshCcw className="h-4 w-4 mr-2" />
+          <RefreshCcw className="w-4 h-4 mr-2" />
           Refresh
         </Button>
       </div>
-      <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
+      <div className="flex flex-col items-center gap-4 mb-4 sm:flex-row">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -141,16 +149,16 @@ export default function PurchasedBooks() {
 const BooksGrid = ({ books }) => {
   const navigate = useNavigate();
   return (
-    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {books.map((book) => (
-        <Card key={book._id} className="overflow-hidden flex flex-col">
+        <Card key={book._id} className="flex flex-col overflow-hidden">
           <CardHeader className="space-y-1">
-            <div className="flex justify-between items-start">
-              <CardTitle className="line-clamp-1 text-base">
+            <div className="flex items-start justify-between">
+              <CardTitle className="text-base line-clamp-1">
                 {book.title}
               </CardTitle>
               <Badge
-                className="bg-blue-500/10 text-blue-500"
+                className="text-blue-500 bg-blue-500/10"
                 variant="secondary"
               >
                 Purchased
@@ -169,7 +177,7 @@ const BooksGrid = ({ books }) => {
             </div>
           </CardContent>
           <CardFooter>
-            <div className="w-full flex flex-col space-y-2">
+            <div className="flex flex-col w-full space-y-2">
               {book.pdf_files && book.pdf_files.length > 0 ? (
                 <>
                   <Button
@@ -206,7 +214,7 @@ const BooksGrid = ({ books }) => {
 
 const NoBooksFound = () => (
   <div className="flex flex-col items-center justify-center h-[400px] border rounded-lg bg-muted/10">
-    <FileText className="h-10 w-10 text-muted-foreground mb-4" />
+    <FileText className="w-10 h-10 mb-4 text-muted-foreground" />
     <h3 className="text-lg font-medium">No books found</h3>
     <p className="text-sm text-muted-foreground">
       Try adjusting your search or filters
