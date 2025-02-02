@@ -4,12 +4,21 @@ import { format } from "date-fns";
 import { Bell } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./hover-card";
 import { Button } from "./button";
+import { useSelector } from "react-redux";
 
 const Notifications = ({ borrows }) => {
+  const { user } = useSelector((state) => state.auth);
   const [showNotifications, setShowNotifications] = useState(false);
 
+  const userBorrows = borrows.filter((borrow) => {
+    if (user.role === "admin") {
+      return true;
+    }
+    return borrow.borrowed_by._id === user._id;
+  });
+
   const notifications = {
-    dueSoonBooks: borrows.filter((borrow) => {
+    dueSoonBooks: userBorrows.filter((borrow) => {
       const dueDate = new Date(borrow.expected_return_date);
       const today = new Date();
       const threeDaysFromNow = new Date(today.setDate(today.getDate() + 3));
@@ -20,7 +29,7 @@ const Notifications = ({ borrows }) => {
         borrow.status === "borrowed"
       );
     }),
-    overdueBooks: borrows.filter((borrow) => {
+    overdueBooks: userBorrows.filter((borrow) => {
       const dueDate = new Date(borrow.expected_return_date);
       return dueDate < new Date() && borrow.status === "borrowed";
     }),
@@ -29,13 +38,10 @@ const Notifications = ({ borrows }) => {
     },
   };
 
-  // Calculate dynamic height
   const calculateHeight = () => {
     const totalBooks =
       notifications.dueSoonBooks.length + notifications.overdueBooks.length;
-    // If there are no notifications, return a minimum height
     if (totalBooks === 0) return 100;
-    // Each book card has an approximate height of 80px
     const height = totalBooks * 80;
     return height > 300 ? 300 : height;
   };
@@ -49,7 +55,7 @@ const Notifications = ({ borrows }) => {
           className="relative"
           onClick={() => setShowNotifications((prev) => !prev)}
         >
-          <Bell className="h-6 w-6 text-primary" />
+          <Bell className="w-6 h-6 text-primary" />
           {notifications.total > 0 && (
             <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-[10px] font-medium text-white flex items-center justify-center">
               {notifications.total}
@@ -58,6 +64,11 @@ const Notifications = ({ borrows }) => {
         </Button>
       </HoverCardTrigger>
       <HoverCardContent className="w-80" align="end">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="font-semibold">
+            {user.role === "admin" ? "All Notifications" : "My Notifications"}
+          </h3>
+        </div>
         <ScrollArea
           style={{ height: `${calculateHeight()}px`, maxHeight: "300px" }}
         >
@@ -65,13 +76,13 @@ const Notifications = ({ borrows }) => {
             <>
               {notifications.dueSoonBooks.length > 0 && (
                 <div className="mb-4">
-                  <h4 className="mb-2 font-semibold text-sm">Due Soon</h4>
+                  <h4 className="mb-2 text-sm font-semibold">Due Soon</h4>
                   {notifications.dueSoonBooks.map((book) => (
                     <div
                       key={book._id}
-                      className="mb-2 p-2 rounded-lg bg-muted/50"
+                      className="p-2 mb-2 rounded-lg bg-muted/50"
                     >
-                      <p className="font-medium text-sm">
+                      <p className="text-sm font-medium">
                         {book.borrowed_book.title}
                       </p>
                       <p className="text-xs text-muted-foreground">
@@ -84,15 +95,15 @@ const Notifications = ({ borrows }) => {
               )}
               {notifications.overdueBooks.length > 0 && (
                 <div>
-                  <h4 className="mb-2 font-semibold text-sm text-red-500">
+                  <h4 className="mb-2 text-sm font-semibold text-red-500">
                     Overdue Books
                   </h4>
                   {notifications.overdueBooks.map((book) => (
                     <div
                       key={book._id}
-                      className="mb-2 p-2 rounded-lg bg-red-100 dark:bg-red-900/20"
+                      className="p-2 mb-2 bg-red-100 rounded-lg dark:bg-red-900/20"
                     >
-                      <p className="font-medium text-sm">
+                      <p className="text-sm font-medium">
                         {book.borrowed_book.title}
                       </p>
                       <p className="text-xs text-muted-foreground">
