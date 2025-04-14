@@ -112,7 +112,9 @@ export default function EditBook() {
   });
 
   useEffect(() => {
+    console.log("Initial book data:", book);
     if (book && !form.getValues().title) {
+      console.log("Setting form values with book:", book);
       form.reset({
         title: book.title,
         author: book.author,
@@ -130,6 +132,7 @@ export default function EditBook() {
       });
 
       if (book.pdf_files && book.pdf_files.length > 0) {
+        console.log("Setting existing PDFs:", book.pdf_files);
         const existingPdfs = book.pdf_files.map((url, index) => {
           const fileName =
             url.split("/").pop() || `existing-pdf-${index + 1}.pdf`;
@@ -149,25 +152,32 @@ export default function EditBook() {
   }, [book, form]);
 
   const onSubmit = async (data) => {
+    console.log("Form submitted with data:", data);
     startTransition(async () => {
       try {
         const newPdfs = pdfs.filter((pdf) => !pdf.isExisting);
+        console.log("New PDFs to upload:", newPdfs);
         let pdfUrls = data.pdf_files || [];
 
         if (newPdfs.length > 0) {
+          console.log("Uploading new PDFs to Cloudinary...");
           const newPdfUrls = await uploadToCloudinary(newPdfs);
+          console.log("New PDF URLs from Cloudinary:", newPdfUrls);
           pdfUrls = [
             ...pdfs.filter((pdf) => pdf.isExisting).map((pdf) => pdf.preview),
             ...newPdfUrls,
           ];
         } else {
+          console.log("Using existing PDF URLs:", pdfs);
           pdfUrls = pdfs.map((pdf) => pdf.preview);
         }
 
         const formData = {
           ...data,
           pdf_files: pdfUrls,
+          cover_image_url: data.cover_image_url || "", // Ensure cover_image_url is included
         };
+        console.log("Final form data to submit:", formData);
 
         if (!data.title || !data.author) {
           toast({
@@ -178,13 +188,15 @@ export default function EditBook() {
           return;
         }
 
-        await editBook(id, formData);
+        const updatedBook = await editBook(id, formData);
+        console.log("Book updated successfully:", updatedBook);
         toast({
           title: "Book updated successfully",
           description: "The book has been updated in the catalog.",
         });
         navigate("/admin/manage-books");
       } catch (error) {
+        console.error("Error in book update:", error);
         toast({
           variant: "destructive",
           title: "Error",
@@ -220,7 +232,7 @@ export default function EditBook() {
   if (!book) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <Loader2 className="w-8 h-8 animate-spin" />
       </div>
     );
   }
@@ -228,10 +240,10 @@ export default function EditBook() {
   return (
     <Form {...form}>
       <div className="space-x-6">
-        <h1 className="text-2xl font-bold mb-6">Edit Book</h1>
+        <h1 className="mb-6 text-2xl font-bold">Edit Book</h1>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6">
             <FormField
               control={form.control}
               name="title"
@@ -304,7 +316,7 @@ export default function EditBook() {
                             !field.value && "text-muted-foreground"
                           )}
                         >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          <CalendarIcon className="w-4 h-4 mr-2" />
                           {field.value ? (
                             format(new Date(field.value), "PPP")
                           ) : (
@@ -385,14 +397,14 @@ export default function EditBook() {
                           size="icon"
                           className="shrink-0"
                         >
-                          <Plus className="h-4 w-4" />
+                          <Plus className="w-4 h-4" />
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
                           <DialogTitle>Add New Category</DialogTitle>
                         </DialogHeader>
-                        <div className="space-y-4 py-4">
+                        <div className="py-4 space-y-4">
                           <div className="space-y-2">
                             <Label htmlFor="name">Category Name</Label>
                             <Input
@@ -535,7 +547,7 @@ export default function EditBook() {
             <Button type="submit" disabled={isPending || isUploading}>
               {isPending || isUploading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Updating Book...
                 </>
               ) : (

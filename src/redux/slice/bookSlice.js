@@ -17,11 +17,14 @@ const bookSlice = createSlice({
       state.books = state.books.filter((book) => book._id !== action.payload);
     },
     updateBook: (state, action) => {
+      console.log("Redux: Updating book in state:", action.payload);
       const index = state.books.findIndex(
         (book) => book._id === action.payload._id
       );
+      console.log("Found book at index:", index);
       if (index !== -1) {
         state.books[index] = action.payload;
+        console.log("Book updated in redux state");
       }
     },
     purchasedBook: (state, action) => {

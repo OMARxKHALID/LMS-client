@@ -66,6 +66,9 @@ export function useBook() {
   };
 
   const editBook = async (bookId, bookData) => {
+    console.log("Starting book edit for ID:", bookId);
+    console.log("Book data to send:", bookData);
+
     try {
       const response = await fetch(`${BASE_URL}/${bookId}`, {
         method: "PUT",
@@ -75,11 +78,15 @@ export function useBook() {
         body: JSON.stringify(bookData),
       });
 
+      console.log("Edit book response status:", response.status);
+
       if (!response.ok) {
         throw new Error("Error updating book");
       }
 
       const updatedBook = await response.json();
+      console.log("Response from server:", updatedBook);
+      console.log("Dispatching updateBook action...");
       dispatch(updateBook(updatedBook));
       return updatedBook;
     } catch (error) {
