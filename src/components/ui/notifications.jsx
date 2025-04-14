@@ -6,19 +6,23 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "./hover-card";
 import { Button } from "./button";
 import { useSelector } from "react-redux";
 
-const Notifications = ({ borrows }) => {
-  const { user } = useSelector((state) => state.auth);
+const Notifications = () => {
   const [showNotifications, setShowNotifications] = useState(false);
+  const { borrows = [] } = useSelector((state) => state.borrow);
+  const { user } = useSelector((state) => state.auth);
 
-  const userBorrows = borrows.filter((borrow) => {
-    if (user.role === "admin") {
-      return true;
-    }
-    return borrow.borrowed_by._id === user._id;
-  });
+  // Ensure borrows is an array before filtering
+  const userBorrows = Array.isArray(borrows)
+    ? borrows.filter((borrow) => {
+        if (!borrow?.borrowed_by?._id) return false;
+        if (user?.role === "admin") return true;
+        return borrow.borrowed_by._id === user?._id;
+      })
+    : [];
 
   const notifications = {
     dueSoonBooks: userBorrows.filter((borrow) => {
+      if (!borrow?.expected_return_date) return false;
       const dueDate = new Date(borrow.expected_return_date);
       const today = new Date();
       const threeDaysFromNow = new Date(today.setDate(today.getDate() + 3));
@@ -30,6 +34,7 @@ const Notifications = ({ borrows }) => {
       );
     }),
     overdueBooks: userBorrows.filter((borrow) => {
+      if (!borrow?.expected_return_date) return false;
       const dueDate = new Date(borrow.expected_return_date);
       return dueDate < new Date() && borrow.status === "borrowed";
     }),
@@ -66,7 +71,7 @@ const Notifications = ({ borrows }) => {
       <HoverCardContent className="w-80" align="end">
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold">
-            {user.role === "admin" ? "All Notifications" : "My Notifications"}
+            {user?.role === "admin" ? "All Notifications" : "My Notifications"}
           </h3>
         </div>
         <ScrollArea
@@ -79,15 +84,17 @@ const Notifications = ({ borrows }) => {
                   <h4 className="mb-2 text-sm font-semibold">Due Soon</h4>
                   {notifications.dueSoonBooks.map((book) => (
                     <div
-                      key={book._id}
+                      key={book?._id || "fallback-key"}
                       className="p-2 mb-2 rounded-lg bg-muted/50"
                     >
                       <p className="text-sm font-medium">
-                        {book.borrowed_book.title}
+                        {book?.borrowed_book?.title || "Untitled Book"}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         Due:{" "}
-                        {format(new Date(book.expected_return_date), "PPP")}
+                        {book?.expected_return_date
+                          ? format(new Date(book.expected_return_date), "PPP")
+                          : "No date"}
                       </p>
                     </div>
                   ))}
@@ -100,15 +107,17 @@ const Notifications = ({ borrows }) => {
                   </h4>
                   {notifications.overdueBooks.map((book) => (
                     <div
-                      key={book._id}
+                      key={book?._id || "fallback-key"}
                       className="p-2 mb-2 bg-red-100 rounded-lg dark:bg-red-900/20"
                     >
                       <p className="text-sm font-medium">
-                        {book.borrowed_book.title}
+                        {book?.borrowed_book?.title || "Untitled Book"}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         Due:{" "}
-                        {format(new Date(book.expected_return_date), "PPP")}
+                        {book?.expected_return_date
+                          ? format(new Date(book.expected_return_date), "PPP")
+                          : "No date"}
                       </p>
                     </div>
                   ))}

@@ -50,25 +50,30 @@ export default function ManageBooks() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(
-      books.filter((book) => book.uploaded_by === user._id).length /
-        itemsPerPage
-    )
-  );
-
   const getCurrentBooks = () => {
     if (!books || books.length === 0) return [];
 
-    // Filter books uploaded by the logged-in user
-    const filteredBooks = books.filter((book) => book.uploaded_by === user._id);
+    // Show all books for admin, or filter by uploaded_by for regular users
+    const filteredBooks =
+      user.role === "admin"
+        ? books
+        : books.filter((book) => book.uploaded_by === user._id);
 
     // Paginate the filtered books
     const indexOfLastBook = currentPage * itemsPerPage;
     const indexOfFirstBook = indexOfLastBook - itemsPerPage;
     return filteredBooks.slice(indexOfFirstBook, indexOfLastBook);
   };
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(
+      (user.role === "admin"
+        ? books.length
+        : books.filter((book) => book.uploaded_by === user._id).length) /
+        itemsPerPage
+    )
+  );
 
   const handlePageChange = (pageNumber) => {
     if (pageNumber > 0 && pageNumber <= totalPages) {
@@ -115,28 +120,28 @@ export default function ManageBooks() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <Loader2 className="w-8 h-8 animate-spin" />
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-        <h2 className="text-2xl lg:text-3xl font-bold tracking-tight">
-          Manage Books
+      <div className="flex flex-col items-center justify-between gap-4 lg:flex-row">
+        <h2 className="text-2xl font-bold tracking-tight lg:text-3xl">
+          {user.role === "admin" ? "Manage All Books" : "Manage My Books"}
         </h2>
         <div className="flex justify-end">
           <Button size="sm" variant="outline" asChild>
             <Link to="/admin/create-book" className="flex items-center">
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="w-4 h-4 mr-2" />
               <span>Add New Book</span>
             </Link>
           </Button>
         </div>
       </div>
 
-      <div className="border-2 border-gray-200 rounded-lg overflow-hidden mb-4">
+      <div className="mb-4 overflow-hidden border-2 border-gray-200 rounded-lg">
         <Table>
           <TableHeader>
             <TableRow>
@@ -149,10 +154,9 @@ export default function ManageBooks() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {books.filter((book) => book.uploaded_by === user._id).length ===
-            0 ? (
+            {getCurrentBooks().length === 0 ? (
               <TableRow>
-                <TableCell colSpan="5" className="text-center">
+                <TableCell colSpan="6" className="text-center">
                   No books available.
                 </TableCell>
               </TableRow>
@@ -175,10 +179,10 @@ export default function ManageBooks() {
                       <PopoverTrigger asChild>
                         <Button
                           variant="ghost"
-                          className="h-8 w-8 p-0"
+                          className="w-8 h-8 p-0"
                           aria-label="Open product actions menu"
                         >
-                          <MoreHorizontal className="h-4 w-4" />
+                          <MoreHorizontal className="w-4 h-4" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent align="end" className="w-[150px]">
@@ -186,11 +190,11 @@ export default function ManageBooks() {
                           <AlertDialogTrigger asChild>
                             <Button
                               variant="ghost"
-                              className="flex items-center justify-between cursor-pointer w-full"
+                              className="flex items-center justify-between w-full cursor-pointer"
                               disabled={isPending}
                             >
                               {isPending ? "Deleting..." : "Delete"}
-                              <Trash className="h-4 w-4" />
+                              <Trash className="w-4 h-4" />
                             </Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
@@ -215,9 +219,9 @@ export default function ManageBooks() {
                         <Link to={`/admin/edit-book/${book._id}`}>
                           <Button
                             variant="ghost"
-                            className="flex items-center justify-between cursor-pointer w-full"
+                            className="flex items-center justify-between w-full cursor-pointer"
                           >
-                            Edit <Edit className="h-4 w-4" />
+                            Edit <Edit className="w-4 h-4" />
                           </Button>
                         </Link>
                       </PopoverContent>
@@ -230,7 +234,7 @@ export default function ManageBooks() {
         </Table>
       </div>
 
-      <div className="mt-4 flex justify-center">
+      <div className="flex justify-center mt-4">
         <Pagination>
           <PaginationContent>
             <PaginationItem>

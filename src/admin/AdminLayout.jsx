@@ -66,14 +66,16 @@ export default function AdminLayout() {
   const shortcutKey = navigator.platform.includes("Mac") ? "⌘" : "Ctrl";
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
+    <div className="flex flex-col min-h-screen md:flex-row">
       <SidebarProvider>
-        <Sidebar className="w-full md:w-56 flex-shrink-0">
+        <Sidebar className="flex-shrink-0 w-full md:w-56">
           <SidebarHeader>
             <div className="flex items-center justify-between px-4">
-              <h2 className="text-lg font-semibold">Admin Panel</h2>
+              <h2 className="text-lg font-semibold">
+                {user.role === "admin" ? "Admin Panel" : "User Panel"}
+              </h2>
               <Link to="/">
-                <Home className="h-5 w-5" />
+                <Home className="w-5 h-5" />
               </Link>
             </div>
           </SidebarHeader>
@@ -89,7 +91,7 @@ export default function AdminLayout() {
                         isActiveRoute("/admin") ? "bg-gray-100" : ""
                       }`}
                     >
-                      <LayoutDashboard className="h-5 w-5 mr-3" />
+                      <LayoutDashboard className="w-5 h-5 mr-3" />
                       <span>Dashboard</span>
                     </Link>
                   </SidebarMenuButton>
@@ -109,7 +111,7 @@ export default function AdminLayout() {
                           : ""
                       }`}
                     >
-                      <History className="h-5 w-5 mr-3" />
+                      <History className="w-5 h-5 mr-3" />
                       <span>Borrowed Books</span>
                     </Link>
                   </SidebarMenuButton>
@@ -129,7 +131,7 @@ export default function AdminLayout() {
                           : ""
                       }`}
                     >
-                      <History className="h-5 w-5 mr-3" />
+                      <History className="w-5 h-5 mr-3" />
                       <span>Purchased Books</span>
                     </Link>
                   </SidebarMenuButton>
@@ -151,7 +153,7 @@ export default function AdminLayout() {
                               : ""
                           }`}
                         >
-                          <BookOpen className="h-5 w-5 mr-3" />
+                          <BookOpen className="w-5 h-5 mr-3" />
                           <span>Manage Books</span>
                         </Link>
                       </SidebarMenuButton>
@@ -166,7 +168,7 @@ export default function AdminLayout() {
                               : ""
                           }`}
                         >
-                          <BookCopy className="h-5 w-5 mr-3 " />
+                          <BookCopy className="w-5 h-5 mr-3 " />
                           <span>Add New Book</span>
                         </Link>
                       </SidebarMenuButton>
@@ -181,7 +183,7 @@ export default function AdminLayout() {
                               : ""
                           }`}
                         >
-                          <FolderTree className="h-5 w-5 mr-3" />
+                          <FolderTree className="w-5 h-5 mr-3" />
                           <span>Categories</span>
                         </Link>
                       </SidebarMenuButton>
@@ -201,7 +203,7 @@ export default function AdminLayout() {
                               : ""
                           }`}
                         >
-                          <DollarSign className="h-5 w-5 mr-3" />
+                          <DollarSign className="w-5 h-5 mr-3" />
                           <span>Earnings</span>
                         </Link>
                       </SidebarMenuButton>
@@ -223,7 +225,7 @@ export default function AdminLayout() {
                           : ""
                       }`}
                     >
-                      <History className="h-5 w-5 mr-3" />
+                      <History className="w-5 h-5 mr-3" />
                       <span>Transactions</span>
                     </Link>
                   </SidebarMenuButton>
@@ -232,15 +234,15 @@ export default function AdminLayout() {
             </SidebarGroup>
           </SidebarContent>
 
-          <SidebarFooter className="border-t p-1">
+          <SidebarFooter className="p-1 border-t">
             <div className="flex items-center justify-between space-x-1">
               <ModeToggle />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center w-full text-left">
-                    <User2 className="h-4 w-4 mr-2" />
+                    <User2 className="w-4 h-4 mr-2" />
                     <span className="text-sm">{user?.user_name || "User"}</span>
-                    <ChevronUp className="ml-auto h-4 w-4" />
+                    <ChevronUp className="w-4 h-4 ml-auto" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="top" align="start" className="w-56">
@@ -271,8 +273,8 @@ export default function AdminLayout() {
         </Sidebar>
 
         <main className="flex-1 overflow-x-hidden overflow-y-auto">
-          <div className="container mx-auto px-4 py-6 sm:px-6 md:px-8">
-            <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-4">
+          <div className="container px-4 py-6 mx-auto sm:px-6 md:px-8">
+            <div className="flex flex-col items-center space-y-4 sm:flex-row sm:items-start sm:space-y-0 sm:space-x-4">
               <div className="w-full sm:w-auto">
                 <TooltipProvider>
                   <Tooltip>

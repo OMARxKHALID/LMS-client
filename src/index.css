@@ -72,3 +72,30 @@
 .rpv-default-layout__container {
   border: none !important;
 }
+
+/* Prevent text selection and protect content */
+.rpv-core__viewer {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+
+.rpv-core__viewer * {
+  pointer-events: none;
+}
+
+.rpv-core__viewer .rpv-core__page-layer {
+  pointer-events: auto;
+}
+
+/* Hide PDF from screenshots */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .rpv-core__viewer * {
+    display: none !important;
+  }
+}

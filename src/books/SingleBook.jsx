@@ -165,7 +165,7 @@ export default function SingleBook() {
     }
   };
 
-  const handlePurchase = async () => {
+  const handlePurchase = () => {
     if (!book) {
       toast({
         variant: "destructive",
@@ -184,45 +184,7 @@ export default function SingleBook() {
       return;
     }
 
-    const { _id: purchased_by } = user || {};
-    const { _id: purchased_book } = book;
-
-    setIsPurchasing(true);
-    try {
-      await purchaseBook({
-        purchased_book,
-        purchased_by,
-        quantity: 1,
-      });
-
-      const updatedBook = {
-        ...book,
-        available_copies: book.available_copies - 1,
-        total_copies: book.total_copies - 1,
-      };
-
-      dispatch(updateBook(updatedBook));
-      dispatch(
-        updateUser({
-          ...user,
-          purchased_books: [...user.purchased_books, book._id],
-        })
-      );
-
-      toast({
-        title: "Purchase Successful",
-        description: `${book.title} has been purchased successfully.`,
-      });
-    } catch (error) {
-      const errorMessage = error?.message || "An unexpected error occurred.";
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: errorMessage,
-      });
-    } finally {
-      setIsPurchasing(false);
-    }
+    navigate("/payment", { state: { book } });
   };
 
   if (isLoading) {
