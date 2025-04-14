@@ -34,7 +34,7 @@ function Transactions() {
   const filteredTransactions =
     role === "admin"
       ? transactions
-      : transactions.filter((t) => user?.transactions.includes(t._id));
+      : transactions.filter((t) => t.user._id === user._id); // Change this line to use t.user._id
 
   const sortedTransactions = [...filteredTransactions].sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -72,7 +72,7 @@ function Transactions() {
   return (
     <Card className="col-span-full">
       <CardHeader>
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
+        <div className="flex flex-col items-start justify-between space-y-2 sm:flex-row sm:items-center sm:space-y-0">
           <div>
             <CardTitle className="text-2xl font-bold">
               Transaction History
@@ -83,29 +83,29 @@ function Transactions() {
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={getTransactions}>
-              <RotateCcw className="mr-2 h-4 w-4" />
+              <RotateCcw className="w-4 h-4 mr-2" />
               Refresh
             </Button>
             <Button
               variant="outline"
               size="icon"
               onClick={handleExportCsv}
-              className="text-sm flex items-center"
+              className="flex items-center text-sm"
             >
-              <Download className="h-5 w-5" />
+              <Download className="w-5 h-5" />
               <span className="sr-only">Export CSV</span>
             </Button>
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+        <div className="grid gap-4 mb-6 md:grid-cols-2 lg:grid-cols-4">
           <Card className="bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900 dark:to-blue-800">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">
                 Total Transactions
               </CardTitle>
-              <BookOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <BookOpen className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{totalTransactions}</div>
@@ -120,7 +120,7 @@ function Transactions() {
               <CardTitle className="text-sm font-medium">
                 Successful Transactions
               </CardTitle>
-              <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />
+              <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{successfulTransactions}</div>
@@ -136,7 +136,7 @@ function Transactions() {
               <CardTitle className="text-sm font-medium">
                 Pending Transactions
               </CardTitle>
-              <Clock className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+              <Clock className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{pendingTransactions}</div>
@@ -151,7 +151,7 @@ function Transactions() {
               <CardTitle className="text-sm font-medium">
                 Failed Transactions
               </CardTitle>
-              <DollarSign className="h-4 w-4 text-red-600 dark:text-red-400" />
+              <DollarSign className="w-4 h-4 text-red-600 dark:text-red-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{failedTransactions}</div>
@@ -163,7 +163,7 @@ function Transactions() {
         </div>
 
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="w-full justify-start overflow-x-auto">
+          <TabsList className="justify-start w-full overflow-x-auto">
             <TabsTrigger value="all">All Transactions</TabsTrigger>
             <TabsTrigger value="successful">Successful</TabsTrigger>
             <TabsTrigger value="pending">Pending</TabsTrigger>

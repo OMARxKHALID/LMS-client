@@ -10,33 +10,34 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-const TransactionTable = ({ transactions, loading }) => {
+const TransactionTable = ({ transactions, loading, user }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[200px]">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <Loader2 className="w-8 h-8 animate-spin" />
       </div>
     );
   }
 
   if (transactions.length === 0) {
     return (
-      <div className="text-center py-6">
+      <div className="py-6 text-center">
         <p className="text-muted-foreground">No transactions found</p>
       </div>
     );
   }
 
   return (
-    <div className="border rounded-lg overflow-hidden mb-4">
+    <div className="mb-4 overflow-hidden border rounded-lg">
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>#</TableHead>
             <TableHead>Transaction ID</TableHead>
-            <TableHead>Book</TableHead>
-            <TableHead>User</TableHead>
+            <TableHead>Book Title</TableHead>
+            <TableHead>{user?.role === "admin" ? "User" : "Price"}</TableHead>
             <TableHead>Total Price</TableHead>
+            <TableHead>Payment Method</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Status</TableHead>
           </TableRow>
@@ -46,9 +47,31 @@ const TransactionTable = ({ transactions, loading }) => {
             <TableRow key={transaction._id}>
               <TableCell>{index + 1}</TableCell>
               <TableCell className="font-medium">{transaction._id}</TableCell>
-              <TableCell>{transaction.book.title}</TableCell>
-              <TableCell>{transaction.user.user_name}</TableCell>
+              <TableCell>{transaction.book?.title || "N/A"}</TableCell>
+              <TableCell>
+                {user?.role === "admin"
+                  ? transaction.user?.user_name
+                  : `$${transaction.book?.price || 0}`}
+              </TableCell>
               <TableCell>${transaction.total_price}</TableCell>
+              <TableCell>
+                {transaction.payment_details ? (
+                  <span
+                    className={`text-xs ${
+                      transaction.payment_details.card_type === "Invalid Card"
+                        ? "text-red-500"
+                        : "text-green-500"
+                    }`}
+                  >
+                    {transaction.payment_details.card_type} ••••{" "}
+                    {transaction.payment_details.last_four}
+                  </span>
+                ) : (
+                  <span className="text-xs text-muted-foreground">
+                    Payment information unavailable
+                  </span>
+                )}
+              </TableCell>
               <TableCell>
                 {format(new Date(transaction.transaction_date), "MMM dd")}
               </TableCell>

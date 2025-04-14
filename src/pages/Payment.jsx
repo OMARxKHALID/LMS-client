@@ -42,26 +42,86 @@ export default function Payment() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    let formattedValue = value;
+
+    if (name === "cardNumber") {
+      // Only format card number with digits
+      formattedValue = value.replace(/[^\d]/g, ""); // Remove non-digits
+      formattedValue = formattedValue.match(/.{1,4}/g)?.join(" ") || "";
+      formattedValue = formattedValue.substring(0, 19);
+    } else if (name === "expiryDate") {
+      // Only format expiry date with digits
+      formattedValue = value.replace(/[^\d]/g, "");
+      if (formattedValue.length >= 2) {
+        formattedValue =
+          formattedValue.substring(0, 2) + "/" + formattedValue.substring(2);
+      }
+      formattedValue = formattedValue.substring(0, 5);
+    } else if (name === "cvv") {
+      // Only allow digits for CVV
+      formattedValue = value.replace(/[^\d]/g, "");
+    }
+    // Card holder name doesn't need special formatting - allow all characters
+    // else if (name === "cardHolder") - no special handling needed
+
     setCardInfo((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: formattedValue,
     }));
+  };
+
+  const getCardType = (number) => {
+    number = number.replace(/\D/g, "");
+
+    // Test card numbers:
+    // Visa: 4111111111111111
+    // Mastercard: 5555555555554444
+    // Amex: 371449635398431
+
+    const patterns = {
+      visa: /^4[0-9]{12}(?:[0-9]{3})?$/,
+      mastercard: /^5[1-5][0-9]{14}$/,
+      amex: /^3[47][0-9]{13}$/,
+    };
+
+    if (patterns.visa.test(number)) return "Visa";
+    if (patterns.mastercard.test(number)) return "Mastercard";
+    if (patterns.amex.test(number)) return "American Express";
+    return "Invalid Card";
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
-    if (
-      !cardInfo.cardNumber ||
-      !cardInfo.cardHolder ||
-      !cardInfo.expiryDate ||
-      !cardInfo.cvv
-    ) {
+    // Validate card details
+    const cardNumberClean = cardInfo.cardNumber.replace(/\s/g, "");
+    const cardType = getCardType(cardNumberClean);
+
+    if (!cardInfo.cardHolder.trim()) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Please fill in all card details",
+        title: "Invalid card holder name",
+        description: "Please enter the card holder name",
+      });
+      return;
+    }
+
+    if (cardType === "Invalid Card") {
+      toast({
+        variant: "destructive",
+        title: "Invalid card number",
+        description:
+          "For testing, please use one of these numbers:\nVisa: 4111111111111111\nMastercard: 5555555555554444\nAmex: 371449635398431",
+      });
+      return;
+    }
+
+    const [month, year] = cardInfo.expiryDate.split("/");
+    if (!month || !year || month > 12 || month < 1) {
+      toast({
+        variant: "destructive",
+        title: "Invalid expiry date",
+        description: "Please enter a valid expiry date (MM/YY)",
       });
       return;
     }
@@ -71,11 +131,19 @@ export default function Payment() {
       const { _id: purchased_by } = user;
       const { _id: purchased_book } = book;
 
-      await purchaseBook({
+      const purchaseData = {
         purchased_book,
         purchased_by,
         quantity: 1,
-      });
+        payment_details: {
+          last_four: cardNumberClean.slice(-4),
+          card_holder: cardInfo.cardHolder,
+          expiry_date: cardInfo.expiryDate,
+          card_type: cardType,
+        },
+      };
+
+      await purchaseBook(purchaseData);
 
       const updatedBook = {
         ...book,
@@ -123,11 +191,20 @@ export default function Payment() {
               <Input
                 id="cardNumber"
                 name="cardNumber"
-                placeholder="1234 5678 9012 3456"
+                placeholder="For testing: 4111111111111111 (Visa)"
                 value={cardInfo.cardNumber}
                 onChange={handleInputChange}
-                maxLength={16}
+                maxLength={19}
               />
+              <p className="text-xs text-muted-foreground">
+                Test Cards:
+                <br />
+                Visa: 4111111111111111
+                <br />
+                Mastercard: 5555555555554444
+                <br />
+                Amex: 371449635398431
+              </p>
             </div>
 
             <div className="space-y-2">

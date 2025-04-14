@@ -44,7 +44,6 @@ import { updateUser } from "@/redux/slice/authSlice";
 export default function SingleBook() {
   const [isBorrowing, setIsBorrowing] = useState(false);
   const [selectedDueDate, setSelectedDueDate] = useState();
-  const [isPurchasing, setIsPurchasing] = useState(false);
 
   const params = useParams();
   const { toast } = useToast();
@@ -57,7 +56,6 @@ export default function SingleBook() {
   const { categories } = useSelector((state) => state.categories);
 
   const { borrowBook, getBorrowRecords } = useBorrow();
-  const { purchaseBook } = useBook();
 
   const book = books.find((book) => book._id === bookId);
   const category = categories.find(
@@ -399,17 +397,9 @@ export default function SingleBook() {
                       </Button>
                       <Button
                         onClick={handlePurchase}
-                        disabled={isPurchasing}
                         className="text-sm sm:text-base"
                       >
-                        {isPurchasing ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Purchasing...
-                          </>
-                        ) : (
-                          "Buy"
-                        )}
+                        Buy
                       </Button>
                     </div>
                   </div>
