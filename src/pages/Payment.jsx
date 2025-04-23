@@ -17,6 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export default function Payment() {
   const [isPurchasing, setIsPurchasing] = useState(false);
@@ -26,6 +27,8 @@ export default function Payment() {
     expiryDate: "",
     cvv: "",
   });
+  const [paymentType, setPaymentType] = useState("full");
+  const [installmentPlan, setInstallmentPlan] = useState("3months");
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -45,12 +48,10 @@ export default function Payment() {
     let formattedValue = value;
 
     if (name === "cardNumber") {
-      // Only format card number with digits
-      formattedValue = value.replace(/[^\d]/g, ""); // Remove non-digits
+      formattedValue = value.replace(/[^\d]/g, "");
       formattedValue = formattedValue.match(/.{1,4}/g)?.join(" ") || "";
       formattedValue = formattedValue.substring(0, 19);
     } else if (name === "expiryDate") {
-      // Only format expiry date with digits
       formattedValue = value.replace(/[^\d]/g, "");
       if (formattedValue.length >= 2) {
         formattedValue =
@@ -58,11 +59,8 @@ export default function Payment() {
       }
       formattedValue = formattedValue.substring(0, 5);
     } else if (name === "cvv") {
-      // Only allow digits for CVV
       formattedValue = value.replace(/[^\d]/g, "");
     }
-    // Card holder name doesn't need special formatting - allow all characters
-    // else if (name === "cardHolder") - no special handling needed
 
     setCardInfo((prev) => ({
       ...prev,
@@ -72,11 +70,6 @@ export default function Payment() {
 
   const getCardType = (number) => {
     number = number.replace(/\D/g, "");
-
-    // Test card numbers:
-    // Visa: 4111111111111111
-    // Mastercard: 5555555555554444
-    // Amex: 371449635398431
 
     const patterns = {
       visa: /^4[0-9]{12}(?:[0-9]{3})?$/,
@@ -90,10 +83,41 @@ export default function Payment() {
     return "Invalid Card";
   };
 
+  const calculateTotalWithInstallment = (price, months) => {
+    // Add 5% interest for installment plans
+    const interest = 0.05;
+    const totalWithInterest = price * (1 + interest);
+    return {
+      monthly: (totalWithInterest / months).toFixed(2),
+      total: totalWithInterest.toFixed(2),
+    };
+  };
+
+  const getPaymentAmount = () => {
+    if (paymentType === "installment") {
+      const { monthly } = calculateTotalWithInstallment(
+        book.price,
+        parseInt(installmentPlan)
+      );
+      return `${monthly}/mo`;
+    }
+    return book.price.toFixed(2);
+  };
+
+  const getTotalAmount = () => {
+    if (paymentType === "installment") {
+      const { total } = calculateTotalWithInstallment(
+        book.price,
+        parseInt(installmentPlan)
+      );
+      return total;
+    }
+    return book.price.toFixed(2);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate card details
     const cardNumberClean = cardInfo.cardNumber.replace(/\s/g, "");
     const cardType = getCardType(cardNumberClean);
 
@@ -135,6 +159,9 @@ export default function Payment() {
         purchased_book,
         purchased_by,
         quantity: 1,
+        payment_type: paymentType,
+        installment_plan:
+          paymentType === "installment" ? installmentPlan : null,
         payment_details: {
           last_four: cardNumberClean.slice(-4),
           card_holder: cardInfo.cardHolder,
@@ -185,7 +212,157 @@ export default function Payment() {
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              <Label>Payment Type</Label>
+              <RadioGroup
+                defaultValue="full"
+                onValueChange={setPaymentType}
+                className="grid grid-cols-2 gap-4"
+              >
+                <div className="relative">
+                  <RadioGroupItem
+                    value="full"
+                    id="full"
+                    className="sr-only peer"
+                  />
+                  <Label
+                    htmlFor="full"
+                    className="flex flex-col h-full p-4 border rounded-lg cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium">Full Payment</span>
+                      <span className="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary">
+                        Recommended
+                      </span>
+                    </div>
+                    <span className="text-2xl font-bold">${book.price}</span>
+                    <span className="mt-1 text-xs text-muted-foreground">
+                      Pay once, own forever
+                    </span>
+                  </Label>
+                </div>
+
+                <div className="relative">
+                  <RadioGroupItem
+                    value="installment"
+                    id="installment"
+                    className="sr-only peer"
+                  />
+                  <Label
+                    htmlFor="installment"
+                    className="flex flex-col h-full p-4 border rounded-lg cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5"
+                  >
+                    <span className="text-sm font-medium">
+                      Installment Plan
+                    </span>
+                    <span className="text-2xl font-bold">
+                      From $
+                      {calculateTotalWithInstallment(book.price, 12).monthly}/mo
+                    </span>
+                    <span className="mt-1 text-xs text-muted-foreground">
+                      Split into easy monthly payments
+                    </span>
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {paymentType === "installment" && (
+              <div className="p-4 space-y-4 border rounded-lg bg-muted/50">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-medium">Choose Your Plan</h3>
+                  <span className="text-xs text-muted-foreground">
+                    5% interest applied
+                  </span>
+                </div>
+                <RadioGroup
+                  defaultValue="3months"
+                  onValueChange={setInstallmentPlan}
+                  className="grid gap-4 sm:grid-cols-3"
+                >
+                  {["3months", "6months", "12months"].map((plan) => {
+                    const months = parseInt(plan);
+                    const { monthly, total } = calculateTotalWithInstallment(
+                      book.price,
+                      months
+                    );
+                    return (
+                      <div key={plan} className="relative">
+                        <RadioGroupItem
+                          value={plan}
+                          id={plan}
+                          className="sr-only peer"
+                        />
+                        <Label
+                          htmlFor={plan}
+                          className="flex flex-col p-4 border rounded-lg cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5"
+                        >
+                          <span className="text-sm font-medium">
+                            {months} Months
+                          </span>
+                          <span className="mt-1 text-2xl font-bold">
+                            ${monthly}
+                          </span>
+                          <span className="mt-1 text-xs text-muted-foreground">
+                            Total: ${total}
+                          </span>
+                        </Label>
+                      </div>
+                    );
+                  })}
+                </RadioGroup>
+
+                <div className="p-4 mt-4 border rounded bg-background">
+                  <h4 className="mb-2 text-sm font-medium">Payment Schedule</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">
+                        First payment today
+                      </span>
+                      <span className="font-medium">
+                        $
+                        {
+                          calculateTotalWithInstallment(
+                            book.price,
+                            parseInt(installmentPlan)
+                          ).monthly
+                        }
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">
+                        Monthly payment
+                      </span>
+                      <span className="font-medium">
+                        $
+                        {
+                          calculateTotalWithInstallment(
+                            book.price,
+                            parseInt(installmentPlan)
+                          ).monthly
+                        }
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">
+                        Total payment
+                      </span>
+                      <span className="font-medium">
+                        $
+                        {
+                          calculateTotalWithInstallment(
+                            book.price,
+                            parseInt(installmentPlan)
+                          ).total
+                        }
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="cardNumber">Card Number</Label>
               <Input
@@ -261,7 +438,12 @@ export default function Payment() {
               ) : (
                 <>
                   <CreditCard className="w-4 h-4 mr-2" />
-                  Pay ${book.price}
+                  Pay ${getPaymentAmount()}
+                  {paymentType === "installment" && (
+                    <span className="ml-1 text-xs">
+                      (Total: ${getTotalAmount()})
+                    </span>
+                  )}
                 </>
               )}
             </Button>

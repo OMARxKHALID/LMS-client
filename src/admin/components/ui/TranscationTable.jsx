@@ -37,6 +37,7 @@ const TransactionTable = ({ transactions, loading, user }) => {
             <TableHead>Book Title</TableHead>
             <TableHead>{user?.role === "admin" ? "User" : "Price"}</TableHead>
             <TableHead>Total Price</TableHead>
+            <TableHead>Payment Type</TableHead>
             <TableHead>Payment Method</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Status</TableHead>
@@ -54,6 +55,35 @@ const TransactionTable = ({ transactions, loading, user }) => {
                   : `$${transaction.book?.price || 0}`}
               </TableCell>
               <TableCell>${transaction.total_price}</TableCell>
+              <TableCell>
+                {transaction.payment_type === "installment" ? (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs font-medium text-blue-600">
+                      Installment Plan:{" "}
+                      {transaction.installment_plan?.plan_type}
+                    </span>
+                    <div className="flex flex-col">
+                      <span className="text-xs text-muted-foreground">
+                        Payment {transaction.payment_number || 1} of{" "}
+                        {transaction.installment_plan?.total_installments}
+                      </span>
+                      <span className="text-xs font-medium">
+                        ${transaction.total_price}/mo
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        Total: ${transaction.installment_plan?.total_amount}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col">
+                    <span className="text-xs">Full Payment</span>
+                    <span className="text-xs font-medium">
+                      ${transaction.total_price}
+                    </span>
+                  </div>
+                )}
+              </TableCell>
               <TableCell>
                 {transaction.payment_details ? (
                   <span

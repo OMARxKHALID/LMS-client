@@ -35,7 +35,6 @@ import {
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/utils/utils";
 import { updateBook } from "@/redux/slice/bookSlice";
-import { useBook } from "@/hooks/useBook";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { motion } from "framer-motion";
 import RelatedBooks from "@/components/ui/books/related-books";
@@ -348,6 +347,12 @@ export default function SingleBook() {
                       <Badge variant="success" className="text-xs sm:text-sm">
                         <CheckCircle className="w-3 h-3 mr-1 sm:h-4 sm:w-4" />
                         Available for Borrowing
+                      </Badge>
+                    )}
+                    {book.price > 0 && (
+                      <Badge variant="outline" className="text-xs sm:text-sm">
+                        <DollarSign className="w-3 h-3 mr-1 sm:h-4 sm:w-4" />
+                        Available for Installment
                       </Badge>
                     )}
                   </div>
